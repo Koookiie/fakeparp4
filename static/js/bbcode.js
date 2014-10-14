@@ -45,6 +45,7 @@ function bbEncode(S, isglobal) {
             case 'url':case 'email': return '<a target="_blank" '+ L[$1] + $2 +'">'+ $3 +'</a>';
             case 'pad': return '<span class="padded">'+ $3 +'</span>';
             case 'spoiler': return '<span class="spoil"><span class="spoiler">'+ $3 +'</span></span>';
+            case 'arq': return '<span class="arq"><img src="/static/img/arquius.png"></img></span>;
             case 'b':case 'i':case 'u':case 's':case 'sup':case 'sub': return '<'+ $1 +'>'+ $3 +'</'+ $1 +'>';
         }
         return '['+ $1 + ']'+ $3 +'[/'+ $1 +']';

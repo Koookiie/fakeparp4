@@ -1,0 +1,437 @@
+/* General */
+
+#conversation, #settings, #userList, #preview, .pager, #archiveConversation {
+    border: 1px solid #2b0057;
+}
+
+#conversation, #settings, #userList, #preview, .pager, #archiveConversation {
+    background-color: #eeeeee;
+}
+
+#chardrop option, #datadrop option {
+    width: 180px;
+    text-overflow: hidden;
+}
+
+.timestamp {
+    display: none;
+}
+
+p:hover .timestamp {
+    display: block;
+    float: right;
+    color: #666;
+}
+
+/* Chat layout */
+
+#conversation {
+    position: absolute;
+    top: 35px;
+    right: 5px;
+    bottom: 79px;
+    left: 5px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 2px;
+    background-position:center;
+    background-attachment:fixed;
+}
+
+#conversation p, #archiveConversation p, #online, #idle {
+    font-weight: bold;
+   /* overflow: hidden;*/
+}
+
+#conversation.search {
+    background-image: url('/static/img/throbber-big.gif');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+body.withSidebar #conversation {
+    right: 230px;
+}
+
+.sidebar {
+    display: none;
+    position: absolute;
+    top: 35px;
+    right: 5px;
+    bottom: 5px;
+    width: 218px;
+    overflow: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background-position: center;
+    background-size: cover;
+}
+
+.sidebar .closeit {
+    float: right;
+    margin-top: 8px;
+    margin-right: 6px;
+}
+
+.sidebar .close {
+    display: none;
+    margin-top: 7px;
+}
+
+#topic {
+    padding: 0 5px 5px;
+    word-wrap: break-word;
+}
+
+#topic:empty:after {
+    content: "(empty)";
+    padding: 2px 0;
+    color: #999999;
+    font-style: italic;
+}
+
+.sidebar ul {
+    margin: 0;
+    padding: 0 0 0 1.5em;
+}
+
+#metaOptions {
+    margin: 0;
+    padding: 0;
+    padding-left: 2px;
+    list-style-type: none;
+}
+
+#online:empty:after, #idle:empty:after {
+    content: "(no-one)";
+    display: block;
+    padding: 2px 0;
+    color: #999999;
+    font-style: italic;
+}
+
+.sidebar ul li {
+    padding: 2px 4px;
+}
+
+#online li, #idle li {
+    cursor: pointer;
+}
+
+.sidebar ul ul {
+    color: #000;
+}
+
+.sidebar audio {
+    width: 200px;
+}
+
+.controls {
+    position: fixed;
+    right: 8px;
+    bottom: 5px;
+    left: 8px;
+}
+
+body.withSidebar .controls {
+    right: 233px;
+}
+
+.controls input[type="submit"], .controls button {
+    font-family: Courier New;
+    font-weight: bold;
+    margin: 5px 0 0 0;
+}
+
+#preview {
+    display: none;
+    font-weight: bold;
+    margin: 0 -3px -1px -3px;
+    padding: 2px;
+    padding-left: 3px;
+    padding-right: 1px;
+    overflow: hidden;
+}
+
+#textInput {
+    font-family: Courier New;
+    background-color: #FFFFFF;
+    font-size: 12px;
+    font-weight: bold;
+    display: block;
+    width: 100%;
+    margin: 0 -3px;
+    padding: 2px;
+}
+
+textarea#textInput {
+    background-color: rgba(255,255,255,0.8);
+    border: 1px solid #000000;
+    resize: none;
+    border-radius: 0px;
+}
+
+textarea#textInput:hover {
+    background-color: #aFaFFF;
+}
+
+#statusInput {
+    font-family: Courier New;
+    font-size: 13px;
+    font-weight: bold;
+    margin-right: 0px;
+    border-right: none;
+}
+
+body #userListButton {
+    display: none;
+}
+
+.controls button[type="submit"] {
+    float: right;
+}
+
+.highlight {
+    background-color: #FFFFFF;
+    border: 1px solid #000000;
+}
+
+.blocking {
+    display: none;
+}
+
+body > #save {
+    display: none;
+}
+
+
+#topbar {
+    font-weight: bold;
+    position: absolute;
+    z-index: 1;
+    font-size: 20px;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 30px;
+    background-color: #810cc0;
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+#topbar, #topbar span {
+    color: black;
+}
+
+#topbar span span {
+    border-radius: 10px;
+}
+
+#topbar .left {
+    position: relative;
+    top: 3px;
+    left: 10px;
+}
+
+#topbar .right {
+    position: absolute;
+    top: 3px;
+    right: 10px;
+}
+
+#topbar .right span {
+    cursor: pointer;
+}
+
+#topbar .right span img {
+    position: relative;
+    top: 2px;
+    border-radius: 10px;
+    padding: 1px;
+}
+
+#topbar .middle {
+    position: absolute;
+    top: 3px;
+}
+
+#exclaim {
+    position: relative;
+    width: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#extain {
+    position: relative;
+    left: 3px;
+    cursor: pointer;
+}
+
+#reclaim {
+    position: relative;
+    left: 2px;
+}
+
+#ooclet {
+    display: inline-block;
+    height: 22px;
+    vertical-align: top;
+    cursor: pointer;
+}
+
+#topbar .middle a {
+    color: black;
+}
+
+/* Sidebars */
+
+#settings, #userList {
+    display: none;
+}
+
+#userList {
+    font-weight: bold;
+}
+
+.sidebar input[name="name"] {
+    width: 90%;
+}
+
+.sidebar input[name="acronym"] {
+    margin-bottom: 4px;
+}
+
+.sidebar .hidedesc {
+    margin-bottom: 5px;
+}
+
+.sidebar #chardrop, .sidebar #datadrop {
+    width: 100%;
+}
+
+/* User groups */
+
+.globalmod {
+    text-decoration: underline;
+}
+
+.mod, .mod2, .mod3 {
+    font-style: italic;
+}
+
+.silent {
+    text-decoration: line-through;
+}
+
+/* Moderation */
+
+#metaOptions, .modPowers #metaResults, #metaResults li {
+    display: none;
+}
+
+.modPowers #metaOptions {
+    display: block;
+}
+
+#metaOptions input {
+    vertical-align: middle;
+    margin: 0 0 0 2px;
+}
+
+/* Mobile */
+
+body.mobile .sidebar {
+    border: 0;
+    top: 30px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    width: auto;
+}
+
+body.mobile .sidebar .close {
+    display: block;
+    margin: 5px;
+    float: right;
+}
+
+body.mobile #conversation {
+    right: 5px !important;
+}
+
+body.mobile .controls {
+    right: 8px !important;
+}
+
+body.mobile #userListButton {
+    display: inline;
+}
+
+.userID {
+    display: block;
+    color: #000000;
+    font-size: 11px;
+}
+
+body.mobile.withSidebar #conversation {
+    overflow: hidden;
+}
+
+body.mobile.withSidebar .controls {
+    display: none;
+}
+
+/* Archive */
+
+.pager {
+    padding: 2px 5px;
+}
+
+#archiveConversation {
+    background-color: rgb(238, 238, 238);
+    margin: 5px 0;
+    padding: 2px 0;
+}
+
+/* Center */
+
+.centerHorizontal {
+    display: inline;
+    position: absolute;
+    left: 50%;
+}
+
+.centerVertical {
+    display: inline;
+    position: absolute;
+    top: 50%;
+}
+
+/* BBCode */
+
+.padded {
+	padding: 5px;
+	border-radius: 5px;
+}
+
+.spoil {
+    border: dashed;
+    border-width: 1px;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.spoiler{
+    opacity: 0;
+    cursor: pointer;
+}
+
+button { 
+    button: 1px solid #6a006a;}

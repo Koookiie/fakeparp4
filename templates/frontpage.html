@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% block header %}
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootswatch/3.2.0/cerulean/bootstrap.min.css">
+<link rel="stylesheet" href="/static/css/bshome.css">
+<link rel="stylesheet" media="screen" type="text/css" href="/static/colorpicker/css/colorpicker.css">
+<script type="text/javascript" src="/static/colorpicker/js/colorpicker.js"></script>
+<script src="/static/js/characters.js?8"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+{% if error=="chaturl_taken" or error=="chaturl_invalid" or error=="password_invalid" %}
+<script>
+    group_chat_error = 1;
+</script>
+{% else %}
+<script>
+    group_chat_error = 0;
+</script>
+{% endif %}
+
+<script src="/static/js/home.js?9"></script>
+{% endblock %}
+{% block content %}
+<form id="frontform" method="post" action="{{url_for('save')}}" role="form">
+<noscript>
+	<h1>You completely need javascript for this site. Turn it on or upgrade to a real browser.</h1>
+</noscript>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">erigam.tk</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a id="main" href="#" class="menuopt sel">Chat</a></li>
+                <li><a id="saved_characters" href="#" class="menuopt sel">Saved Characters</a></li>
+                <li><a id="character_database" href="#" class="menuopt sel">Character Database</a></li>
+                <li><a id="group_chat" href="#" class="menuopt sel">Groups</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</div>
+
+<div class="jumbotron mainjumbo">
+  <div class="container">
+    <h1>Erigam</h1>
+    <strong style="font-size: 18px"> {{message|safe}} </strong>
+    <p style="font-size: 15px">{{users_searching+users_chatting}} users online ({{users_searching}} searching, {{users_chatting}} chatting) {% if tagshow == 1 %} <br>Tags being searched: {{tagset.encode('utf-8')}} {% endif %}</p>
+  </div>
+</div>
+
+<div class="container">
+        {% if error=="name" %} <div class="alert alert-danger"><strong>You can't chat with a blank name!</strong></div>{% endif %}
+        {% if error=="case" %} <div class="alert alert-danger"><strong>Congratulations. You've somehow picked a case option which doesn't exist. I'm not sure how you got here, but I guess you'll just have to try again.</strong></div>{% endif %}
+        {% if error=="color" %} <div class="alert alert-danger"><strong>You entered an invalid hex code. Try using the color picker.</strong></div>{% endif %}
+        {% if error=="chaturl_taken" %}
+            <div class="alert alert-danger"><strong>The chat URL you specified has already been taken.</strong></div>
+        {% elif error=="chaturl_invalid" %}
+            <div class="alert alert-danger"><strong>The chat URL you specified is invalid. Chat URLs can only contain letters, numbers, hyphens and underscores.</strong></div>
+        {% elif error=="password_invalid" %}
+            <div class="alert alert-danger"><strong>Invalid Password.</strong></div>
+        {% endif %}
+        <div class="row">
+            <div class="opting main sopting">
+                <div class="options-contents" id="character-config">
+                <div class="col-md-6">
+                    <!-- Characters -->
+                    <div class="form-group">
+                        <select class="form-control" id="chardrop" size="1">
+                            <option>Saved Characters</option>
+                        </select>
+                        <select class="form-control" id="datadrop" size="1">
+                            <option>Character Database</option>
+                        </select>
+                    </div>
+
+                    <!-- Name -->
+                    <div class="form-group">
+                        <label>Username: </label>
+                        <input class="form-control" id="usingname" type="text" size="50" name="name" value="{{user.character['name']}}" maxlength="50"/>
+                    </div>
+
+                    <!-- Acronym -->
+                    <div class="form-group">
+                        <label>Alias: </label>
+                        <input class="form-control" id="ailin" type="text" size="15" name="acronym" value="{{user.character['acronym']}}" maxlength="15"/>
+                    </div>
+
+                    <!-- Color -->
+                    <div class="form-group">
+                        <label>Color: </label>
+                        <input class="form-control" id="coln" type="text" size="7" maxlength="6" name="color" value="{{user.character['color']}}"/>
+                    </div>
+
+                    <!-- Prefix & Suffix -->
+                    <div class="form-group">
+                        <label>Prefix: </label>
+                        <input class="form-control" id="prei" type="text" name="quirk_prefix" value="{{user.character['quirk_prefix']}}"/>
+                        <label>Suffix: </label>
+                        <input class="form-control" id="sufi" type="text" name="quirk_suffix" value="{{user.character['quirk_suffix']}}"/>
+                    </div>
+
+                    <!-- Quirks -->
+                    <div class="options-contents defaults-off" id="typing-quirks">
+
+                        <div class="form-group">
+                            <label>Letter replacements:</label>
+                            <ul id="replacementList">
+                                {% if replacements|length!=0 %}
+                                {% for replacement in replacements %}
+                                <li><input class="form-control quirks" type="text" name="quirk_from" size="4" value="{{replacement[0]}}"> to <input class="form-control quirks" type="text" name="quirk_to" size="4" value="{{replacement[1]}}"> <a href="#" class="btn btn-danger deleteReplacement">Remove</a></li>
+                                {% endfor %}
+                                {% else %}
+                                <li><input class="form-control quirks" type="text" name="quirk_from" size="4"> to <input class="form-control quirks" type="text" name="quirk_to" size="4"> <a href="#" class="btn btn-danger deleteReplacement">Remove</a></li>
+                                {% endif %}
+                            </ul>
+                            <a href="#" class="btn btn-primary" id="addReplacement">Add</a>
+                            <a href="#" class="btn btn-primary" id="clearReplacements">Clear</a>
+                        </div>
+                    </div>
+
+                    </div><div class="col-md-6">
+
+
+                    <!-- Case -->
+                    <div class="form-group">
+                        <label>Case:</label>
+                        <select class="form-control" id="casing" name="case">
+                            {% for case in case_options.items()|sort %}
+                            <option value="{{case[0]}}"{% if case[0]==user.character['case'] %} selected="selected"{%endif%}>{{case[1]}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- RP Type -->
+                    <div class="form-group">
+                        <label>Script or paragraph?</label>
+                        <select class="form-control" id="para" name="para">
+                            <option value="">No preference</option>
+                            <option value="0"{% if picky_options.get('para')=='0' %} selected="selected"{% endif %}>Script</option>
+                            <option value="1"{% if picky_options.get('para')=='1' %} selected="selected"{% endif %}>Paragraph</option>
+                        </select>
+                    </div>
+
+                    <!-- NSFW -->
+                    <div class="form-group">
+                        <label>Work-safe or not?</label>
+                        <select class="form-control" id="nsfwsfw" name="nsfw">
+                            <option id="sfwsel" value="0"{% if picky_options.get('nsfw2')=='0' %} selected="selected"{% endif %}>Safe for work</option>
+                            <option id="nsfwsel" value="1"{% if picky_options.get('nsfw2')=='1' %} selected="selected"{% endif %}>Not safe for work</option>
+                            <option id="nopref" value="2"{% if picky_options.get('nsfw2')=='2' %} selected="selected"{% endif %}>No preference</option>
+                        </select>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="form-group">
+                        <label>Tags: </label>
+                        <input class="form-control" type="text" id="tags" name="tags" size="50" maxlength="500" value="{{tag_text}}" placeholder="Seperate with commas: tag, -excludeTag">
+                    </div>
+
+                    <div class="form-group">
+                        <input class="form-control btn btn-primary chatbuttons" id="save" type="submit" name="save" value="Save">
+                        <input class="form-control btn btn-primary chatbuttons" type="submit" name="search" value="Start Chatting">
+                    </div>
+
+                    <div class="form-group">
+                        <a href="javascript:void(0)" class="btn btn-primary typetog">Replacements</a>
+                        <a class="form-control btn btn-primary chatbuttons" id="savca" href="javascript:void(0)">Save Locally</a>
+                    </div>
+
+                    <div class="form-group">
+                        <input class="form-control chatbuttons" type="text" name="decrypt" id="decryptChar" placeholder="Character Code">
+                        <a class="form-control btn btn-primary chatbuttons" id="savci" href="javascript:void(0)">Import Character</a>
+                    </div>
+                </div> <!-- End 6 grid -->
+                <div class="col-md-12">
+                    <!-- Quote -->
+                    <blockquote>
+                        <span class="pester-line" id="color-preview" style="color:#{{user.character['color']}};"><span id="acronym">??: </span><span id="quote">oh god how did this get here I am not good with computer</span></span>
+                    </blockquote>
+                </div>
+                </div>
+            </div>
+
+    <div class="opting group_chat">
+        <center>
+            <div class="form-group">
+                <input class="form-control groups" type="text" name="chaturl" id="groupsub" placeholder="Chat URL" maxlength="100">
+                <input class="form-control groups btn btn-primary" id="groupbut" type="submit" name="create" value="Create Chat Room">
+            </div>
+            <div class="form-group">
+                <input class="form-control groups" type="password" name="mod_pass" id="modpass" placeholder="Admin Password" maxlength="100">
+            </div>
+            <div class="group_container">
+                <h1>Public Groups</h1>
+                <br /><br />
+                <div class="active_container">
+                    {% for chat in active_pub %}
+                        <div id="chat_{{chat['url']}}">
+                            <h3 class="url"><a href="/chat/{{chat['url']}}">{{chat['url']}}</a></h3>
+                            <p class="topic">{{chat['topic']}}</p>
+                            <p class="online">
+                                <span class="num_active">Active: {{chat['active']}}</span>
+                                <span class="num_idle">Idle: {{chat['idle']}}</span>
+                                <p class="total">
+                                    <span class="num_total">Total: {{chat['active'] + chat['idle']}}</span>
+                                </p>
+                            </p>
+                            {% if chat['nsfw'] == True %}
+                                <p class="nsfw"> This chat is NSFW </p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </center>
+    </div>
+
+        <div class="opting saved_characters"></div>
+
+        <div class="opting character_database"></div>
+
+    </div>
+</div>
+</form>
+<span id="stori"></span>
+{% endblock %}

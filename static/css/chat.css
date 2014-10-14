@@ -1,0 +1,388 @@
+/* General */
+
+body {
+	margin: 5px;
+	background-color: #cccccc;
+	background-attachment: fixed;
+	word-wrap: break-word;
+}
+
+body, button, input, select, optgroup, option {
+	font-family: "Courier", monospace;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+a:hover {text-decoration: none;}
+A:link {text-decoration: none}
+A:visited {text-decoration: none}
+A:active {text-decoration: none}
+A:hover {text-decoration: underline}
+
+h1 {
+	font-size: 14pt;
+	word-wrap: break-word;
+}
+
+p {
+	margin: 0;
+	padding: 2px 5px;
+}
+
+hr {
+	margin: 5px 0;
+	border-color: #999999;
+	border-style: solid;
+	border-width: 1px 0 0 0;
+}
+
+button, input, select, #conversation, #settings, #userList, #preview, .pager, #archiveConversation, .aButton {
+	border: 1px solid #999999;
+	border-radius: 1px;
+}
+
+#conversation, #settings, #userList, #preview, .pager, #archiveConversation {
+	background-color: #eeeeee;
+}
+
+button, .aButton {
+	background-color: rgba(83,83,83,0.8);
+	color: #eeeeee;
+}
+
+input, select {
+	background-color: rgba(255,255,255,0.8);
+}
+
+input[type="submit"], button, .aButton {
+	margin: 1px;
+	display: inline-block;
+	padding: 2px 4px;
+	cursor: pointer;
+}
+
+input {
+	padding: 2px;
+}
+
+optgroup {
+	color: #666666;
+	font-style: normal;
+}
+
+optgroup option {
+	color: #000000;
+	padding: 0 10px;
+}
+
+input:focus, input:hover, select:focus, select:hover, button:hover, .aButton:hover {
+	background-color: #ffffff;
+}
+
+button:hover, .aButton:hover {
+	background-color: #666666;
+}
+
+.aButton:hover {
+	text-decoration: none;
+}
+
+.timestamp {
+	display: none;
+}
+
+p:hover .timestamp {
+	display: block;
+	float: right;
+	color: #666;
+}
+
+/* Chat layout */
+
+#conversation {
+	position: fixed;
+	top: 5px;
+	right: 5px;
+	bottom: 79px;
+	left: 5px;
+	overflow: auto;
+	padding: 2px 0;
+}
+
+#conversation.search {
+	background-image: url('/static/img/throbber-big.gif');
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+body.withSidebar #conversation {
+	right: 230px;
+}
+
+.sidebar {
+	display: none;
+	position: fixed;
+	top: 5px;
+	right: 5px;
+	bottom: 5px;
+	width: 218px;
+	overflow: auto;
+}
+
+.sidebar .close {
+	display: none;
+}
+
+#topic {
+	padding: 0 5px 5px;
+	word-wrap: break-word;
+}
+
+#topic:empty {
+	display: none;
+}
+
+.sidebar ul {
+	margin: 0;
+	padding: 0 0 0 2em;
+}
+
+#online:empty:after, #idle:empty:after {
+	content: "(no-one)";
+	display: block;
+	padding: 2px 0;
+	color: #999999;
+	font-style: italic;
+}
+
+.sidebar ul li {
+	padding: 2px 0;
+}
+
+#online li, #idle li {
+	cursor: pointer;
+}
+
+.sidebar ul ul {
+	color: #000;
+}
+
+#controls {
+	position: fixed;
+	right: 8px;
+	bottom: 5px;
+	left: 8px;
+}
+
+body.withSidebar #controls {
+	right: 233px;
+}
+
+#controls input[type="submit"], #controls button, .aButton {
+	margin: 5px 0 0 0;
+}
+
+#hidePreview {
+	position: absolute;
+	right: 0;
+	padding: 2px;
+}
+
+#preview {
+	margin: 0 -3px -1px -3px;
+	padding: 2px;
+	overflow: hidden;
+}
+
+#textInput {
+	display: block;
+	width: 100%;
+	margin: 0 -3px;
+	padding: 2px;
+}
+
+body #userListButton {
+	display: none;
+}
+
+#controls button[type="submit"] {
+	float: right;
+}
+
+.highlight {
+	background-color: rgba(255, 255, 255, 0.75);
+}
+
+body > #save {
+	display: none;
+}
+
+/* Sidebars */
+
+body.settings #settings, body.userList #userList {
+	display: block;
+}
+
+/* User groups */
+
+.globalmod {
+	text-decoration: underline;
+}
+
+.mod, .mod2, .mod3 {
+	font-style: italic;
+}
+
+.silent {
+	text-decoration: line-through;
+}
+
+/* Moderation */
+
+#metaOptions, .modPowers #metaResults, #metaResults li {
+	display: none;
+}
+
+#metaOptions input {
+	vertical-align: middle;
+	margin: 0 0 0 2px;
+}
+
+
+/* Mobile */
+
+body.mobile .sidebar {
+	left: 5px;
+	width: auto;
+}
+
+body.mobile .sidebar .close {
+	display: block;
+	margin: 5px;
+	float: right;
+}
+
+body.mobile #conversation {
+	right: 5px !important;
+}
+
+body.mobile #controls {
+	right: 8px !important;
+}
+
+body.mobile #userListButton {
+	display: inline;
+}
+
+body.mobile.withSidebar #conversation, body.mobile.withSidebar #controls {
+	display: none;
+}
+
+/* Archive */
+
+.pager {
+	padding: 2px 5px;
+}
+
+#archiveConversation {
+	margin: 5px 0;
+	padding: 2px 0;
+}
+
+/* BBCode */
+.padded {
+	padding: 5px;
+	border-radius: 5px;
+}
+
+.spoil {
+	border: dashed;
+	border-width: 1px;
+	padding-left: 2px;
+	padding-right: 2px;
+}
+
+.spoiler{
+	opacity: 0;
+	cursor: pointer;
+}
+
+.userID {
+	display: block;
+	color: #000000;
+	font-size: 11px;
+}
+
+#backgroundAudio {
+	width: 100%;
+}
+
+/* Online / Idle Status  */
+
+.sidebar h1 {
+	padding: 0 0.5em;
+}
+
+#online li {
+	list-style: none;
+	background: url("/static/img/sburb_green.png") no-repeat 0 0;
+	padding-left: 16px;
+	min-height:19px;
+}
+
+#idle li {
+	list-style: none;
+	background: url("/static/img/sburb_red.png") no-repeat 0 0;
+	padding-left: 16px;
+	min-height:19px;
+}
+
+#actionList li {
+	list-style: disc;
+	background: none;
+	padding-left: 0;
+}
+
+/* Sidebar Menu */
+
+#chatName {
+	text-align: center;
+}
+
+#menu, #unban {
+	display: none;
+}
+
+.modPowers #menu {
+	display: block;
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+.pwbPowers #unban {
+	display: inline-block;
+}
+
+#chatName {
+	padding: 5px;
+}
+
+#menu.showmenu #metaOptions {
+	display: block;
+}
+
+#menu:hover, .showmenu {
+	color: rgb(238, 238, 238);
+	background-color: rgb(153, 153, 153);
+}
+
+.button {
+	border: 1px solid rgba(0,0,0,0.0);
+	height: 25px;
+	width: 200px;
+	margin-bottom: 10px;
+}
+
+.active {
+	background-color: #333333;
+}

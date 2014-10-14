@@ -69,7 +69,6 @@ charaSaving = [
     ['Homestuck','Tavrisprite','TAVRISPRITE','0715CD','','normal'],
     ['Homestuck','Fefetasprite','FEFETASPRITE','B536DA','3833 <','normal',['E','-E','ee','33','H',')(','h',')(']],
     ['Homestuck','Erisolsprite','ERISOLSPRITE','4AC925','','normal',['I','II','i','ii','S','2','s','2','V','VV','v','vv','W','WW','w','ww']],
-    ['Homestuck','Arquiusprite','ARQUIUSPRITE','E00707','[arq]','normal'],
     ['Homestuck','The Handmaid','♈','A10000','','normal'],
     ['Homestuck','The Summoner','♉','A15000','','normal'],
     ['Homestuck','The Ψiioniic','♊','A1A100','','normal'],
@@ -292,24 +291,6 @@ $(document).ready(function() {
                                 cR++;
                             }
                         });
-                    } else if (o = 6) {
-                        $('#'+cInfoSav).append('Regex replacements: ');
-                        rInfo = eInfo;
-                        cR=0;
-                        $.each(rInfo, function(c) {
-                            rInfio = rInfo[c];
-                            cE=c%2;
-                            if (cE == 0) {
-                                $('#'+cInfoSav).append(rInfio+' to ');
-                                cR++;
-                            } else if (cR == rInfo.length-1) {
-                                $('#'+cInfoSav).append(rInfio);
-                                $('#'+cInfoSav).append('<br />');
-                            } else {
-                                $('#'+cInfoSav).append(rInfio+', ');
-                                cR++;
-                            }
-                        });
                     }
                 });
                 $('#'+cInfoSav).append('<span class="ccaode">Character&nbsp;Code:&nbsp;<span class="Scode">'+JSON.stringify(charInfo)+'</span></span><br />');
@@ -358,22 +339,16 @@ $(document).ready(function() {
             charin = JSON.parse(testCode);
             if (charin instanceof Array || $.isArray(charin)) {
                 if (testCode) {
+                    if (charin.length == 5) {
                     if (charin.length == 5) { //No replacement.
                         chariSav.unshift(charin);
                         localStorage.setItem('saveChar', JSON.stringify(chariSav));
                         alert('Your character has been saved!');
                         location.reload();
+                    } else if (charin.length == 6) {
+                        //TODO: Check if Replacements are divisible by 2.
                     } else if (charin.length == 6) { //Normal replacements.
                         if (charin[5] instanceof Array && charin[5].length%2 == 0) {
-                            chariSav.unshift(charin);
-                            localStorage.setItem('saveChar', JSON.stringify(chariSav));
-                            alert('Your character has been saved!');
-                            location.reload();
-                        } else {
-                            alert('That is not a valid code!');
-                        }
-                    } else if (charin.length == 7) { //Regex replacements.
-                        if (charin[6] instanceof Array && charin[6].length%2 == 0) {
                             chariSav.unshift(charin);
                             localStorage.setItem('saveChar', JSON.stringify(chariSav));
                             alert('Your character has been saved!');

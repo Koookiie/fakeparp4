@@ -5,4 +5,4 @@ Erigam is the forked code behind [erigam.tk](http://erigam.tk). It's available u
 
 It's driven by Python, Redis and MySQL.
 
-Disclaimer: This code is literal garbage and you shouldn't use any parts of it seriously. You have been warned.
+Disclaimer: This code is literal garbage and you shouldn't use any parts of it seriously.

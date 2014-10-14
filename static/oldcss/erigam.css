@@ -1,0 +1,304 @@
+
+/* Global*/
+
+body {
+    font-family: Helvetica Neue, Helvetica, Monospace;
+    font-size: 12px;
+}
+
+body {
+    margin: 5px;
+  /*  background-color: #FFFFFF;*/
+    background-attachment: fixed;
+    background-color: #b543f3;
+    background-image:none;
+    /*main one: http://i.imgur.com/1gA5miD.jpg*/
+    /*background-size: cover;*/
+    /*KARRY LOVES ANUS*/
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    word-wrap: break-word;
+}
+
+button, input, select {
+    font-size: 13px;
+    background-color: #ffffff;
+	border: 1px solid #ffffff;
+	border-radius: 0px;
+}
+
+input[type="submit"] {
+	cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance-: none;
+}
+
+input[name="chaturl"] {
+    cursor: text;
+}
+
+input[type="text"], textarea {
+    cursor: text;
+    -webkit-appearance: none;
+    -moz-appearance-: none;
+}
+
+input {
+    max-width: 100%;
+    padding: 2px 4px;
+}
+
+button {
+    padding: 2px 4px;
+    cursor: pointer;
+}
+
+label {
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+ul#replacementList {
+    padding-left: 0px;
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+.hidden {
+    display: none;
+}
+
+.typetog {
+    position: relative;
+    left: 2px;
+}
+
+.settingshap a:hover {
+    background-color: #aFaFFF;
+}
+
+input {
+    padding: 2px;
+}
+
+optgroup {
+    color: #666666;
+    font-style: normal;
+}
+
+optgroup option {
+    color: #000000;
+    padding: 0 10px;
+}
+
+h1 {
+    font-size: 14pt;
+    word-wrap: break-word;
+    margin: 5px;
+}
+
+p {
+    margin: 0;
+    padding: 2px 5px;
+}
+
+hr {
+    margin: 5px 0;
+    border-color: #000000;
+    border-style: solid;
+    border-width: 1px 0 0 0;
+}
+
+a.buttonlinka, .buttonlinka, .settingshap a {
+    font-size: 13px;
+    font-family: Arial;
+    background-color: rgba(255,255,255,0.8);
+    border: 1px solid #000000;
+    color: #000000;
+    cursor: pointer;
+    display: inline-block;
+    margin: 0px;
+    margin-top: 5px;
+    padding: 2px 4px;
+    text-decoration: none;
+}
+
+a.buttonlinka:hover, .buttonlinka:hover, .settingshap a:hover {
+    background-color: #aFaFFF;
+}
+
+
+div.options h1, div.options h2 {
+	margin: 0px;
+	display: inline;
+}
+
+div.options button {
+	vertical-align: 20%;
+}
+
+select.character-select {
+	font-size: 12pt;
+}
+
+#color-preview {
+	padding: 4px;
+	background-color: #FFFFFF;
+}
+
+label.quirk {
+	display: block;
+
+}
+
+.Sreplacements {
+    display: none;
+}
+
+.picky-group {
+	margin: 5px;
+	margin-left: 0.5em;
+}
+
+.picky-header {
+	font-weight: bold;
+}
+
+#saveOptions {
+    margin: 0px;
+    padding-left: 0px;
+    list-style-type: none;
+}
+
+#saveOptions li {
+	margin: 5px 0;
+}
+
+/* Chat */
+
+.stoptions label {
+    display: block;	
+}
+
+div.chat-container {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background: #EEE;
+}
+
+#chat-log {
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	overflow: auto;
+	position: absolute;
+}
+
+#chat-log-inner {
+	margin: 1em;
+}
+
+#chat-hover {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	border-top: 1px solid #DDD;	
+}
+
+#chat-hover input#chat-line {
+	width: 100%;
+	margin:0;
+	border-left: 0;
+	border-right: 0;
+}
+
+#preview-text {
+    margin-top: 3px;
+}
+
+#hide-preview {
+	position: absolute;
+	right: 0;
+	margin: 0;
+	padding: 0;
+	bottom: 23px;
+	text-decoration: none;
+}
+
+#hide-preview:link ,#hide-preview:visited {	
+	color: grey;
+}
+
+/* Local Options */
+
+.stoptions h2 {
+    margin: 0px;
+    margin-bottom: 5px;
+}
+
+.labeling {
+    position: relative;
+    top: -2px;
+}
+
+#chardrop {
+    display: none;
+}
+
+#chardrop, #datadrop {
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: ellipsis;
+    margin-bottom: 5px;
+}
+
+.fann {
+    display: inline-block;
+    vertical-align: top;
+    width: 30%;
+}
+
+.fandom {
+    margin: 5px;
+}
+
+#chardrop, #datadrop {
+    width: 25%;
+}
+
+/* MOBILE */
+
+body.mobile div.online-notice {
+    float: left;
+    display: block;
+    max-height: 100%;
+    max-width: 100%;
+}
+
+body.mobile div.useranch span {
+    display: block;
+    overflow: hidden;
+    border: 1px solid #92B792;
+}
+
+body.mobile div.useranch label {
+    float: left;
+}
+
+body.mobile div.useranch input {
+    width: 100%;
+    border: none;
+    margin: 0px;
+}
+
+body.mobile .fann, body.mobile #chardrop, body.mobile #datadrop {
+    width: 100%;
+}

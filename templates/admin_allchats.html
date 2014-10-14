@@ -1,0 +1,31 @@
+{% include 'header_admin.html' %}
+
+<div class="container">
+    <h1> All Chats <small>{{chats|length}} chats listed.</small> </h1>
+    <table class="table table-striped table-bordered" id="usertable">
+        <thead>
+            <tr>
+                <th class="col-sm-2">Chat</th>
+                <th class="col-sm-7">Topic</th>
+                <th class="col-sm-1">Active</th>
+                <th class="col-sm-1">Idle</th>
+                <th class="col-sm-1">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for chat in chats %}
+            <tr>
+                <td><a href="/chat/{{chat['url']}}">{{chat['url']}}</a></td>
+                <td>{{chat['topic'].decode('utf-8')}}</td>
+                <td>{{chat['active']}}</td>
+                <td>{{chat['idle']}}</td>
+                <td>{{chat['total_online']}}</td>
+            </tr>
+    {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</body>
+
+</html>

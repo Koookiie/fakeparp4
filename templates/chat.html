@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title%}{% endblock %}
+{% block header %}
+<link rel="stylesheet" href="/static/css/chat.css?3">
+<link rel="stylesheet" media="screen" type="text/css" href="/static/colorpicker/css/colorpicker.css"/>
+<script type="text/javascript" src="/static/colorpicker/js/colorpicker.js"></script>
+<script src="/static/js/characters.js?1"></script>
+<script src="/static/js/quirks.js?1"></script>
+<script type="text/javascript">
+	var user = {{character_dict|tojson|safe}};
+	var chat = {{(chat)|tojson|safe}};
+	var chat_meta = {{chat_meta|tojson|safe}};
+	var latestNum = {{latest_num}};
+	var highlightUser = {{highlight if highlight else "null"}};
+</script>
+<script src="/static/js/chat.js?7"></script>
+{% endblock %}
+{% block content %}
+<div id="conversation"{% if rnum == 1 %} style="transform: rotate(180deg);"{% endif %}>
+{% if chat_meta['type']!='unsaved' %}
+	<p><a href="/chat/{{chat}}/log" target="_blank">View earlier messages</a></p>
+{% endif %}
+{% for line in lines %}
+	{% if line.counter== -1 %}
+		{% set class = "system" %}
+	{% elif line.counter== -2 %}
+		{% set class = "system_important" %}
+	{% else %}
+		{% set class = "user" ~ line.counter %}
+	{% endif %}
+	<p class="{{class}} message" title="{{class}}" style="color: #{{line.color}}">{{line.line}}</p>
+{% endfor %}
+	<p class="system" title="system message" style="color: red; font-size: 20px">[ADMIN ANNOUNCEMENT] Check out our public Skype <a href="skype:?chat&blob=TH_Gep83BefdevlOkSUKXrb96VaElyOFFhmAgCjImPRfEYfIDcnngGRRSEDJydkTzUqHfT4Zk1h8QdV7OVJYKpoujas031zlPT-BjIXR26Wm1e0NIrJbPw">group</a>!</p>
+</div>
+
+
+<div id="userList" class="sidebar">
+	<a href="#" class="close">[close]</a>
+{% if chat_meta['type'] == 'group' %}
+	<h1 id="chatName">{{chat.replace('_', ' ')}}</h1>
+	<div id="menu">
+		<hr>
+		<h1 id="modSettings">&#9660; Mod Settings &#9660;</h1>
+		<div id="metaOptions">
+			<button type="button" class="button" id="topicButton">Change Topic</button>
+			<button type="button" class="button" id="bgButton">Change Background</button>
+			<button type="button" class="button" id="audioButton">Change BG Audio</button>
+			<button type="button" class="button metatog" id="autosilence"> Auto-silence new users </button>
+			<button type="button" class="button metatog {% if chat_meta['public']=='1' %}active{% endif %}" id="public"> Public Chat </button>
+			<button type="button" class="button metatog" id="nsfw"> NSFW </button>
+			<form action="/chat/{{chat}}/unban" target="_blank"><button type="submit" class="button metapwb" id="unban" value="Unban">Unban</button></form>
+		</div>
+		<hr>
+	</div>
+	{{"<h1>EXPERIMENTAL</h1>"|safe if chat_meta.beta}}
+	<p id="topic">{{chat_meta.get('topic','')}}</p>
+	<ul id="metaResults">
+		<li id="autosilenceResult">New users are auto-silenced.</li>
+		<li id="publicResult">This chat is public.</li>
+		<li id="nsfwResult">This chat is not safe for work.</li>
+	</ul>
+	<hr>
+{% endif %}
+	<h1 class="states">Online</h1>
+	<ul id="online"></ul>
+	<h1 class="states">Idle</h1>
+	<ul id="idle"></ul>
+</div>
+
+<form id="settings" class="sidebar">
+	<a href="#" class="close">[close]</a>
+
+	<div class="characterswitch">
+		<h1>Character</h1>
+		<p>
+			<select size="1" id="chardrop">
+				<option>Saved Characters</option>
+			</select>
+			<select size="1" id="datadrop">
+				<option>Character Database</option>
+			</select>
+		</p>
+		<p><input id="usingname" type="text" name="name" value="{{user.character['name']}}" maxlength="50"></p>
+		<p><input id="ailin" type="text" size="15" name="acronym" value="{{user.character['acronym']}}" maxlength="15"> <input id="coln" type="text" size="7" maxlength="6" name="color" value="{{user.character['color']}}"></p>
+	</div>
+	<p><label>Prefix: <input id="prei" type="text" size="8" name="quirk_prefix" value="{{user.character['quirk_prefix']}}" /></label></p>
+	<p><label>Suffix: <input id="sufi" type="text" size="8" name="quirk_suffix" value="{{user.character['quirk_suffix']}}" /></label></p>
+	<p><label>Case: <select id="casing" name="case">
+		{% for case in case_options.items()|sort %}
+		<option value="{{case[0]}}"{% if case[0]==user.character['case'] %} selected="selected"{%endif%}>{{case[1]}}</option>
+		{% endfor %}
+	</select></label></p>
+	<p>Replacements:</p>
+		<ul id="replacementList">
+			{% if character_dict['character']['replacements']|length!=0 %}
+			{% for replacement in character_dict['character']['replacements'] %}
+			<li><input type="text" name="quirk_from" size="4" value="{{replacement[0]}}"> to <input type="text" name="quirk_to" size="4" value="{{replacement[1]}}"> <a href="#" class="deleteReplacement">x</a></li>
+			{% endfor %}
+			{% else %}
+			<li><input type="text" name="quirk_from" size="4"> to <input type="text" name="quirk_to" size="4"> <a href="#" class="deleteReplacement">x</a></li>
+			{% endif %}
+		</ul>
+	<p><a href="#" id="addReplacement">[Add]</a> <a href="javascript:void(0)" id="clearReplacements">[Clear]</a></p>
+
+	<p><button type="submit">Apply</button> <button type="button" id="settingsCancelButton">Cancel</button></p>
+	<br />
+	<h1>Options</h1>
+	<!-- <p class="useroptions">
+		<div class="desknot"><input class="deskingtopnot" type="checkbox" name="desknot" /><label>Desktop Notifications</label></div>
+	</p> -->
+	<div class="stoptions">
+		<label><input type="checkbox" class="disnot" name="disnot" checked><span class="labeling disnota"> Confirm Window Close</span></label>
+		<label><input type="checkbox" class="sysnot" name="sysnot"><span class="labeling sysnota"> Hide System Notifications</span></label>
+		<label><input type="checkbox" class="oocset" name="oocset"><span class="labeling oocseta"> Out Of Character</span></label>
+		<label><input type="checkbox" class="bbset" name="bbset"><span class="labeling bbseta"> Sho BBCode Colors (Refresh)</span></label>
+		<label><input type="checkbox" class="audioset" name="audioset"><span class="labeling audioseta"> Enable Audio</span></label>
+		<label><input type="checkbox" class="bgset" name="bgset"><span class="labeling bgseta"> Enable Backgrounds</span></label>
+		<label><input type="checkbox" class="highlightall" name="highlightall"><span class="labeling highlightalla"> Highlight All</span></label>
+			</div>
+		</div>
+	</div>
+	<p class="settingshap">
+		<a id="viewLog" class="aButton" target="_blank" href="/chat/{{chat}}/log">Logs</a>
+		<a id="saveLog" class="aButton" href="javascript:void(0)">Save log</a>
+	</p>
+	<p class="settingshap">
+		<a id="inPass" class="aButton" href="javascript:void(0)">Admin Password<br /></a>
+		<a id="editPass" class="aButton" style="display:none;" href="javascript:void(0)">Change Admin Password<br /></a>
+	</p>
+	<p><audio id="backgroundAudio" src="" autoplay loop controls></audio></p>
+</form>
+
+<form id="controls" class="controls">
+	<a href="#" id="hidePreview">[hide]</a>
+	<div id="preview"></div>
+	<input type="text" id="textInput" name="textInput" autocomplete="off" maxlength="1500">
+	<button type="button" id="disconnectButton">Abscond</button>
+	<button type="button" id="idleButton">Idle</button>
+	<button type="button" id="userListButton">Users</button>
+	<button type="button" id="settingsButton">Settings</button>
+	<a id="logLink" class="aButton" target="_blank">Log</a>
+	<button type="submit">Send</button>
+</form>
+
+<div id="save">
+	<p>Did you enjoy that chat? If so, remember to save the log - the chat will be deleted from this URL in 7 days.</p>
+	<form action="/logs/save" method="post" target="_blank"><p>
+		<input type="hidden" name="chat" value="">
+		<input id="saveLink" type="submit" name="save" value="Save log">
+		<input type="submit" name="tumblr" value="Save log and post to Tumblr">
+	</p></form>
+</div>
+
+{% endblock %}

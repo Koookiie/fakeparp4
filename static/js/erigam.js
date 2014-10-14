@@ -69,10 +69,7 @@ charaSaving = [
     ['Homestuck','Tavrisprite','TAVRISPRITE','0715CD','','normal'],
     ['Homestuck','Fefetasprite','FEFETASPRITE','B536DA','3833 <','normal',['E','-E','ee','33','H',')(','h',')(']],
     ['Homestuck','Erisolsprite','ERISOLSPRITE','4AC925','','normal',['I','II','i','ii','S','2','s','2','V','VV','v','vv','W','WW','w','ww']],
-<<<<<<< HEAD
-=======
     ['Homestuck','Arquiusprite','ARQUIUSPRITE','E00707','[arq]','normal'],
->>>>>>> 96a832119cecec59b97e5244cbee8bcef863fa0b
     ['Homestuck','The Handmaid','♈','A10000','','normal'],
     ['Homestuck','The Summoner','♉','A15000','','normal'],
     ['Homestuck','The Ψiioniic','♊','A1A100','','normal'],
@@ -295,8 +292,6 @@ $(document).ready(function() {
                                 cR++;
                             }
                         });
-<<<<<<< HEAD
-=======
                     } else if (o = 6) {
                         $('#'+cInfoSav).append('Regex replacements: ');
                         rInfo = eInfo;
@@ -315,7 +310,6 @@ $(document).ready(function() {
                                 cR++;
                             }
                         });
->>>>>>> 96a832119cecec59b97e5244cbee8bcef863fa0b
                     }
                 });
                 $('#'+cInfoSav).append('<span class="ccaode">Character&nbsp;Code:&nbsp;<span class="Scode">'+JSON.stringify(charInfo)+'</span></span><br />');
@@ -364,21 +358,15 @@ $(document).ready(function() {
             charin = JSON.parse(testCode);
             if (charin instanceof Array || $.isArray(charin)) {
                 if (testCode) {
-<<<<<<< HEAD
                     if (charin.length == 5) {
-=======
                     if (charin.length == 5) { //No replacement.
->>>>>>> 96a832119cecec59b97e5244cbee8bcef863fa0b
                         chariSav.unshift(charin);
                         localStorage.setItem('saveChar', JSON.stringify(chariSav));
                         alert('Your character has been saved!');
                         location.reload();
-<<<<<<< HEAD
                     } else if (charin.length == 6) {
                         //TODO: Check if Replacements are divisible by 2.
-=======
                     } else if (charin.length == 6) { //Normal replacements.
->>>>>>> 96a832119cecec59b97e5244cbee8bcef863fa0b
                         if (charin[5] instanceof Array && charin[5].length%2 == 0) {
                             chariSav.unshift(charin);
                             localStorage.setItem('saveChar', JSON.stringify(chariSav));
@@ -387,8 +375,6 @@ $(document).ready(function() {
                         } else {
                             alert('That is not a valid code!');
                         }
-<<<<<<< HEAD
-=======
                     } else if (charin.length == 7) { //Regex replacements.
                         if (charin[6] instanceof Array && charin[6].length%2 == 0) {
                             chariSav.unshift(charin);
@@ -398,7 +384,6 @@ $(document).ready(function() {
                         } else {
                             alert('That is not a valid code!');
                         }
->>>>>>> 96a832119cecec59b97e5244cbee8bcef863fa0b
                     } else {
                         alert('That is not a valid code!');
                     }

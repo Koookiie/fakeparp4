@@ -1,7 +1,7 @@
 /* General */
 
 #conversation, #settings, #userList, #preview, .pager, #archiveConversation {
-    border: 1px solid #2b0057;
+    border: 1px solid #999999;
 }
 
 #conversation, #settings, #userList, #preview, .pager, #archiveConversation {

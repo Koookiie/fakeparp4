@@ -335,7 +335,7 @@ $(document).ready(function() {
 
         $('#savci').click(function() {
             chariSav = JSON.parse(localStorage.getItem('saveChar'));
-            charin = JSON.parse($('#decryptChar').val(););
+            charin = JSON.parse($('#decryptChar').val());
             if (charin instanceof Array || $.isArray(charin)) {
                 if (!charin) { alert('That is not a valid code!'); }
                 if (charin.length == 5) {

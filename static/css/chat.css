@@ -99,6 +99,12 @@ p:hover .timestamp {
 
 /* Chat layout */
 
+#topbar {
+	background-color: #eeeeee;
+	border: 1px solid #999999;
+	padding: 2px 5px;
+}
+
 #conversation {
 	position: fixed;
 	top: 30px;

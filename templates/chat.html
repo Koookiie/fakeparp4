@@ -53,8 +53,8 @@
 			<button type="button" class="button metatog" id="nsfw"> NSFW </button>
 			<form action="/chat/{{chat}}/unban" target="_blank"><button type="submit" class="button metapwb" id="unban" value="Unban">Unban</button></form>
 		</div>
+		<hr>
 	</div>
-	<hr>
 	{{"<h1>EXPERIMENTAL</h1>"|safe if chat_meta.beta}}
 	<p id="topic">{{chat_meta.get('topic','')}}</p>
 	<ul id="metaResults">

@@ -54,6 +54,7 @@
 			<form action="/chat/{{chat}}/unban" target="_blank"><button type="submit" class="button metapwb" id="unban" value="Unban">Unban</button></form>
 		</div>
 	</div>
+	<hr>
 	{{"<h1>EXPERIMENTAL</h1>"|safe if chat_meta.beta}}
 	<p id="topic">{{chat_meta.get('topic','')}}</p>
 	<ul id="metaResults">
@@ -61,7 +62,6 @@
 		<li id="publicResult">This chat is public.</li>
 		<li id="nsfwResult">This chat is not safe for work.</li>
 	</ul>
-	<hr>
 {% endif %}
 	<h1 class="states">Online</h1>
 	<ul id="online"></ul>

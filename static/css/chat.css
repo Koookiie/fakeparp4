@@ -392,3 +392,7 @@ body.mobile.withSidebar #conversation, body.mobile.withSidebar #controls {
 .active {
 	background-color: #333333;
 }
+
+#topic:not(:empty) {
+	border-bottom: 1px solid #999999;
+}

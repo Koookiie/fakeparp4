@@ -333,14 +333,12 @@ body.mobile.withSidebar #conversation, body.mobile.withSidebar #controls {
 	list-style: none;
 	background: url("/static/img/sburb_green.png") no-repeat 0 0;
 	padding-left: 16px;
-	min-height:19px;
 }
 
 #idle li {
 	list-style: none;
 	background: url("/static/img/sburb_red.png") no-repeat 0 0;
 	padding-left: 16px;
-	min-height:19px;
 }
 
 #actionList li {

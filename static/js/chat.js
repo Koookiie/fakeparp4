@@ -1102,7 +1102,7 @@ $(document).ready(function() {
             if ($("#user"+counterstyping[x]).length) {
                 // seriously, i don't know what this does but it works
                 // nevermind
-                var name = $("#user"+counterstyping[x])[0].firstChild.nodeValue;
+                var name = $("#user"+counterstyping[x]).data()['character']['name'];
                 if (counterstyping.length === 1) {
                     // the cases so we don't have "anonymous, is typing..."
                     typingString = name;

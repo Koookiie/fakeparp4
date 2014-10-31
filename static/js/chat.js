@@ -388,7 +388,7 @@ $(document).ready(function() {
                 msgClass = 'user'+msg.counter;
             }
 
-            if ($.inArray(msg.counter, globals) != -1 || msg.counter == -123 || msg.counter == -3){
+            if ($.inArray(msg.counter, globals) !== -1 || msg.counter == -123 || msg.counter == -3){
                 message = bbEncode(htmlEncode(linkify(msg.line)), true);
             } else {
                 message = bbEncode(htmlEncode(linkify(msg.line)), false);

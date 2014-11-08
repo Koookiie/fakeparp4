@@ -37,6 +37,9 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         if message["a"] in ("typing", "stopped_typing") and 'c' in message:
             try:
                 counter = int(message['c'])
+                session = r.hget("chat.%s.counters" % (self.chat), counter)
+                if self.remote_ip != r.hget("session.%s.meta" % (session), "last_ip"):
+                    return
             except TypeError:
                 return
             r.publish("chat:"+str(self.chat), json.dumps({

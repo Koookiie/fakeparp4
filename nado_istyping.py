@@ -6,9 +6,11 @@ from tornado.gen import engine, Task
 import ujson as json
 from tornadoredis import Client
 import redis
+import re
 
 print "WS Server started!"
 
+session_validator = re.compile('^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$')
 r = redis.Redis()
 wsclients = set()
 
@@ -20,6 +22,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         self.chat = chat
         self.redis_listen("chat:"+str(self.chat))
         self.remote_ip = self.request.headers.get('X-Forwarded-For', self.request.headers.get('X-Real-Ip', self.request.remote_ip))
+        self.session = self.get_cookie("session", None)
         wsclients.add(self)
         print '[{ip}|{chat}] connected to server ({connected} connected to server)'.format(
             ip=self.remote_ip,
@@ -28,6 +31,9 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         )
 
     def on_message(self, msg):
+        if self.session is None or session_validator.match(self.session) is None:
+            return
+
         print "[{ip}|{chat}] WS message: {msg}".format(
             ip=self.remote_ip,
             chat=self.chat,
@@ -37,8 +43,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         if message["a"] in ("typing", "stopped_typing") and 'c' in message:
             try:
                 counter = int(message['c'])
-                session = r.hget("chat.%s.counters" % (self.chat), counter)
-                if self.remote_ip != r.hget("session.%s.meta" % (session), "last_ip"):
+                if self.remote_ip != r.hget("session.%s.meta" % (self.session), "last_ip"):
                     return
             except TypeError:
                 return

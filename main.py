@@ -47,6 +47,8 @@ def show_homepage(error):
         metadata['url'] = chat
         metadata['total_online'] = metadata['active'] + metadata['idle']
         metadata['nsfw'] = metadata.get('nsfw') == "1"
+        if 'topic' in metadata:
+            metadata['topic'] = unicode(metadata['topic'], encoding='utf8')
         sessions.append(metadata)
 
     sessions = sorted(sessions, key=lambda k: k['total_online'])

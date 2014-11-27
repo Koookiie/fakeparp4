@@ -24,21 +24,11 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         self.remote_ip = self.request.headers.get('X-Forwarded-For', self.request.headers.get('X-Real-Ip', self.request.remote_ip))
         self.session = self.get_cookie("session", None)
         wsclients.add(self)
-        print '[{ip}|{chat}] connected to server ({connected} connected to server)'.format(
-            ip=self.remote_ip,
-            chat=self.chat,
-            connected=len(wsclients)
-        )
 
     def on_message(self, msg):
         if self.session is None or session_validator.match(self.session) is None:
             return
 
-        print "[{ip}|{chat}] WS message: {msg}".format(
-            ip=self.remote_ip,
-            chat=self.chat,
-            msg=msg
-        )
         message = json.loads(msg)
         if message["a"] in ("typing", "stopped_typing") and 'c' in message:
             try:
@@ -55,11 +45,6 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
         self.redis_client.unsubscribe("chat:"+str(self.chat))
         wsclients.discard(self)
-        print '[{ip}|{chat}] connection closed. ({connected} connected to server)'.format(
-            ip=self.remote_ip,
-            chat=self.chat,
-            connected=len(wsclients)
-        )
 
     @engine
     def redis_listen(self, channel):

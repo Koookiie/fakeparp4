@@ -1099,24 +1099,6 @@ $(document).ready(function() {
         } else {
             $("#istyping").text("Someone is typing...");
         }
-
-        var von = conversation.scrollTop()+conversation.height()+24;
-        var don = conversation[0].scrollHeight;
-        var lon = don-von;
-        if (lon <= 30){
-            flip = 1;
-        } else {
-            flip = 0;
-        }
-        if (flip == 1) {
-            conversation.scrollTop(conversation[0].scrollHeight);
-            flip = 0;
-        }
-        if (chatState != 'inactive') {
-            window.setTimeout(typingNotifications, 500);
-        };
-        // if i have to put a comment that says end
-        // the code is crap
     }
 
     window.setTimeout(typingNotifications, 500);

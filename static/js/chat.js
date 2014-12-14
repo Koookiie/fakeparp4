@@ -434,7 +434,6 @@ $(document).ready(function() {
             closeSettings();
             getMessages();
             pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
-            window.setTimeout(typingNotifications, 500);
         }
 
         function getMessages() {
@@ -1095,6 +1094,8 @@ $(document).ready(function() {
             $("#istyping").text("Someone is typing...");
         }
     }
+
+    window.setTimeout(typingNotifications, 500);
 
     if (window.WebSocket) {
         function start(reason){

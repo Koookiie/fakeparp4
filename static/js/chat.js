@@ -1109,18 +1109,15 @@ $(document).ready(function() {
                 var wsaction = message.a
                 var wscounter = message.c;
                 if (wsaction=="typing") {
-                    // what the f*ck
                     if ($.inArray(wscounter, counterstyping) !== -1) {
                         window.clearTimeout(counterintervals[wscounter]);
-                        counterintervals[wscounter] = window.setTimeout(function(){
-                            removeItem(wscounter, counterstyping);
-                        }, 8000);
-                    } else {
-                        counterstyping.push(wscounter)
-                        counterintervals[wscounter] = window.setTimeout(function(){
-                            removeItem(wscounter, counterstyping);
-                        }, 8000);
+                    else {
+                        counterstyping.push(wscounter);
                     }
+
+                    counterintervals[wscounter] = window.setTimeout(function(){
+                        removeItem(wscounter, counterstyping);
+                    }, 8000);
                 } else if (wsaction=="stopped_typing") {
                     removeItem(wscounter, counterstyping);
                     window.clearTimeout(counterintervals[wscounter]);
@@ -1128,7 +1125,9 @@ $(document).ready(function() {
             }
 
             ws.onclose = function(){
-                if (chatState != 'inactive'){setTimeout(function(){start('auto')}, 10000);}
+                if (chatState != 'inactive'){
+                    setTimeout(start, 10000, 'auto');
+                }
             }  
         }
         start('manual');

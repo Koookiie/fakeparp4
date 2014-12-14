@@ -1085,13 +1085,14 @@ $(document).ready(function() {
             return;
         } else if (chatState == "inactive") {
             return;
+        } else {
+            $("#istyping").animate({opacity: 1});
         }
 
         if (!$("#istyping").length) {
             $('<p>').addClass("message").attr('title', 'system').css('color', '#000000').attr('id', 'istyping').html("Someone is typing...").appendTo("#conversation");
         } else {
             $("#istyping").text("Someone is typing...");
-            $("#istyping").animate({opacity: 1});
         }
     }
 

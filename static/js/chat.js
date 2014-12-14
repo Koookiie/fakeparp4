@@ -1083,14 +1083,15 @@ $(document).ready(function() {
         if (counterstyping.length === 0) {
             // and if the typing indicator is there
             if ($("#istyping").length) {
-                // screw this why am i commenting
                 $("#istyping").animate({opacity: 0})
             }
             // pebis
             window.setTimeout(typingNotifications, 500);
             return;
         } else if (chatState == "inactive") {
-            return ;
+            return;
+        } else {
+            $("#istyping").animate({opacity: 1});
         }
 
         // lol javascript wtf am i doing
@@ -1110,14 +1111,11 @@ $(document).ready(function() {
             }
         }
 
-        // suck my dinger donger
         if (!$("#istyping").length) {
             $('<p>').addClass("message").attr('title', 'system').css('color', '#000000').attr('id', 'istyping').html(typingString + " is typing...").appendTo("#conversation");
         } else {
             $("#istyping").text(typingString + " is typing...");
         }
-
-        //ripped directly from the scroll code, temporary hack please clean
 
         var von = conversation.scrollTop()+conversation.height()+24;
         var don = conversation[0].scrollHeight;

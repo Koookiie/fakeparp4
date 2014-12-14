@@ -1094,28 +1094,7 @@ $(document).ready(function() {
             $("#istyping").animate({opacity: 1});
         }
 
-        // lol javascript wtf am i doing
-        var typingString = " ";
-
-        for (var x=0; x < counterstyping.length; x++) {
-            if ($("#user"+counterstyping[x]).length) {
-                // seriously, i don't know what this does but it works
-                // nevermind
-                var name = $("#user"+counterstyping[x]).data()['character']['name'];
-                if (counterstyping.length === 1) {
-                    // the cases so we don't have "anonymous, is typing..."
-                    typingString = name;
-                } else {
-                    typingString = typingString + name + ", ";
-                }
-            }
-        }
-
-        if (!$("#istyping").length) {
-            $('<p>').addClass("message").attr('title', 'system').css('color', '#000000').attr('id', 'istyping').html(typingString + " is typing...").appendTo("#conversation");
-        } else {
-            $("#istyping").text(typingString + " is typing...");
-        }
+        $("#istyping").text("Someone is typing...");
 
         var von = conversation.scrollTop()+conversation.height()+24;
         var don = conversation[0].scrollHeight;

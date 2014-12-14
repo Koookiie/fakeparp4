@@ -1077,33 +1077,24 @@ $(document).ready(function() {
         ws.send(JSON.stringify({a: 'stopped_typing', c: user.meta.counter}));
     }
 
-    function typingNotifications() { // is a function really needed for putting down a simple message
-
-        // If there are no counters in the array and the chat is active...
+    function typingNotifications() {
         if (counterstyping.length === 0) {
-            // and if the typing indicator is there
-            if ($("#istyping").length) {
-                $("#istyping").animate({opacity: 0})
-            }
-            // pebis
+            $("#istyping").animate({opacity: 0})
             window.setTimeout(typingNotifications, 500);
             return;
         } else if (chatState == "inactive") {
             return;
-        } else {
-            $("#istyping").animate({opacity: 1});
         }
 
         if (!$("#istyping").length) {
             $('<p>').addClass("message").attr('title', 'system').css('color', '#000000').attr('id', 'istyping').html("Someone is typing...").appendTo("#conversation");
         } else {
             $("#istyping").text("Someone is typing...");
+            $("#istyping").animate({opacity: 1});
         }
     }
 
     window.setTimeout(typingNotifications, 500);
-
-    // xxx move this to seperate file 
 
     function removeItem(item, array) {
         array.splice($.inArray(item, array), 1);

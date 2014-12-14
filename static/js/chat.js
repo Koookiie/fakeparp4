@@ -1084,7 +1084,7 @@ $(document).ready(function() {
             // and if the typing indicator is there
             if ($("#istyping").length) {
                 // screw this why am i commenting
-                $("#istyping").fadeOut(1000);
+                $("#istyping").animate({opacity: 0})
             }
             // pebis
             window.setTimeout(typingNotifications, 500);

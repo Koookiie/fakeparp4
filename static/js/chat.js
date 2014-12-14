@@ -1094,7 +1094,11 @@ $(document).ready(function() {
             $("#istyping").animate({opacity: 1});
         }
 
-        $("#istyping").text("Someone is typing...");
+        if (!$("#istyping").length) {
+            $('<p>').addClass("message").attr('title', 'system').css('color', '#000000').attr('id', 'istyping').html("Someone is typing...").appendTo("#conversation");
+        } else {
+            $("#istyping").text("Someone is typing...");
+        }
 
         var von = conversation.scrollTop()+conversation.height()+24;
         var don = conversation[0].scrollHeight;

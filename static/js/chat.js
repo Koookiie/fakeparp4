@@ -1093,6 +1093,7 @@ $(document).ready(function() {
         } else {
             $("#istyping").text("Someone is typing...");
         }
+        window.setTimeout(typingNotifications, 500);
     }
 
     window.setTimeout(typingNotifications, 500);

@@ -113,6 +113,10 @@ function cmobile() {
     }
 }
 
+function removeItem(item, array) {
+    array.splice($.inArray(item, array), 1);
+}
+
 $(document).ready(function() {
 
     if (cmobile()) {

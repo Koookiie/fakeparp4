@@ -1111,7 +1111,7 @@ $(document).ready(function() {
                 if (wsaction=="typing") {
                     if ($.inArray(wscounter, counterstyping) !== -1) {
                         window.clearTimeout(counterintervals[wscounter]);
-                    else {
+                    } else {
                         counterstyping.push(wscounter);
                     }
 

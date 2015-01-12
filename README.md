@@ -1,7 +1,7 @@
-erigam.tk
+rp.terminallycapricio.us
 ======
 
-Erigam is the forked code behind [erigam.tk](http://erigam.tk). It's available under the MIT license. It is based off of MSPARP and Charat, which is the code for [msparp.com](http://msparp.com).
+Code for [rp.terminallycapricio.us](http://rp.terminallycapricio.us). Used to be erigam but domain changed. It's available under the MIT license. It is based off of MSPARP and Charat, which is the code for [msparp.com](http://msparp.com).
 
 It's driven by Python, Redis and MySQL.
 

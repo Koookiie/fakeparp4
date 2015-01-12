@@ -16,9 +16,6 @@
 <script src="/static/js/chat.js?7"></script>
 {% endblock %}
 {% block content %}
-<div id="topbar">
-	<a href="/">Home</a>
-</div>
 <div id="conversation"{% if rnum == 1 %} style="transform: rotate(180deg);"{% endif %}>
 {% if chat_meta['type']!='unsaved' %}
 	<p><a href="/chat/{{chat}}/log" target="_blank">View earlier messages</a></p>

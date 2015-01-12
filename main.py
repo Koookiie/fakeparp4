@@ -2,7 +2,6 @@ try:
     import ujson as json
 except:
     import json
-import traceback
 import datetime
 from flask import Flask, g, request, render_template, redirect, url_for, jsonify, abort
 from random import randint
@@ -15,7 +14,7 @@ from socket import inet_aton
 from lib import SEARCH_PERIOD, ARCHIVE_PERIOD, OUBLIETTE_ID, get_time, validate_chat_url, DogeNotPaidException
 from lib.archive import archive_chat, get_or_create_log
 from lib.characters import CHARACTER_GROUPS, CHARACTERS
-from lib.messages import parse_line, send_message
+from lib.messages import parse_line
 from lib.model import Chat, ChatSession, Log, LogPage
 from lib.request_methods import populate_all_chars, connect_redis, connect_mysql, create_normal_session, set_cookie, disconnect_redis, disconnect_mysql
 from lib.sessions import CASE_OPTIONS
@@ -241,7 +240,7 @@ def save():
             if not validate_chat_url(chat):
                 raise ValueError('chaturl_invalid')
             if mod_pass == '':
-            	raise ValueError('password_invalid')
+                raise ValueError('password_invalid')
             g.user.set_chat(chat)
             if g.user.meta['group']!='globalmod':
                 g.user.set_group('mod')
@@ -287,8 +286,6 @@ def save_log(chat_url=None):
         g.redis.zadd('archive-queue', chat, get_time(ARCHIVE_PERIOD))
     return redirect(url_for('view_log', chat=chat))
 
-
-
 @app.route('/logs/<log_id>')
 def view_log_by_id(log_id=None):
     log = g.mysql.query(Log).filter(Log.id==log_id).one()
@@ -329,11 +326,7 @@ def view_log(chat=None):
     for line in lines:
         line['datetime'] = datetime.datetime.fromtimestamp(line['timestamp'])
 
-    if g.redis.sismember('use-legacy-bbcode', chat):
-        legacy_bbcode = True
-    else:
-        legacy_bbcode = False
-
+    legacy_bbcode = g.redis.sismember('use-legacy-bbcode', chat)
 
     return render_template('log.html',
         chat=chat,

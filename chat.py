@@ -1,8 +1,8 @@
 from functools import wraps
-from flask import Flask, g, request, render_template, make_response, jsonify, abort
+from flask import Flask, g, request, make_response, jsonify, abort
 
-from lib import PING_PERIOD, ARCHIVE_PERIOD, IP_BAN_PERIOD, CHAT_FLAGS, get_time
-from lib.api import ping, change_state, disconnect, get_online_state
+from lib import IP_BAN_PERIOD, CHAT_FLAGS, get_time
+from lib.api import ping, change_state, disconnect
 from lib.groups import MOD_GROUPS, GROUP_RANKS, MINIMUM_RANKS
 from lib.messages import send_message, get_userlists, parse_messages
 from lib.request_methods import populate_all_chars, connect_redis, create_chat_session, set_cookie, disconnect_redis

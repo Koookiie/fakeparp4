@@ -305,38 +305,6 @@ $(document).ready(function() {
             });
         }
 
-        $('#savca').click(function() {
-            charaSav = JSON.parse(localStorage.getItem('saveChar'));
-            username = $('#usingname').val();
-            alias = $('#ailin').val();
-            acolor = $('#coln').val();
-            prefix = $('#prei').val();
-            casetype = $('#casing').val();
-            aReplacements = new Array();
-
-            iL = 0;
-            $('#replacementList input').each(function(i){
-                renk = $(this).val();
-                rE = i%2;
-                if (rE == 0 && !renk) {
-                    iL = 1;
-                } else if (rE == 1 && iL == 1) {
-                    iL = 0;
-                } else {
-                    aReplacements.push(renk);
-                }
-            });
-
-            if (typeof aReplacements !== 'undefined' && aReplacements.length > 0) {
-                charan = [username,alias,acolor,prefix,casetype,aReplacements];
-            } else {
-                charan = [username,alias,acolor,prefix,casetype];
-            }
-            charaSav.unshift(charan);
-            localStorage.setItem('saveChar', JSON.stringify(charaSav));
-            location.reload();
-        });
-
         function charDrop() {
             lara = defCharSav;
             usernamea = $('#usingname').val();

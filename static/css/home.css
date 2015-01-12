@@ -8,12 +8,6 @@ body {
 	width: 100%;
 }
 
-#coln, #ailin, #usingname, #prei, #sufi, #casing, #replacementList,
-#para, #nsfwsfw, #tags, #save, .buttonlinka, .quirks, .chatbuttons,
-.groups {
-	width: auto;
-}
-
 .quirks {
 	display: inline-block;
 	margin: 5px;

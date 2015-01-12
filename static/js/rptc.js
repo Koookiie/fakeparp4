@@ -250,57 +250,6 @@ $(document).ready(function() {
             if (localStorage.getItem('saveChar') == 'undefined' || localStorage.getItem('saveChar') === null) {
                 localStorage.setItem('saveChar',JSON.stringify([['anonymous','??','000000','','normal']]));
             }
-
-            $('.saved_characters').html('');
-            charaSav = JSON.parse(localStorage.getItem('saveChar'));
-            defCharSav = charaSav;
-            $.each(charaSav, function(i) {
-                charInfo = charaSav[i];
-                cInfoSav = 'c'+i;
-                $('.saved_characters').append('<div class="Cselection" id="'+cInfoSav+'"></div><br />');
-                ii = i+1;
-                $('#'+cInfoSav).append('<span class="nummy">'+ii+'.</span><br />');
-                $.each(charInfo, function(o) {
-                    eInfo = charInfo[o];
-                    if (o == 0) {
-                        $('#'+cInfoSav).append('Username: <span class="Susername">'+eInfo+'</span><br />');
-                    } else if (o == 1) {
-                        if (eInfo) {
-                            $('#'+cInfoSav).append('Alias: <span class="Salias">'+eInfo+'</span><br />');
-                        }    
-                    } else if (o == 2) {
-                        $('#'+cInfoSav).append('Color: #<span class="Scolor">'+eInfo+'</span><br />');
-                    } else if (o == 3) {
-                        if (eInfo) {
-                            $('#'+cInfoSav).append('Prefix: <span class="Sprefix">'+eInfo+'</span><br />');
-                        }
-                    } else if (o == 4) {
-                        $('#'+cInfoSav).append('Type Case: <span class="Stypecase">'+eInfo+'</span><br />');
-                    } else if (o == 5) {
-                        $('#'+cInfoSav).append('Replacements: ');
-                        rInfo = eInfo;
-                        cR=0;
-                        $.each(rInfo, function(c) {
-                            rInfio = rInfo[c];
-                            cE=c%2;
-                            if (cE == 0) {
-                                $('#'+cInfoSav).append(rInfio+' to ');
-                                cR++;
-                            } else if (cR == rInfo.length-1) {
-                                $('#'+cInfoSav).append(rInfio);
-                                $('#'+cInfoSav).append('<br />');
-                            } else {
-                                $('#'+cInfoSav).append(rInfio+', ');
-                                cR++;
-                            }
-                        });
-                    }
-                });
-                $('#'+cInfoSav).append('<span class="ccaode">Character&nbsp;Code:&nbsp;<span class="Scode">'+JSON.stringify(charInfo)+'</span></span><br />');
-                $('#'+cInfoSav).append('<a href="javascript:void(0)" id="'+cInfoSav+'c" class="add">[be]</span>');
-                $('#'+cInfoSav).append('<a href="javascript:void(0)" id="'+cInfoSav+'cd" class="delc">[delete]</span>');
-                dropshow = '['+charInfo[1]+'] '+charInfo[0];
-            });
         }
 
         function dataDrop() {
@@ -345,9 +294,6 @@ $(document).ready(function() {
 
         chararefresh();
 
-    } else {
-        $('.saved_characters').hide();
-        $('#saved_characters').hide();
     }
 
     dataDrop();

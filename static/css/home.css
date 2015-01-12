@@ -35,6 +35,13 @@ body, .navbar-default .navbar-nav>li>a {
     color: white;
 }
 
+.navbar-rptc .navbar-nav>.active>a,
+.navbar-rptc .navbar-nav>.active>a:hover,
+.navbar-rptc .navbar-nav>.active>a:focus,
+.navbar-rptc .navbar-nav a:hover {
+	background-color: #440a7f;
+}
+
 /* Jumbotron */
 
 .jumbotron {
@@ -54,5 +61,15 @@ body, .navbar-default .navbar-nav>li>a {
 
 .btn-primary:hover {
 	background-color: #945AD0;
+	border: none;
+}
+
+.btn-danger, .btn-danger:focus {
+	background-color: #89338B;
+	border: none;
+}
+
+.btn-danger:hover {
+	background-color: #F350F7;
 	border: none;
 }

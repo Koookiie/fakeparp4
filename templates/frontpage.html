@@ -47,7 +47,7 @@
 
 <div class="jumbotron mainjumbo">
   <div class="container">
-    <h1>RP.TC</h1>
+    <h1>RP.TC <small id="topquote"></small></h1>
     <strong style="font-size: 18px"> {{message|safe}} </strong>
     <p style="font-size: 15px">{{users_searching+users_chatting}} users online ({{users_searching}} searching, {{users_chatting}} chatting) {% if tagshow == 1 %} <br>Tags being searched: {{tagset.encode('utf-8')}} {% endif %}</p>
   </div>
@@ -75,7 +75,7 @@
                             {% for group in groups %}
                             <optgroup label="{{group}}">
                                 {% for char in characters[group] %}
-                                <option value="{{char|lower}}" {% if char|lower==user.character['character'] %}selected="selected"{%endif%}>{{char}}</option>
+                                    <option value="{{char|lower}}" {% if char|lower==user.character['character'] %}selected="selected"{%endif%}>{{char}}</option>
                                 {% endfor %}
                             </optgroup>
                             {% endfor %}

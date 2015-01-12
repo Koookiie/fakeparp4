@@ -1,4 +1,23 @@
+var quotes = [
+    'Oh god how did this get here I am not good with computer D:',
+    'HELP! I HAVE A SNOWGLOBE IN MY BUTT!',
+    'Eww purple.',
+    'Purple is my favorite color OwO',
+    'How do rp',
+    'Instructions weren\'t clear enough I got my dick caught in a ceiling fan',
+    'Instructions were perfectly clear I still got my dick caught in a ceiling fan',
+    'Dang! It didn\'t work!',
+    'What the hell?',
+    'Gee I hope the site works today.',
+    'brb going to fuck a cabbage',
+    'help i have a karry stuck in my anus',
+    '#blamekarry',
+];
+
 $(document).ready(function() {
+
+    var quote = quotes[Math.floor(Math.random()*quotes.length)];
+    $('#topquote').html(quote);
 
     jQuery.expr[':'].focus = function( elem ) {
       return elem === document.activeElement && ( elem.type || elem.href );
@@ -132,5 +151,10 @@ $(document).ready(function() {
 
     $('div.defaults-off').hide();
     settingUp=false;
+
+    $('.typetog').click(function() {
+        $('#typing-quirks').slideToggle();
+        $('#typing-quirks2').slideToggle();
+    });
 
 });

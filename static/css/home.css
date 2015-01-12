@@ -3,8 +3,11 @@ body {
 	padding-bottom: 20px;
 }
 
-#chardrop, 
-#datadrop {
+body, .navbar-default .navbar-nav>li>a {
+    color: #2b0057;
+}
+
+#chardrop, #datadrop {
 	width: 100%;
 }
 
@@ -26,6 +29,34 @@ body {
     display: block;
 }
 
-label {
-	color: #043174;
+/* Navbar */
+
+.navbar-rptc {
+    background-color: #2b0057;
+}
+
+.navbar-rptc a {
+    color: white;
+}
+
+/* Jumbotron */
+
+.jumbotron {
+    background-color: rgb(220,201,255);
+}
+
+/* Forms */
+
+.form-control {
+	width: auto;
+}
+
+.btn-primary {
+	background-color: #2b0057;
+	border: none;
+}
+
+.btn-primary:hover {
+	background-color: #945AD0;
+	border: none;
 }

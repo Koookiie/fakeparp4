@@ -36,9 +36,9 @@ function bbEncode(S) {
         linkint = linkint.replace(/javascript/ig, " ");
         $2 = linkint;
         switch ($1) {
-            case 'url':case 'email': return '<a target="_blank" '+ L[$1] + $2 +'">'+ $3 +'</a>';
-            case 'img': var d = D($2); return '<img src="'+ $3 +'"'+ (d ? ' width="'+ d[1] +'" height="'+ d[2] +'"' : '') +' alt="'+ (d ? '' : $2) +'" style=\'max-width: 100%;\' />';
-            case 'audio': return '<audio src="'+ $3 +'" autoplay controls></audio>';
+            case 'url': case 'email': return '<a target="_blank" '+ L[$1] + $2 +'">'+ $3 +'</a>';
+            case 'img': return $("<img/>").attr({"src": $3, "width": 300}).css("max-width", "100%")[0].outerHTML;
+            case 'audio': return $("<audio>/").attr({"src": $3, "autoplay": "autoplay", "controls": "controls"})[0].outerHTML;
             case 'pad': return '<span class="padded">'+ $3 +'</span>';
             case 'spoiler': return '<span class="spoil"><span class="spoiler">'+ $3 +'</span></span>';
             case 'b':case 'i':case 'u':case 's':case 'sup':case 'sub': return '<'+ $1 +'>'+ $3 +'</'+ $1 +'>';
@@ -47,7 +47,7 @@ function bbEncode(S) {
     }
 
     var C = {code: [{'\\[': '&#91;', ']': '&#93;'}, '', '']};
-    var rB = X('\\[([a-z][a-z0-9]*)(?:=([^\\]]+))?]((?:.|[\r\n])*?)\\[/\\1]', 'g'), rD = X('^(\\d+)x(\\d+)$');
+    var rB = X('\\[([a-z][a-z0-9]*)(?:=([^\\]]+))?]((?:.|[\r\n])*?)\\[/\\1]', 'g');
     var L = {url: 'href="', email: 'href="mailto: '};
     var F = {font: 'font-family:$1', color: 'color:$1', bgcolor: 'background-color:$1', tshadow: 'line-height:20px;text-shadow:$1', bshadow: 'line-height:20px;box-shadow:$1'};
     var I = {}, B = {};

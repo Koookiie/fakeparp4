@@ -110,13 +110,12 @@ def show_homepage(error):
 def chat(chat_url=None):
 
     if chat_url is None:
-        chat_meta = { 'type': 'unsaved' }
+        chat_meta = {'type': 'unsaved'}
         existing_lines = []
         latest_num = -1
     else:
-        #if g.redis.zrank('ip-bans', chat_url+'/'+request.headers['CF-Connecting-IP']) is not None:
         if g.redis.zrank('ip-bans', chat_url+'/'+request.headers['X-Forwarded-For']) is not None:
-            if chat_url==OUBLIETTE_ID:
+            if chat_url == OUBLIETTE_ID:
                 abort(403)
             chat_url = OUBLIETTE_ID
         # Check if chat exists
@@ -209,7 +208,7 @@ def chat(chat_url=None):
 
 @app.route('/search', methods=['POST'])
 def foundYet():
-    target=g.redis.get('session.'+g.user.session_id+'.match')
+    target = g.redis.get('session.'+g.user.session_id+'.match')
     if target:
         g.redis.delete('session.'+g.user.session_id+'.match')
         return jsonify(target=target)
@@ -242,7 +241,7 @@ def save():
             if mod_pass == '':
                 raise ValueError('password_invalid')
             g.user.set_chat(chat)
-            if g.user.meta['group']!='globalmod':
+            if g.user.meta['group'] != 'globalmod':
                 g.user.set_group('mod')
             g.redis.hmset('chat.'+chat+'.meta', {'type': 'group', 'public': '0'})
             g.redis.hset('chat.'+chat+'.counter', 'modPass', mod_pass)
@@ -288,7 +287,7 @@ def save_log(chat_url=None):
 
 @app.route('/logs/<log_id>')
 def view_log_by_id(log_id=None):
-    log = g.mysql.query(Log).filter(Log.id==log_id).one()
+    log = g.mysql.query(Log).filter(Log.id == log_id).one()
     if log.url is not None:
         return redirect(url_for('view_log', chat=log.url))
     abort(404)
@@ -300,7 +299,7 @@ def view_log(chat=None):
     continuable = g.redis.hget('chat.'+chat+'.meta', 'type') is not None
 
     try:
-        log = g.mysql.query(Log).filter(Log.url==chat).one()
+        log = g.mysql.query(Log).filter(Log.url == chat).one()
     except:
         abort(404)
 
@@ -308,7 +307,7 @@ def view_log(chat=None):
     mode = request.args.get('mode') or 'normal'
 
     try:
-        log_page = g.mysql.query(LogPage).filter(and_(LogPage.log_id==log.id, LogPage.number==current_page)).one()
+        log_page = g.mysql.query(LogPage).filter(and_(LogPage.log_id == log.id, LogPage.number == current_page)).one()
     except NoResultFound:
         abort(404)
 

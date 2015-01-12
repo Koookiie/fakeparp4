@@ -6,6 +6,7 @@ from lib.api import ping, change_state, disconnect
 from lib.groups import MOD_GROUPS, GROUP_RANKS, MINIMUM_RANKS
 from lib.messages import send_message, get_userlists, parse_messages
 from lib.request_methods import populate_all_chars, connect_redis, create_chat_session, set_cookie, disconnect_redis
+from lib.characters import CHARACTER_DETAILS
 from lib.punishments import scenify, balon
 import random
 
@@ -82,6 +83,7 @@ def postMessage():
                 set_message = None
                 # XXX make a function for fetching name and acronym?
                 # Convert the name and acronym to unicode.
+                ss_character = g.redis.hget(ss_key, 'character') or 'anonymous/other'
                 set_session_name = unicode(
                     g.redis.hget(ss_key, 'name') or CHARACTER_DETAILS[ss_character]['name'],
                     encoding='utf8'
@@ -274,8 +276,6 @@ def getMessages():
             'messages': parse_messages(messages, after+1)
         }
     elif g.joining:
-        if g.redis.hget('chat.'+chat+'.meta', 'autosilence') == '1' and g.redis.hget('session.'+set_session_id+'.meta.'+chat, 'group') == 'user':
-            g.redis.hset('session.'+set_session_id+'.meta.'+chat, 'group', 'silent')
         message_dict = {
             'messages': []
         }
@@ -296,11 +296,11 @@ def getMessages():
     # Self channel.
     # Right now this is only used by kick/ban and IP lookup, so only subscribe
     # if we're in a group chat or a global mod.
-    if g.chat_type=='group' or g.user.meta['group']=='globalmod':
+    if g.chat_type == 'group' or g.user.meta['group'] == 'globalmod':
         g.pubsub.subscribe('channel.'+chat+'.'+g.user.session_id)
 
     for msg in g.pubsub.listen():
-        if msg['type']=='message':
+        if msg['type'] == 'message':
             # The pubsub channel sends us a JSON string, so we return that instead of using jsonify.
             resp = make_response(msg['data'])
             resp.headers['Content-type'] = 'application/json'
@@ -308,7 +308,7 @@ def getMessages():
 
 @app.route('/quit', methods=['POST'])
 def quitChatting():
-    disconnect_message = '%s [%s] disconnected.' % (g.user.character['name'], g.user.character['acronym']) if g.user.meta['group']!='silent' else None
+    disconnect_message = '%s [%s] disconnected.' % (g.user.character['name'], g.user.character['acronym']) if g.user.meta['group'] != 'silent' else None
     disconnect(g.redis, request.form['chat'], g.user.session_id, disconnect_message)
     return 'ok'
 

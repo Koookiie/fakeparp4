@@ -10,18 +10,23 @@ from flask import g, request
 from uuid import uuid4
 
 from lib import DELETE_SESSION_PERIOD, get_time, DogeNotPaidException
+from characters import CHARACTER_DETAILS
 from messages import send_message
 
 CASE_OPTIONS = {
     'normal': 'Normal',
     'upper': 'UPPER CASE',
-    'lower': 'lower case',
+    'lower': 'adaptive lower',
     'title': 'Title Case',
     'inverted': 'iNVERTED',
-    'alternating': 'AlTeRnAtInG'
+    'alternating': 'AlTeRnAtInG CaSe',
+    'alt-lines': 'alternating LINES',
+    'proper': 'Proper grammar',
+    'first-caps': 'First letter caps'
 }
 
 CHARACTER_DEFAULTS = {
+    'character': 'anonymous/other',
     'acronym': '??',
     'name': 'anonymous',
     'color': '000000',
@@ -31,22 +36,6 @@ CHARACTER_DEFAULTS = {
     'replacements': '[]'
 }
 
-def rptc_defaults():
-    return random.choice([{
-        'acronym': 'TC',
-        'name': 'terminallyCapricious',
-        'color': '2B0057',
-        'quirk_prefix': '',
-        'case': 'alternating',
-        'replacements': '[]'
-    }, {
-        'acronym': 'CA',
-        'name': 'caligulasAquarium',
-        'color': '6A006A',
-        'quirk_prefix': '',
-        'case': 'normal',
-        'replacements': '[["V", "VV"], ["v", "vv"], ["W", "WW"], ["w", "ww"]]'
-    }])
 
 META_DEFAULTS = {
     'group': 'user'
@@ -78,7 +67,7 @@ class Session(object):
                 lambda: get_or_create(
                     redis,
                     original_prefix,
-                    lambda: dict(rptc_defaults())
+                    lambda: CHARACTER_DEFAULTS
                 )
             )
         else:
@@ -88,8 +77,15 @@ class Session(object):
             self.character = get_or_create(
                 redis,
                 self.prefix,
-                lambda: dict(rptc_defaults())
+                lambda: CHARACTER_DEFAULTS
             )
+
+        # Old data transation hack
+        if 'character' not in self.character:
+            self.character['character'] = 'anonymous/other'
+
+        # Fill in missing fields from the characters dict.
+        self.character = fill_in_data(self.character)
 
         # Character encodings are stupid.
         self.unicodify()
@@ -146,6 +142,13 @@ class Session(object):
             character['color'] = form['color']
         else:
             raise ValueError("color")
+
+        # Validate character
+        # XXX Get all-chars from CHARACTER_DEFAULTS.keys()?
+        if form['character'] in redis.smembers('all-chars'):
+            character['character'] = form['character']
+        else:
+            raise ValueError("character")
 
         character['quirk_prefix'] = form['quirk_prefix'][:1500]
         character['quirk_suffix'] = form['quirk_suffix'][:1500]
@@ -211,11 +214,12 @@ class Session(object):
                 self.meta_prefix,
                 lambda: new_chat_metadata(self.redis, chat, self.session_id)
             )
-            self.character = get_or_create(
+            character = get_or_create(
                 self.redis,
                 self.prefix,
                 lambda: self.character
             )
+            self.character = fill_in_data(character)
             self.unicodify()
 
     def set_group(self, group):
@@ -225,7 +229,7 @@ class Session(object):
 
 def get_or_create(redis, key, default):
     data = redis.hgetall(key)
-    if data is None or len(data)==0:
+    if data is None or len(data) == 0:
         data = default()
         redis.hmset(key, data)
     return data
@@ -233,24 +237,35 @@ def get_or_create(redis, key, default):
 def new_chat_metadata(redis, chat, session_id):
     # This can be overloaded as a general hook for joining a chat for the first time.
     if redis.sismember('global-mods', session_id):
-        metadata = { 'group': 'globalmod' }
-    elif redis.hget('chat.'+chat+'.meta', 'autosilence')=='1':
-        metadata = { 'group': 'silent' }
+        metadata = {'group': 'globalmod'}
+    elif redis.hget('chat.'+chat+'.meta', 'autosilence') == '1':
+        metadata = {'group': 'silent'}
     else:
         metadata = dict(META_DEFAULTS)
-    if redis.hget('chat.'+chat+'.meta', 'doge')=='1':
+    if redis.hget('chat.'+chat+'.meta', 'doge') == '1':
         send_address = redis.hget('session.'+session_id+'.meta', 'doge_send_address')
         if send_address is None:
             r = requests.post("http://rcx2.scorpiaproductions.co.uk/eridoge/new")
-            if r.status_code==200:
+            if r.status_code == 200:
                 send_address = r.text
                 redis.hset('session.'+session_id+'.meta', 'doge_send_address', send_address)
                 raise DogeNotPaidException(send_address)
         else:
-            if requests.post("http://rcx2.scorpiaproductions.co.uk/eridoge/verify/%s" % send_address).status_code!=204:
+            if requests.post("http://rcx2.scorpiaproductions.co.uk/eridoge/verify/%s" % send_address).status_code != 204:
                 raise DogeNotPaidException(send_address)
             redis.hdel('session.'+session_id+'.meta', 'doge_send_address')
     metadata['counter'] = redis.hincrby('chat.'+chat+'.meta', 'counter', 1)
     redis.hset('chat.'+chat+'.counters', metadata['counter'], session_id)
     redis.sadd('session.'+session_id+'.chats', chat)
     return metadata
+
+def fill_in_data(character_data):
+    # Erigam transition hack
+    if 'character' not in character_data:
+        character_data['character'] = 'anonymous/other'
+
+    if len(character_data) < len(CHARACTER_DETAILS[character_data['character']])+1:
+        new_character_data = dict(CHARACTER_DETAILS[character_data['character']])
+        new_character_data.update(character_data)
+        return new_character_data
+    return character_data

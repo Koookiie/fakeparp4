@@ -7,6 +7,7 @@ import datetime
 from lib import ARCHIVE_PERIOD, get_time
 from lib.api import disconnect
 from lib.archive import archive_chat, delete_chat_session, delete_chat, delete_session
+from lib.characters import CHARACTER_DETAILS
 from lib.messages import send_message
 from lib.model import sm
 
@@ -27,6 +28,8 @@ if __name__=='__main__':
             disconnect_message = None
             if redis.hget('session.'+session+'.meta.'+chat, 'group')!='silent':
                 session_name = redis.hget('session.'+session+'.chat.'+chat, 'name')
+                if session_name is None:
+                    session_name = CHARACTER_DETAILS[redis.hget('session.'+session+'.chat.'+chat, 'character')]['name']
                 disconnect_message = '%s\'s connection timed out. Please don\'t quit straight away; they could be back.' % (session_name)
             disconnect(redis, chat, session, disconnect_message)
             print 'dead', dead

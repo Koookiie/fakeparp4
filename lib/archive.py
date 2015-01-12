@@ -3,6 +3,7 @@ from sqlalchemy.orm.exc import NoResultFound, FlushError
 from sqlalchemy.exc import IntegrityError, DataError
 import traceback
 import sys
+from characters import CHARACTER_DETAILS
 from model import Chat, ChatSession, Log, LogPage
 
 def get_or_create_log(redis, mysql, chat_url, chat_type='saved'):
@@ -60,18 +61,17 @@ def archive_chat(redis, mysql, chat_url):
     t = [(k, redis_sessions[k]) for k in redis_sessions]
     t.sort()
     redis_sessions = {}
-    for k,v in t:
+    for k, v in t:
         if v in redis_sessions.values():
             print "Duplicate session found, ignoring"
             continue
         redis_sessions[k] = v
 
-
     #print "redis sessions", redis_sessions
     # Update the sessions which are already in the database.
     try:
         for mysql_session in mysql_sessions:
-            #print "mysql_session", mysql_session
+            default_character = CHARACTER_DETAILS[mysql_session.character]
             redis_session = redis.hgetall('session.'+mysql_session.session_id+'.chat.'+chat_url)
             redis_session_meta = redis.hgetall('session.'+mysql_session.session_id+'.meta.'+chat_url)
             # Delete the session from mysql if it's been deleted from redis.
@@ -82,12 +82,13 @@ def archive_chat(redis, mysql, chat_url):
                 redis.zscore('chat-sessions', chat_url+'/'+mysql_session.session_id) or 0
             )
             mysql_session.expiry_time = expiry_time
-            mysql_session.group = redis_session_meta['group']
-            mysql_session.name = redis_session.get('name')
-            mysql_session.acronym = redis_session.get('acronym')
-            mysql_session.color = redis_session.get('color')
-            mysql_session.case = redis_session.get('case')
-            mysql_session.replacements = redis_session.get('replacements')
+            mysql_session.group = redis_session_meta.get('group', 'user')
+            mysql_session.character = redis_session.get('character', 'anonymous/other')
+            mysql_session.name = redis_session.get('name', default_character['name'])
+            mysql_session.acronym = redis_session.get('acronym', default_character['acronym'])
+            mysql_session.color = redis_session.get('color', default_character['color'])
+            mysql_session.case = redis_session.get('case', default_character['case'])
+            mysql_session.replacements = redis_session.get('replacements', default_character['replacements'])
             mysql_session.quirk_prefix = redis_session.get('quirk_prefix', '')[:1500]
             mysql_session.quirk_suffix = redis_session.get('quirk_suffix', '')[:1500]
             try:
@@ -105,11 +106,12 @@ def archive_chat(redis, mysql, chat_url):
             redis_session_meta = redis.hgetall('session.'+session_id+'.meta.'+chat_url)
             # Sometimes the counter list contains sessions that have already been deleted.
             # If this is one of them, skip it.
-            if len(redis_session)==0 or len(redis_session_meta)==0:
+            if len(redis_session) == 0 or len(redis_session_meta) == 0:
                 continue
             expiry_time = datetime.datetime.fromtimestamp(
                 redis.zscore('chat-sessions', chat_url+'/'+session_id) or 0
             )
+            default_character = CHARACTER_DETAILS[redis_session.get('character', 'anonymous/other')]
             #print "about to add chatsession log.id", log.id, "session id", session_id
             mysql_session = ChatSession(
                 log_id=log.id,
@@ -117,11 +119,12 @@ def archive_chat(redis, mysql, chat_url):
                 counter=counter,
                 expiry_time=expiry_time,
                 group=redis_session_meta['group'],
-                name=redis_session.get('name')[:100],
-                acronym=redis_session.get('acronym')[:15],
-                color=redis_session.get('color')[:6],
-                case=redis_session.get('case'),
-                replacements=redis_session.get('replacements'),
+                character=redis_session.get('character', 'anonymous/other'),
+                name=redis_session.get('name', default_character['name'])[:100],
+                acronym=redis_session.get('acronym', default_character['acronym'])[:15],
+                color=redis_session.get('color', default_character['color'])[:6],
+                case=redis_session.get('case', default_character['case']),
+                replacements=redis_session.get('replacements', default_character['replacements']),
                 quirk_prefix=redis_session.get('quirk_prefix', '')[:1500],
                 quirk_suffix=redis_session.get('quirk_suffix', '')[:1500],
             )
@@ -184,6 +187,7 @@ def delete_chat(redis, mysql, chat_url):
 
     redis.delete('chat.'+chat_url+'.online')
     redis.delete('chat.'+chat_url+'.idle')
+    redis.delete('chat.'+chat_url+'.characters')
 
     for session_id in redis.hvals('chat.'+chat_url+'.counters'):
         redis.srem('session.'+session_id+'.chats', chat_url)

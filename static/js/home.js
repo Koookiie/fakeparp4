@@ -60,17 +60,6 @@ $(document).ready(function() {
             $('#group_chat').click();
         }
 
-    $('#datadrop').change(function() {
-        if ($('#datadrop option:selected').text() == "[KANKRI] Kankri") {
-            $.get('/static/txt/seri9usly_this_is_fucking_ridicul9us.txt', function(reply) {
-                config.find('#color-preview #quote').text(reply);
-            });
-        } else {
-            var quote = quotes[Math.floor(Math.random()*quotes.length)];
-            $('#quote').html(quote);
-        }
-    });
-
     $('select[name="character"]').change(function() {
         if(characters[this.value]) {
             var newCharacter = characters[this.value];

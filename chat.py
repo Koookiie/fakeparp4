@@ -5,13 +5,14 @@ from lib import PING_PERIOD, ARCHIVE_PERIOD, IP_BAN_PERIOD, CHAT_FLAGS, get_time
 from lib.api import ping, change_state, disconnect, get_online_state
 from lib.groups import MOD_GROUPS, GROUP_RANKS, MINIMUM_RANKS
 from lib.messages import send_message, get_userlists, parse_messages
-from lib.request_methods import connect_redis, create_chat_session, set_cookie, disconnect_redis
+from lib.request_methods import populate_all_chars, connect_redis, create_chat_session, set_cookie, disconnect_redis
 from lib.punishments import scenify, balon
 import random
 
 app = Flask(__name__)
 
 # Pre and post request stuff
+app.before_first_request(populate_all_chars)
 app.before_request(connect_redis)
 app.before_request(create_chat_session)
 app.after_request(set_cookie)
@@ -82,11 +83,11 @@ def postMessage():
                 # XXX make a function for fetching name and acronym?
                 # Convert the name and acronym to unicode.
                 set_session_name = unicode(
-                    g.redis.hget(ss_key, 'name'),
+                    g.redis.hget(ss_key, 'name') or CHARACTER_DETAILS[ss_character]['name'],
                     encoding='utf8'
                 )
                 set_session_acronym = unicode(
-                    g.redis.hget(ss_key, 'acronym'),
+                    g.redis.hget(ss_key, 'acronym') or CHARACTER_DETAILS[ss_character]['acronym'],
                     encoding='utf8'
                 )
                 if set_group == 'globalmod':
@@ -124,12 +125,13 @@ def postMessage():
             # XXX make a function for fetching name and acronym?
             # Fetch their name and convert to unicode.
             their_chat_key = 'session.'+their_session_id+'.chat.'+chat
+            their_character = g.redis.hget(their_chat_key, 'character')
             their_session_name = unicode(
-                g.redis.hget(their_chat_key, 'name'),
+                g.redis.hget(their_chat_key, 'name') or CHARACTER_DETAILS[their_character]['name'],
                 encoding='utf8'
             )
             their_session_acronym = unicode(
-                g.redis.hget(their_chat_key, 'acronym'),
+                g.redis.hget(their_chat_key, 'acronym') or CHARACTER_DETAILS[their_character]['acronym'],
                 encoding='utf8'
             )
             if request.form['user_action'] == 'kick':

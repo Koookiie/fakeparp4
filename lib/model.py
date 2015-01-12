@@ -8,7 +8,7 @@ import datetime
 def now():
     return datetime.datetime.now()
 
-engine = create_engine('postgresql://charat:SfPAAhnAJb5xven4@localhost/charat', convert_unicode=True, pool_recycle=3600)
+engine = create_engine('postgresql://charat:SfPAAhnAJb5xven4@localhost/charat', client_encoding='utf8', pool_recycle=3600)
 sm = sessionmaker(autocommit=False,
                   autoflush=False,
                   bind=engine)
@@ -52,6 +52,7 @@ class ChatSession(Base):
     group = Column(Enum(u"silent", u"user", u"mod3", u"mod2", u"mod", u"globalmod", name=u"chat_sessions_group"), nullable=False, default=u"user")
     # XXX UTF-8 ISSUES WITH LENGTH?!
     # XXX also check these lengths
+    character = Column(Unicode(100), nullable=False, default=u"anonymous/other")
     name = Column(Unicode(100), nullable=False, default=u"Anonymous")
     acronym = Column(Unicode(15), nullable=False, default=u"")
     color = Column(Unicode(6), nullable=False, default=u"000000")

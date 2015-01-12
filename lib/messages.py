@@ -5,6 +5,9 @@ except:
     import json
 
 from lib import DELETE_UNSAVED_PERIOD, DELETE_SAVED_PERIOD, get_time, LONGPOLL_TIMEOUT_PERIOD
+from characters import CHARACTER_DETAILS
+
+FULL_CHARACTER_LENGTH = len(CHARACTER_DETAILS['anonymous/other'])+1
 
 def send_message(redis, chat, counter, msg_type, text=None, color='000000', acronym='', audience=None, useg=True):
 
@@ -101,9 +104,11 @@ def get_sublist(redis, chat, sessions):
     for session in sessions:
         sl_pipe.hgetall('session.'+session+'.chat.'+chat)
         sl_pipe.hgetall('session.'+session+'.meta.'+chat)
-        results = sl_pipe.execute()
-        session_character = results[0]
-        session_meta = results[1]
+        session_character, session_meta = sl_pipe.execute()
+        if len(session_character) < FULL_CHARACTER_LENGTH:
+            new_session_character = dict(CHARACTER_DETAILS[session_character.get('character', 'anonymous/other')])
+            new_session_character.update(session_character)
+            session_character = new_session_character
         if session_character and session_meta:
             sublist.append({
                 'character': session_character,

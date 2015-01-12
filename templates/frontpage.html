@@ -39,7 +39,6 @@
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li class="active"><a id="main" href="#" class="menuopt sel">Chat</a></li>
-                <li><a id="character_database" href="#" class="menuopt sel">Character Database</a></li>
                 <li><a id="group_chat" href="#" class="menuopt sel">Groups</a></li>
             </ul>
         </div><!--/.nav-collapse -->
@@ -71,8 +70,15 @@
                 <div class="col-md-6">
                     <!-- Characters -->
                     <div class="form-group">
-                        <select class="form-control" id="datadrop" size="1">
-                            <option>Character Database</option>
+                        <label>Character: </label>
+                        <select class="form-control character-select" name="character">
+                            {% for group in groups %}
+                            <optgroup label="{{group}}">
+                                {% for char in characters[group] %}
+                                <option value="{{char|lower}}" {% if char|lower==user.character['character'] %}selected="selected"{%endif%}>{{char}}</option>
+                                {% endfor %}
+                            </optgroup>
+                            {% endfor %}
                         </select>
                     </div>
 
@@ -212,9 +218,6 @@
             </div>
         </center>
     </div>
-
-        <div class="opting character_database"></div>
-
     </div>
 </div>
 </form>

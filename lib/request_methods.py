@@ -1,17 +1,29 @@
 from flask import g, request, abort
-from redis import ConnectionPool, Redis, UnixDomainSocketConnection
+from redis import ConnectionPool, Redis
 
 from lib import validate_chat_url
+from characters import CHARACTER_DETAILS
 from model import sm
 from sessions import Session
 
 # Connection pooling. This takes far too much effort.
 redis_pool = ConnectionPool(host="localhost", port=6379)
 
+# Application start
+
+def populate_all_chars():
+    redis = Redis()
+    pipe = redis.pipeline()
+    pipe.delete('all-chars')
+    pipe.sadd('all-chars', *CHARACTER_DETAILS.keys())
+    pipe.execute()
+    del pipe
+    del redis
+
 # Before request
 
 def connect_redis():
-    # Connect to database 
+    # Connect to database
     g.redis = Redis(connection_pool=redis_pool)
 
 def connect_mysql():

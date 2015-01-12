@@ -74,11 +74,15 @@
 
 	<div class="characterswitch">
 		<h1>Character</h1>
-		<p>
-			<select size="1" id="datadrop">
-				<option>Character Database</option>
-			</select>
-		</p>
+		<p><select name="character">
+		{% for group in groups %}
+		<optgroup label="{{group}}">
+			{% for char in characters[group] %}
+			<option value="{{char|lower}}"{% if char|lower==user.character['character'] %} selected="selected"{%endif%}>{{char}}</option>
+			{% endfor %}
+		</optgroup>
+		{% endfor %}
+		</select></p>
 		<p><input id="usingname" type="text" name="name" value="{{user.character['name']}}" maxlength="50"></p>
 		<p><input id="ailin" type="text" size="15" name="acronym" value="{{user.character['acronym']}}" maxlength="15"> <input id="coln" type="text" size="7" maxlength="6" name="color" value="{{user.character['color']}}"></p>
 	</div>

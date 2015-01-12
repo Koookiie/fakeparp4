@@ -14,9 +14,10 @@ from socket import inet_aton
 
 from lib import SEARCH_PERIOD, ARCHIVE_PERIOD, OUBLIETTE_ID, get_time, validate_chat_url, DogeNotPaidException
 from lib.archive import archive_chat, get_or_create_log
+from lib.characters import CHARACTER_GROUPS, CHARACTERS
 from lib.messages import parse_line, send_message
 from lib.model import Chat, ChatSession, Log, LogPage
-from lib.request_methods import connect_redis, connect_mysql, create_normal_session, set_cookie, disconnect_redis, disconnect_mysql
+from lib.request_methods import populate_all_chars, connect_redis, connect_mysql, create_normal_session, set_cookie, disconnect_redis, disconnect_mysql
 from lib.sessions import CASE_OPTIONS
 
 app = Flask(__name__)
@@ -26,6 +27,7 @@ app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True
 
 # Pre and post request stuff
+app.before_first_request(populate_all_chars)
 app.before_request(connect_redis)
 app.before_request(connect_mysql)
 app.before_request(create_normal_session)
@@ -89,6 +91,9 @@ def show_homepage(error):
         tag_text=g.redis.get(g.user.prefix+'.tag-text') or "",
         picky_options=g.redis.hgetall(g.user.prefix+'.picky-options') or {},
         case_options=CASE_OPTIONS,
+        groups=CHARACTER_GROUPS,
+        characters=CHARACTERS,
+        default_char=g.user.character['character'],
         users_searching=g.redis.zcard('searchers'),
         users_chatting=g.redis.scard('sessions-chatting'),
         active_pub=sessions,
@@ -143,6 +148,7 @@ def chat(chat_url=None):
                         "group": mysql_session.group,
                     })
                     g.redis.hmset('session.'+mysql_session.session_id+'.chat.'+chat_url, {
+                        "character": mysql_session.character,
                         "name": mysql_session.name,
                         "acronym": mysql_session.acronym,
                         "color": mysql_session.color,
@@ -187,6 +193,8 @@ def chat(chat_url=None):
         user=g.user,
         character_dict=g.user.json_info(),
         case_options=CASE_OPTIONS,
+        groups=CHARACTER_GROUPS,
+        characters=CHARACTERS,
         chat=chat_url,
         chat_meta=chat_meta,
         #lines=existing_lines[-200:],
@@ -220,8 +228,10 @@ def quitSearching():
 @app.route('/save', methods=['POST'])
 def save():
     try:
-        g.user.save_character(request.form)
-        g.user.save_pickiness(request.form)
+        if 'character' in request.form:
+            g.user.save_character(request.form)
+        if 'save_pickiness' in request.form:
+            g.user.save_pickiness(request.form)
         if 'create' in request.form:
             chat = request.form['chaturl']
             mod_pass = request.form['mod_pass']
@@ -250,78 +260,6 @@ def save():
         return redirect(url_for('chat'))
     else:
         return redirect(url_for('configure'))
-
-@app.route('/chat/theoubliette/rules')
-def oubliette_rules():
-    return redirect("http://25.media.tumblr.com/e90694511be9f77643d6b4a65877f82e/tumblr_mi5x7uAtAu1s5icjdo1_1280.jpg")
-
-# Admin
-
-@app.route('/admin/lbbcode', strict_slashes=False)
-def BBsettings(rtext=""):
-    rtext = request.args.get('rtext')
-    bbList = g.redis.smembers("use-legacy-bbcode")
-    if g.redis.sismember('global-mods', g.user.session_id):
-        return render_template('admin_bbcode.html',
-        lines=bbList,
-        result=rtext
-    )
-    else:
-        return render_template("admin_denied.html")
-
-@app.route('/admin/lbbcode_ajax')
-def BBAjax():
-    do_chat = request.args.get('id')
-    do_action = request.args.get('action')
-    if g.redis.sismember('global-mods', g.user.session_id):
-        try:
-            if do_action == "add":
-                g.redis.sadd("use-legacy-bbcode", do_chat)
-            elif do_action == "remove":
-                g.redis.srem("use-legacy-bbcode", do_chat)
-            return redirect(url_for('BBsettings', rtext="Done!"))
-        except:
-            return redirect(url_for('BBsettings', rtext="Error."))
-    else:
-        return render_template("admin_denied.html")
-
-@app.route('/admin/background', strict_slashes=False)
-def BackgroundSettings(rtext=""):
-    rtext = request.args.get('rtext')
-    bgList = g.redis.smembers("chat-backgrounds")
-    if g.redis.sismember('global-mods', g.user.session_id):
-        return render_template('admin_background.html',
-        lines=bgList,
-        result=rtext
-    )
-    else:
-        return render_template("admin_denied.html")
-
-@app.route('/admin/background_ajax')
-def BSAjax():
-    do_chat = request.args.get('id')
-    do_action = request.args.get('action')
-    do_bg = request.args.get('bg')
-    meta = g.redis.hgetall("session."+g.user.session_id)
-    if g.redis.sismember('global-mods', g.user.session_id):
-        try:
-            if do_action == "add":
-                if g.redis.exists('chat.'+do_chat+'.meta'):
-                    g.redis.sadd("chat-backgrounds", do_chat)
-                    g.redis.hset('chat.'+do_chat+'.meta', 'background', do_bg)
-                    send_message(g.redis, str(do_chat), -1, 'meta_change', '[GLOBALMOD] %s [%s] has changed the conversation background to "%s".' % (meta["name"], meta["acronym"], do_bg), useg=False)
-                else:
-                    return redirect(url_for('BackgroundSettings', rtext="Existance check error. Please create or join chat and try again."))
-            elif do_action == "remove":
-                g.redis.srem("chat-backgrounds", do_chat)
-                g.redis.hdel('chat.'+do_chat+'.meta', 'background')
-                send_message(g.redis, str(do_chat), -1, 'meta_change', '[GLOBALMOD] %s [%s] has removed the conversation background.' % (meta["name"], meta["acronym"]), useg=False)
-            return redirect(url_for('BackgroundSettings', rtext="Done!"))
-        except:
-            error = traceback.format_exc()
-            return redirect(url_for('BackgroundSettings', rtext=error))
-    else:
-        return render_template("admin_denied.html")
 
 # Logs
 @app.route('/logs/group/<chat>')

@@ -470,7 +470,7 @@ $(document).ready(function() {
                     // Reload chat metadata.
                     var chat_meta = data.meta;
                     for (i=0; i<CHAT_FLAGS.length; i++) {
-                        if (typeof data.meta[CHAT_FLAGS[i]] !== 'undefined' && data.meta[CHAT_FLAGS[i]] !== 0) {
+                        if (typeof data.meta[CHAT_FLAGS[i]] !== 'undefined' && data.meta[CHAT_FLAGS[i]] != 0) {
                             $('#'+CHAT_FLAGS[i]).addClass('active');
                             $('#'+CHAT_FLAGS[i]+'Result').show();
                         } else {

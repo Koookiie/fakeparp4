@@ -65,11 +65,6 @@ a {
     display: none;
 }
 
-.typetog {
-    position: relative;
-    left: 2px;
-}
-
 input {
     padding: 2px;
 }

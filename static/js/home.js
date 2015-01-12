@@ -94,13 +94,6 @@ $(document).ready(function() {
     updatePreview();
 
     var name = $("select.character-select").attr('value');
-    /*
-    config.find('#color-preview #quote').text(characters[name]['quote']);
-    if (name=="kankri") {
-        $.get('/static/txt/seri9usly_this_is_fucking_ridicul9us.txt', function(reply) {
-            config.find('#color-preview #quote').text(reply);
-        });
-    }*/
 
     $('input[name="picky"]').change(function() {
         if($(this).is(':checked')) {

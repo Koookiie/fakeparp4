@@ -337,29 +337,6 @@ $(document).ready(function() {
             location.reload();
         });
 
-        $('#savci').click(function() {
-            chariSav = JSON.parse(localStorage.getItem('saveChar'));
-            charin = JSON.parse($('#decryptChar').val());
-            if (charin instanceof Array || $.isArray(charin)) {
-                if (!charin) { alert('That is not a valid code!'); }
-                if (charin.length == 5) {
-                    chariSav.unshift(charin);
-                    localStorage.setItem('saveChar', JSON.stringify(chariSav));
-                    alert('Your character has been saved!');
-                    location.reload();
-                } else if (charin.length == 6) {
-                    //TODO: Check if Replacements are divisible by 2.
-                } else if (charin.length == 6) { //Normal replacements.
-                    if (charin[5] instanceof Array && charin[5].length%2 == 0) {
-                        chariSav.unshift(charin);
-                        localStorage.setItem('saveChar', JSON.stringify(chariSav));
-                        alert('Your character has been saved!');
-                        location.reload();
-                    } else { alert('That is not a valid code!'); }
-                } else { alert('That is not a valid code!'); }
-            }
-        });
-
         function charDrop() {
             lara = defCharSav;
             usernamea = $('#usingname').val();

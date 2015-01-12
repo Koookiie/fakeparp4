@@ -1,189 +1,26 @@
-/* Chat */
-
 body {
-    font-size: 16px;
+	padding-top: 20px;
+	padding-bottom: 20px;
 }
 
-div.chat-container {
-	position: absolute;
-	left: 0;
-	top: 0;
+#chardrop, 
+#datadrop {
 	width: 100%;
-	height: 100%;
-	background: #EEE;
 }
 
-#chat-log {
-	left: 0;
-	right: 0;
-	top: 0;
-	bottom: 0;
-	overflow: auto;
-	position: absolute;
+#coln, #ailin, #usingname, #prei, #sufi, #casing, #replacementList,
+#para, #nsfwsfw, #tags, #save, .buttonlinka, .quirks, .chatbuttons,
+.groups {
+	width: auto;
 }
 
-#chat-log-inner {
-	margin: 1em;
+.quirks {
+	display: inline-block;
+	margin: 5px;
 }
 
-#chat-hover {
-	position: absolute;
-	bottom: 0;
-	width: 100%;
-	border-top: 1px solid #DDD;	
-}
-
-#chat-hover input#chat-line {
-	width: 100%;
-	margin:0;
-	border-left: 0;
-	border-right: 0;
-}
-
-#preview-text {
-    margin-top: 3px;
-}
-
-#hide-preview {
-	position: absolute;
-	right: 0;
-	margin: 0;
-	padding: 0;
-	bottom: 23px;
-	text-decoration: none;
-}
-
-#hide-preview:link ,#hide-preview:visited {	
-	color: grey;
-}
-
-/* Searching */
-
-
-
-/* Homepage */
-
-body {
-    background-color: rgba(184, 201, 255, 0.5);
-    font-family:  Courier New;
-    word-wrap: break-word;
-}
-
-a {
-    text-decoration: none;
-}
-
-noscript, .error {
-	color: #00ffff;
-}
-
-.clear {
-    clear: both;
-}
-
-.hide {
-    display: none;
-}
-
-div.title {
-    font-size: 50px;
-    padding-left: 6px;
-}
-
-div.title a, .descript {
-    color: black;
-    text-decoration: none;
-}
-
-.nnote {
-    color: #00dddd;
-    font-size: 14px;
-}
-
-div.online-notice {
-	float: right;
-	border: 1px solid black;
-	background: white;
-	color: black;
-	padding: 5px;
-	max-width: 400px;
-	max-height: 180px;
-	overflow: auto;
-}
-
-div.useranch {
-    margin: 0px;
-}
-
-.typetog {
-    position: relative;
-    left: -4px;
-}
-
-.online-notice h1 {
-	font-size: 12pt;
-	text-decoration: underline;
-	margin-bottom: 0;
-}
-
-a.buttonlinka, .buttonlinka {
-    font-size: 13px;
-    font-family: Arial;
-    border: 1px solid #6a006a;
-    color: #000000;
-    cursor: pointer;
-    display: inline-block;
-    margin: 0px;
-    margin-top: 5px;
-    padding: 4px;
-    padding-bottom: 2px;
-    text-decoration: none;
-}
-
-#savca {
-    position: relative;
-    left: 1px;
-}
-
-button, input, select {
-        background-color:#ffffff;
-	border: 1px solid #6a006a;
-}
-
-.options {
-	border: 1px solid #000000;
-	border-radius: 10px;
-	padding: 0px;
-	background-color: #fff;
-}
-
-.options .menu {
-    background-color: rgba(90, 136, 255, 0.5);
-    font-size: 18px;
-    margin: 0px;
-    border-radius: 8px;
-}
-
-.options .menu .menuopt {
-    display: inline-block;
-    padding: 5px;
-    cursor: pointer;
-}
-
-.options .menu .linkopt {
-    display: inline-block;
-    padding: 5px;
-    cursor: pointer;
-}
-
-.options .menu .sel {
-    display: inline-block;
-    padding: 5px;
-    text-decoration: underline;
-}
-
-a.alinked {
-    color: #000000;
+#groupsub {
+	display: inline-block;
 }
 
 .opting {
@@ -191,132 +28,10 @@ a.alinked {
     display: none;
 }
 
-.opting li {
-    list-style: none;
-    margin: 5px 0;
-}
-
 .sopting {
     display: block;
 }
 
-div.options h1, div.options h2 {
-	margin: 0px;
-	display: inline;
-}
-
-div.options button {
-	vertical-align: 20%;
-}
-
-select.character-select {
-	font-size: 12pt;
-}
-
-.pester-line {
-	font-family: courier,monospace;
-	font-weight: bold;
-	font-size: 12px;
-	background-color: #EEE;
-}
-
-#color-preview {
-	padding: 4px;
-	background-color: #FFFFFF;
-}
-
-label.quirk {
-	display: block;
-
-}
-
-.Sreplacements {
-    display: none;
-}
-
-.picky-group {
-	margin: 5px;
-	margin-left: 0.5em;
-}
-
-.picky-header {
-	font-weight: bold;
-}
-
-#saveOptions {
-    margin: 0px;
-    padding-left: 0px;
-    list-style-type: none;
-}
-
-#saveOptions li {
-	margin: 5px 0;
-}
-
-input[type="submit"] {
-	cursor: pointer;
-}
-
-input[name="chaturl"] {
-    cursor: text;
-}
-
-input[type="text"] {
-    cursor: text;
-}
-
-input {
-        max-width: 100%;
-        padding: 2px 4px;
-}
-
-button {
-    padding: 2px 4px;
-    cursor: pointer;
-    background-color:#DB9EFF;
-    border:1px solid #6A006A;
-}
-
 label {
-    display: inline-block;
-    margin-bottom: 5px;
+	color: #043174;
 }
-
-ul#replacementList {
-    padding-left: 0px;
-    list-style: none;
-}
-
-/* Local Options */
-
-.stoptions h2 {
-    margin: 0px;
-    margin-bottom: 5px;
-}
-
-.labeling {
-    position: relative;
-    top: -2px;
-}
-
-#chardrop {
-    display: none;
-}
-
-#chardrop, #datadrop {
-    width: 100%;
-    text-overflow: ellipsis;
-    overflow: ellipsis;
-    margin-bottom: 5px;
-}
-
-.fann {
-    display: inline-block;
-    vertical-align: top;
-    width: 30%;
-}
-
-.fandom {
-    margin: 5px;
-}
-

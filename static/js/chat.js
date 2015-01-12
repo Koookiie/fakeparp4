@@ -968,7 +968,7 @@ $(document).ready(function() {
                 var admin_old_pass = prompt('Enter the old Admin Password:');
                 var admin_pass = prompt('Enter the new Admin Password:');
                 if (admin_pass!=null) {
-                    if (admin_old_pass!=null){} else {
+                    if (admin_old_pass == null) {
                         admin_old_pass == '';
                     }
                     $.post(POST_URL,{'chat': chat, 'oldPass': admin_old_pass.substr(0, 150), 'editPass': admin_pass.substr(0, 150), 'counter': user.meta.counter});

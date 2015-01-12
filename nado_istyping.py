@@ -2,7 +2,7 @@ import tornado.httpserver
 import tornado.websocket
 import tornado.ioloop
 import tornado.web
-from tornado.gen import engine, Task
+import tornado.gen
 import ujson as json
 from tornadoredis import Client
 import redis
@@ -19,25 +19,34 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         return True
 
     def open(self, chat):
+        self.client = Client()
         self.chat = chat
         self.redis_listen("chat:"+str(self.chat))
         self.remote_ip = self.request.headers.get('X-Forwarded-For', self.request.headers.get('X-Real-Ip', self.request.remote_ip))
         self.session = self.get_cookie("session", None)
         wsclients.add(self)
 
+    @tornado.gen.coroutine
     def on_message(self, msg):
         if self.session is None or session_validator.match(self.session) is None:
             return
 
-        message = json.loads(msg)
-        if message["a"] in ("typing", "stopped_typing") and 'c' in message:
+        try:
+            message = json.loads(msg)
+        except ValueError:
+            print "Error: %s" % (msg)
+            return
+
+        if 'a' in message and 'c' in message:
+            if message["a"] not in ("typing", "stopped_typing"):
+                return
+
             try:
                 counter = int(message['c'])
-                if self.remote_ip != r.hget("session.%s.meta" % (self.session), "last_ip"):
-                    return
             except TypeError:
                 return
-            r.publish("chat:"+str(self.chat), json.dumps({
+
+            self.client.publish("chat:"+str(self.chat), json.dumps({
                 "a": message["a"],  # action
                 "c": counter  # counter
             }))
@@ -46,18 +55,22 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         self.redis_client.unsubscribe("chat:"+str(self.chat))
         wsclients.discard(self)
 
-    @engine
+    @tornado.gen.coroutine
     def redis_listen(self, channel):
         self.redis_client = Client()
-        yield Task(self.redis_client.subscribe, channel)
+        yield tornado.gen.Task(self.redis_client.subscribe, channel)
         self.redis_client.listen(self.on_redis_message, self.on_redis_unsubscribe)
 
     def on_redis_message(self, message):
-        if message.kind == "message":
-            self.write_message(message.body)
+        try:
+            if message.kind == "message":
+                self.write_message(message.body)
+        except tornado.websocket.WebSocketClosedError:
+            pass
 
     def on_redis_unsubscribe(self, callback):
         self.redis_client.disconnect()
+        self.client.disconnect()
 
 settings = dict(
     debug=True,

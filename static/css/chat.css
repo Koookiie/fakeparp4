@@ -13,11 +13,8 @@ body, button, input, select, optgroup, option {
 	font-weight: bold;
 }
 
-a:hover {text-decoration: none;}
-A:link {text-decoration: none}
-A:visited {text-decoration: none}
-A:active {text-decoration: none}
-A:hover {text-decoration: underline}
+a:hover, a:link, a:visited, a:active, {text-decoration: none}
+a:hover {text-decoration: underline}
 
 h1 {
 	font-size: 14pt;
@@ -36,12 +33,12 @@ hr {
 	border-width: 1px 0 0 0;
 }
 
-button, input, select, #conversation, #settings, #userList, #preview, .pager, #archiveConversation, .aButton {
+button, input, select, #conversation, #settings, #userList, #preview, .aButton {
 	border: 1px solid #999999;
 	border-radius: 1px;
 }
 
-#conversation, #settings, #userList, #preview, .pager, #archiveConversation {
+#conversation, #settings, #userList, #preview {
 	background-color: #eeeeee;
 }
 
@@ -85,16 +82,6 @@ button:hover, .aButton:hover {
 
 .aButton:hover {
 	text-decoration: none;
-}
-
-.timestamp {
-	display: none;
-}
-
-p:hover .timestamp {
-	display: block;
-	float: right;
-	color: #666;
 }
 
 /* Chat layout */
@@ -276,17 +263,6 @@ body.mobile #userListButton {
 
 body.mobile.withSidebar #conversation, body.mobile.withSidebar #controls {
 	display: none;
-}
-
-/* Archive */
-
-.pager {
-	padding: 2px 5px;
-}
-
-#archiveConversation {
-	margin: 5px 0;
-	padding: 2px 0;
 }
 
 /* BBCode */

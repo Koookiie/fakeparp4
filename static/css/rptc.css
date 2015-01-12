@@ -219,11 +219,7 @@ div.chat-container {
     top: -2px;
 }
 
-#chardrop {
-    display: none;
-}
-
-#chardrop, #datadrop {
+#datadrop {
     width: 100%;
     text-overflow: ellipsis;
     overflow: ellipsis;
@@ -265,7 +261,7 @@ body.mobile div.useranch input {
     margin: 0px;
 }
 
-body.mobile .fann, body.mobile #chardrop, body.mobile #datadrop {
+body.mobile .fann, body.mobile #datadrop {
     width: 100%;
 }
 

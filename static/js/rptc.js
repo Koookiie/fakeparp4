@@ -241,7 +241,6 @@ $(document).ready(function() {
 
     //Character Display
     if (Modernizr.localstorage) {
-        $('#chardrop').show();
         function chararefresh() {
             if (localStorage.saveChar !== "") {
                 localStorage.setItem('saveChar',localStorage.saveChar);
@@ -301,47 +300,6 @@ $(document).ready(function() {
                 $('#'+cInfoSav).append('<a href="javascript:void(0)" id="'+cInfoSav+'c" class="add">[be]</span>');
                 $('#'+cInfoSav).append('<a href="javascript:void(0)" id="'+cInfoSav+'cd" class="delc">[delete]</span>');
                 dropshow = '['+charInfo[1]+'] '+charInfo[0];
-                $('#chardrop').append('<option value="'+cInfoSav+'">'+dropshow+'</option>');
-            });
-        }
-
-        function charDrop() {
-            lara = defCharSav;
-            usernamea = $('#usingname').val();
-            aliasa = $('#ailin').val();
-            acolora = $('#coln').val();
-            prefixa = $('#prei').val();
-            casetypea = $('#casing').val();
-            eplacements = new Array();
-
-            iL = 0;
-            $('#replacementList input').each(function(i){
-                renk = $(this).val();
-                rE = i%2;
-                if (rE == 0 && !renk) {
-                    iL = 1;
-                } else if (rE == 1 && iL == 1) {
-                    iL = 0;
-                } else {
-                    eplacements.push(renk);
-                }
-            });
-
-            if (typeof eplacements !== 'undefined' && eplacements.length > 0) {
-                charak = [usernamea,aliasa,acolora,prefixa,casetypea,eplacements];
-            } else {
-                charak = [usernamea,aliasa,acolora,prefixa,casetypea];
-            }
-    
-            ch1 = charak.join(',');
-            var ch2;
-
-            $.each(lara, function(i) {
-                ch2 = lara[i].join(',');
-                if(ch1 == ch2) {
-                    $('#chardrop').val('c'+i);
-                    return
-                }
             });
         }
 
@@ -386,7 +344,6 @@ $(document).ready(function() {
         }
 
         chararefresh();
-        charDrop();
 
     } else {
         $('.saved_characters').hide();
@@ -407,10 +364,6 @@ $(document).ready(function() {
         location.reload();
     });
 
-    $('#chardrop').change(function(){
-        become($(this).val());
-    });
-
     $('#datadrop').change(function(){
         become($(this).val());
     });
@@ -420,12 +373,10 @@ $(document).ready(function() {
         {
             charra = defCharSav;
             $('#datadrop').val('');
-            $('#chardrop').val('c'+ide.substr(1));
         }
         if (ide.substr(0,1) == 'a')
         {
             charra = charaSaving;
-            $('#chardrop').val('');
             $('#datadrop').val('a'+ide.substr(1));
         }
 

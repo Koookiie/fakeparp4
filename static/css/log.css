@@ -8,11 +8,6 @@
     background-color: #eeeeee;
 }
 
-#chardrop option, #datadrop option {
-    width: 180px;
-    text-overflow: hidden;
-}
-
 .timestamp {
     display: none;
 }
@@ -311,7 +306,7 @@ body > #save {
     margin-bottom: 5px;
 }
 
-.sidebar #chardrop, .sidebar #datadrop {
+.sidebar #datadrop {
     width: 100%;
 }
 

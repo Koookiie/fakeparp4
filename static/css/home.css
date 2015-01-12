@@ -7,10 +7,6 @@ body, .navbar-default .navbar-nav>li>a {
     color: #2b0057;
 }
 
-#chardrop, #datadrop {
-	width: 100%;
-}
-
 .quirks {
 	display: inline-block;
 	margin: 5px;
@@ -51,7 +47,7 @@ body, .navbar-default .navbar-nav>li>a {
 	width: auto;
 }
 
-.btn-primary {
+.btn-primary, .btn-primary:focus {
 	background-color: #2b0057;
 	border: none;
 }

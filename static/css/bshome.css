@@ -36,17 +36,6 @@ body {
     display: block;
 }
 
-.selfie {
-	width: 125px;
-	height: 100px;
-	border: solid 2px;
-}
-
-.mainjumbo {
-	background-color: #D2E0FF;
-	color: #043174;
-}
-
 label {
 	color: #043174;
 }

@@ -50,7 +50,7 @@ $(document).ready(function() {
     var MOD_GROUPS = ['globalmod', 'mod', 'mod2', 'mod3']
     var GROUP_RANKS = { 'globalmod': 6, 'mod': 5, 'mod2': 4, 'mod3': 3, 'user': 2, 'silent': 1 }
     var GROUP_DESCRIPTIONS = {
-        'globalmod': { title: 'God tier moderator', description: 'Erigam staff.', shorthand: 'Staff' },
+        'globalmod': { title: 'God tier moderator', description: 'RP.TC staff.', shorthand: 'Staff' },
         'mod': { title: 'Professional Wet Blanket', description: 'can silence, kick and ban other users.', shorthand: 'Wet Blanket' },
         'mod2': { title: 'Bum\'s Rusher', description: 'can silence and kick other users.', shorthand: 'Bum Rusher' },
         'mod3': { title: 'Amateur Gavel-Slinger', description: 'can silence other users.', shorthand: 'Gavel Slinger' },
@@ -82,7 +82,7 @@ $(document).ready(function() {
     var bbset = 1;
     var audio, background;
 
-    // erigam websocket
+    // Websocket
     var typing, typing_timeout;
     var counterintervals = {};
     var counterstyping = [];

@@ -14,7 +14,7 @@ li {color: lightgreen;}
 <p class=result> {{"Result: " + result if result !=None else "Result: space rulez (aka this is better than seeing just None \o/)"}} </p>
 <ul>
 {% for line in lines %}
-	<li><a href="http://erigam.tk/chat/{{line}}"> {{line}}</a>
+	<li><a href="/chat/{{line}}"> {{line}}</a>
 	<ul> <li><a href="/admin/background_ajax?action=remove&id={{line}}">Remove</a></ul></li>
 	<ul> <li> {{g.redis.hget('chat.'+line+'.meta', 'background')}} </ul></li>
 	</li> 

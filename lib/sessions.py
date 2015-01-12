@@ -31,7 +31,7 @@ CHARACTER_DEFAULTS = {
     'replacements': '[]'
 }
 
-def erigam_defaults():
+def rptc_defaults():
     return random.choice([{
         'acronym': 'TC',
         'name': 'terminallyCapricious',
@@ -78,7 +78,7 @@ class Session(object):
                 lambda: get_or_create(
                     redis,
                     original_prefix,
-                    lambda: dict(erigam_defaults())
+                    lambda: dict(rptc_defaults())
                 )
             )
         else:
@@ -88,7 +88,7 @@ class Session(object):
             self.character = get_or_create(
                 redis,
                 self.prefix,
-                lambda: dict(erigam_defaults())
+                lambda: dict(rptc_defaults())
             )
 
         # Character encodings are stupid.

@@ -101,7 +101,7 @@ p:hover .timestamp {
 
 #conversation {
 	position: fixed;
-	top: 30px;
+	top: 5px;
 	right: 5px;
 	bottom: 79px;
 	left: 5px;
@@ -122,7 +122,7 @@ body.withSidebar #conversation {
 .sidebar {
 	display: none;
 	position: fixed;
-	top: 30px;
+	top: 5px;
 	right: 5px;
 	bottom: 5px;
 	width: 218px;

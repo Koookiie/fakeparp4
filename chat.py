@@ -7,8 +7,7 @@ from lib.groups import MOD_GROUPS, GROUP_RANKS, MINIMUM_RANKS
 from lib.messages import send_message, get_userlists, parse_messages
 from lib.request_methods import populate_all_chars, connect_redis, create_chat_session, set_cookie, disconnect_redis
 from lib.characters import CHARACTER_DETAILS
-from lib.punishments import scenify, balon
-import random
+from lib.punishments import randpunish
 
 app = Flask(__name__)
 
@@ -42,11 +41,7 @@ def postMessage():
         line = request.form['line'].replace('\n', ' ')[:1500]
         #if g.redis.hexists('punish-scene', request.headers['CF-Connecting-IP']):
         if g.redis.hexists('punish-scene', request.headers['X-Forwarded-For']):
-            punish = random.choice(['panda', 'morse'])
-            if punish == 'panda':
-                line = scenify(g.redis, g.user.session_id, chat, line)
-            elif punish == 'morse':
-                line = balon(g.redis, g.user.session_id, chat, line)
+            line = randpunish(g.redis, g.user.session_id, chat, line)
         send_message(g.redis, chat, g.user.meta['counter'], 'message', line, g.user.character['color'], g.user.character['acronym'])
     if 'state' in request.form and request.form['state'] in ['online', 'idle']:
         change_state(g.redis, chat, g.user.session_id, request.form['state'])

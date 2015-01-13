@@ -56,16 +56,7 @@ class ChatSession(Base):
     name = Column(Unicode(100), nullable=False, default=u"Anonymous")
     acronym = Column(Unicode(15), nullable=False, default=u"")
     color = Column(Unicode(6), nullable=False, default=u"000000")
-    case = Column(Enum(
-        u"alt-lines",
-        u"alternating",
-        u"inverted",
-        u"lower",
-        u"normal",
-        u"title",
-        u"upper",
-        name=u"chat_sessions_case"
-    ), nullable=False, default=u"normal")
+    case = Column(Unicode(35), nullable=False, default=u"normal")
     replacements = Column(UnicodeText, nullable=False, default=u"[]")
     quirk_prefix = Column(Unicode(1500), nullable=False, default=u"")
     quirk_suffix = Column(Unicode(1500), nullable=False, default=u"")

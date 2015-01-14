@@ -49,7 +49,7 @@
   <div class="container">
     <h1>RP.TC</h1>
     <strong style="font-size: 18px"> {{message|safe}} </strong>
-    <p style="font-size: 15px">{{users_searching+users_chatting}} users online ({{users_searching}} searching, {{users_chatting}} chatting) {% if tagshow == 1 %} <br>Tags being searched: {{tagset.encode('utf-8')}} {% endif %}</p>
+    <p style="font-size: 15px">{{users_searching+users_chatting}} users online ({{users_searching}} searching, {{users_chatting}} chatting) {% if tagset %} <br>Tags being searched: {{tagset}} {% endif %}</p>
   </div>
 </div>
 
@@ -75,7 +75,7 @@
                             {% for group in groups %}
                             <optgroup label="{{group}}">
                                 {% for char in characters[group] %}
-                                    <option value="{{char|lower}}" {% if char|lower==user.character['character'] %}selected="selected"{%endif%}>{{char}}</option>
+                                    <option value="{{char|lower}}" {% if char|lower==g.user.character['character'] %}selected="selected"{%endif%}>{{char}}</option>
                                 {% endfor %}
                             </optgroup>
                             {% endfor %}
@@ -85,30 +85,30 @@
                     <!-- Name -->
                     <div class="form-group">
                         <label>Username: </label>
-                        <input class="form-control" id="usingname" type="text" size="50" name="name" value="{{user.character['name']}}" maxlength="50"/>
+                        <input class="form-control" id="usingname" type="text" size="50" name="name" value="{{g.user.character['name']}}" maxlength="50"/>
                     </div>
 
                     <!-- Acronym -->
                     <div class="form-group">
                         <label>Alias: </label>
-                        <input class="form-control" id="ailin" type="text" size="15" name="acronym" value="{{user.character['acronym']}}" maxlength="15"/>
+                        <input class="form-control" id="ailin" type="text" size="15" name="acronym" value="{{g.user.character['acronym']}}" maxlength="15"/>
                     </div>
 
                     <!-- Color -->
                     <div class="form-group">
                         <label>Color: </label>
-                        <input class="form-control" id="coln" type="text" size="7" maxlength="6" name="color" value="{{user.character['color']}}"/>
+                        <input class="form-control" id="coln" type="text" size="7" maxlength="6" name="color" value="{{g.user.character['color']}}"/>
                     </div>
 
                     <!-- Prefix & Suffix -->
                     <div class="form-group">
                         <label>Prefix: </label>
-                        <input class="form-control" id="prei" type="text" name="quirk_prefix" value="{{user.character['quirk_prefix']}}"/>
+                        <input class="form-control" id="prei" type="text" name="quirk_prefix" value="{{g.user.character['quirk_prefix']}}"/>
                     </div>
 
                     <div class="form-group">
                         <label>Suffix: </label>
-                        <input class="form-control" id="sufi" type="text" name="quirk_suffix" value="{{user.character['quirk_suffix']}}"/>
+                        <input class="form-control" id="sufi" type="text" name="quirk_suffix" value="{{g.user.character['quirk_suffix']}}"/>
                     </div>
 
                     <!-- Quirks -->
@@ -138,7 +138,7 @@
                         <label>Case:</label>
                         <select class="form-control" id="casing" name="case">
                             {% for case in case_options.items()|sort %}
-                            <option value="{{case[0]}}"{% if case[0]==user.character['case'] %} selected="selected"{%endif%}>{{case[1]}}</option>
+                            <option value="{{case[0]}}"{% if case[0]==g.user.character['case'] %} selected="selected"{%endif%}>{{case[1]}}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -166,7 +166,7 @@
                     <!-- Tags -->
                     <div class="form-group">
                         <label>Tags: </label>
-                        <input class="form-control" type="text" id="tags" name="tags" size="50" maxlength="500" value="{{tag_text}}" placeholder="Seperate with commas: tag, -excludeTag">
+                        <input class="form-control" type="text" id="tags" name="tags" size="50" maxlength="500" value="{{tag_text.decode("utf8")}}" placeholder="Seperate with commas: tag, -excludeTag">
                     </div>
 
                     <div class="form-group">
@@ -182,7 +182,7 @@
                 <div class="col-md-12">
                     <!-- Quote -->
                     <blockquote>
-                        <span class="pester-line" id="color-preview" style="color:#{{user.character['color']}};"><span id="acronym">??: </span><span id="quote">oh god how did this get here I am not good with computer</span></span>
+                        <span class="pester-line" id="color-preview" style="color:#{{g.user.character['color']}};"><span id="acronym">??: </span><span id="quote">oh god how did this get here I am not good with computer</span></span>
                     </blockquote>
                 </div>
                 </div>

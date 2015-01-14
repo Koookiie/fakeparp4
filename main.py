@@ -70,34 +70,24 @@ def show_homepage(error):
 
     for tagset in tagsets:
         for tag in tagset:
+            if tag == '' or tag[:1] == '-':
+                pass
             tags.append(tag)
 
-    for tag in tags:
-        if tag == '' or tag[:1] == '-':
-            tags.remove(tag)
-
-    if len(tags) != 0:
-        tagzero = 1
-    else:
-        tagzero = 0
-
-    tagset = ', '.join(sorted(tags))
+    tagset = ', '.join(sorted(tags)).decode("utf8")
 
     return render_template('frontpage.html',
         error=error,
-        user=g.user,
         replacements=json.loads(g.user.character['replacements']),
         tag_text=g.redis.get(g.user.prefix+'.tag-text') or "",
         picky_options=g.redis.hgetall(g.user.prefix+'.picky-options') or {},
         case_options=CASE_OPTIONS,
         groups=CHARACTER_GROUPS,
         characters=CHARACTERS,
-        default_char=g.user.character['character'],
         users_searching=g.redis.zcard('searchers'),
         users_chatting=g.redis.scard('sessions-chatting'),
         active_pub=sessions,
         tagset=tagset,
-        tagshow=tagzero,
         message=g.redis.get('front_message') or "Blame Nepeat",
     )
 

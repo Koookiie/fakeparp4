@@ -39,7 +39,7 @@ function bbEncode(S) {
             case 'url': case 'email': return '<a target="_blank" '+ L[$1] + $2 +'">'+ $3 +'</a>';
             case 'img': return $("<img/>").attr({"src": $3, "width": 300}).css("max-width", "100%")[0].outerHTML;
             case 'audio':
-            return $("<audio>/").attr({"src": $3, "{$autoplay$}": "autoplay", "controls": "controls"})[0].outerHTML.replace("{$autoplay$}", "autoplay");
+            return $("<audio>/").attr({"src": $3, "_autoplay_": "autoplay", "controls": "controls"})[0].outerHTML.replace("_autoplay_", "autoplay");
             case 'pad': return '<span class="padded">'+ $3 +'</span>';
             case 'spoiler': return '<span class="spoil"><span class="spoiler">'+ $3 +'</span></span>';
             case 'b':case 'i':case 'u':case 's':case 'sup':case 'sub': return '<'+ $1 +'>'+ $3 +'</'+ $1 +'>';

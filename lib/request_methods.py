@@ -49,15 +49,16 @@ def create_session():
         abort(403)
 
     # Create a user object, using session ID.
-    if 'chat' in request.form and validate_chat_url(request.form['chat']):
-        chat = request.form['chat']
 
-        session_id = request.cookies.get('session', None)
+    session_id = request.cookies.get('session', None)
+    chat = request.form.get('chat', None)
+
+    if chat and validate_chat_url(chat):
         if session_id is None:
             abort(400)
         g.user = Session(g.redis, session_id, chat)
 
-        # Chat type
+        # XXX find out what this is supposed to do
         g.chat_type = g.redis.hget('chat.'+chat+'.meta', 'type')
         if g.chat_type is None:
             abort(404)

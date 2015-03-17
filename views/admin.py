@@ -86,7 +86,7 @@ def admin_allbans():
     sort = request.args.get('sort', None)
     result = None
 
-    if not g.user.globalmod
+    if not g.user.globalmod:
         return render_template('admin_denied.html')
 
     if "ip" in request.form and "chat" in request.form:

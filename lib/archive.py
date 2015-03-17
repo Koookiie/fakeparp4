@@ -12,15 +12,15 @@ def get_or_create_log(redis, mysql, chat_url, chat_type='saved'):
     # If the LogPage doesn't exist, create LogPage.
     # If the Chat doesn't exist, create Chat.
     try:
-        log = mysql.query(Log).filter(Log.url==chat_url).one()
+        log = mysql.query(Log).filter(Log.url == chat_url).one()
         try:
-            latest_page_query = mysql.query(LogPage).filter(LogPage.log_id==log.id).order_by(LogPage.number.asc())
+            latest_page_query = mysql.query(LogPage).filter(LogPage.log_id == log.id).order_by(LogPage.number.asc())
             latest_page = latest_page_query[-1]
             # XXX Is IndexError the right exception?
         except IndexError:
             latest_page = new_page(mysql, log)
         try:
-            chat = mysql.query(Chat).filter(Chat.log_id==log.id).one()
+            chat = mysql.query(Chat).filter(Chat.log_id == log.id).one()
         except NoResultFound:
             chat = Chat(log_id=log.id, type=chat_type)
             mysql.add(chat)
@@ -75,7 +75,7 @@ def archive_chat(redis, mysql, chat_url):
             redis_session = redis.hgetall('session.'+mysql_session.session_id+'.chat.'+chat_url)
             redis_session_meta = redis.hgetall('session.'+mysql_session.session_id+'.meta.'+chat_url)
             # Delete the session from mysql if it's been deleted from redis.
-            if len(redis_session)==0 or len(redis_session_meta)==0:
+            if len(redis_session) == 0 or len(redis_session_meta) == 0:
                 mysql.delete(mysql_session)
                 continue
             expiry_time = datetime.datetime.fromtimestamp(
@@ -92,7 +92,7 @@ def archive_chat(redis, mysql, chat_url):
             mysql_session.quirk_prefix = redis_session.get('quirk_prefix', '')[:1500]
             mysql_session.quirk_suffix = redis_session.get('quirk_suffix', '')[:1500]
             try:
-            	del redis_sessions[str(mysql_session.counter)]
+                del redis_sessions[str(mysql_session.counter)]
             except KeyError:
                 print "=== KeyError for SQL session %s ===" % (mysql_session.counter)
     except (UnicodeDecodeError, TypeError, KeyError):
@@ -157,7 +157,7 @@ def archive_chat(redis, mysql, chat_url):
     for line in lines:
         # Create a new page if the line won't fit on this one.
         #if len(latest_page.content.encode('utf8'))+len(line)>65535:
-        if len(latest_page.content.encode('utf8'))+len(line)>65535:
+        if len(latest_page.content.encode('utf8'))+len(line) > 65535:
             print "creating a new page"
             latest_page = latest_page = new_page(mysql, log, latest_page.number)
             print "page "+str(latest_page.number)

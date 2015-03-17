@@ -9,8 +9,9 @@ from lib.request_methods import (
 )
 
 from views import (
-    chat,
     main,
+    backend,
+    chat,
     admin
 )
 
@@ -32,7 +33,8 @@ app.jinja_env.lstrip_blocks = True
 
 # Register Blueprints
 app.register_blueprint(main.blueprint)
-app.register_blueprint(chat.blueprint, url_prefix='/chat_ajax')
+app.register_blueprint(backend.blueprint, url_prefix='/chat_ajax')
+app.register_blueprint(chat.blueprint, url_prefix='/chat')
 app.register_blueprint(admin.blueprint, url_prefix='/admin')
 
 # Debug

@@ -76,7 +76,7 @@ def set_cookie(response):
         pass
     return response
 
-def disconnect_db(response):
+def disconnect_db(response=None):
     # Close and delete Redis PubSubs
     if hasattr(g, "pubsub"):
         g.pubsub.close()

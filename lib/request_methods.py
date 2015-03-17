@@ -1,3 +1,4 @@
+from functools import wraps
 from flask import g, request, abort
 from redis import ConnectionPool, Redis
 
@@ -19,6 +20,18 @@ def populate_all_chars():
     pipe.execute()
     del pipe
     del redis
+
+# SQL functions
+
+def use_db(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Create DB object if it does not exist.
+        if not hasattr(g, "mysql"):
+            g.mysql = sm()
+
+        return f(*args, **kwargs)
+    return decorated_function
 
 # Before request
 
@@ -64,7 +77,7 @@ def set_cookie(response):
 
 def disconnect_db(response):
     # Close and delete Redis PubSubs
-    if 'pubsub' in g:
+    if hasattr(g, "pubsub"):
         g.pubsub.close()
         del g.pubsub
 
@@ -72,7 +85,8 @@ def disconnect_db(response):
     del g.redis
 
     # Close SQL
-    g.mysql.close()
-    del g.mysql
+    if hasattr(g, "mysql"):
+        g.mysql.close()
+        del g.mysql
 
     return response

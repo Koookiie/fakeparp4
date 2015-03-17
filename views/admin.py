@@ -12,7 +12,7 @@ blueprint = Blueprint('admin', __name__)
 @blueprint.route("/changemessages", methods=['GET', 'POST'])
 def change_messages():
 
-    if not g.redis.sismember('global-mods', g.user.session_id):
+    if not g.user.globalmod:
         return render_template('admin_denied.html')
 
     if 'front_message' in request.form:
@@ -30,7 +30,7 @@ def change_messages():
 def global_broadcast():
     result = None
 
-    if not g.redis.sismember('global-mods', g.user.session_id):
+    if not g.user.globalmod:
         return render_template('admin_denied.html')
 
     if 'line' in request.form:
@@ -86,9 +86,7 @@ def admin_allbans():
     sort = request.args.get('sort', None)
     result = None
 
-    if g.redis.sismember('global-mods', g.user.session_id):
-        pass
-    else:
+    if not g.user.globalmod
         return render_template('admin_denied.html')
 
     if "ip" in request.form and "chat" in request.form:
@@ -120,9 +118,7 @@ def admin_allbans():
 
 @blueprint.route('/allchats')
 def show_allchats():
-    if g.redis.sismember('global-mods', g.user.session_id):
-        pass
-    else:
+    if not g.user.globalmod:
         return "denid"
     pipe = g.redis.pipeline()
     sessions = []
@@ -160,7 +156,7 @@ def show_allchats():
 @blueprint.route('/panda', methods=['GET', 'POST'])
 def admin_panda():
     result = None
-    if not g.redis.sismember('global-mods', g.user.session_id):
+    if not g.user.globalmod:
         return render_template('admin_denied.html')
 
     if "ip" in request.form:

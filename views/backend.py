@@ -341,9 +341,7 @@ def save():
 
 @blueprint.route('/ip_lookup', methods=['POST'])
 def ip_lookup():
-    if g.user.session_id in g.redis.smembers("global-mods"):
-        pass
-    else:
+    if not g.user.globalmod:
         return "go away"
     chat = request.form['chat']
     counter = request.form['counter']

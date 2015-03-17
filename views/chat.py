@@ -96,16 +96,6 @@ def chat(chat_url=None):
         existing_lines = [parse_line(line, 0) for line in g.redis.lrange('chat.'+chat_url, 0, -1)]
         latest_num = len(existing_lines)-1
 
-    if g.redis.sismember('use-legacy-bbcode', chat_url):
-        legacy_bbcode = True
-    else:
-        legacy_bbcode = False
-
-    if g.redis.sismember('chat-backgrounds', chat_url):
-        chatbackground = str(g.redis.hget('chat.'+chat_url+'.meta', 'background'))
-    else:
-        chatbackground = None
-
     if 'counter' in g.user.meta:
         highlight = g.redis.hget("chat.%s.highlights" % (chat_url), g.user.meta['counter'])
     else:
@@ -122,8 +112,7 @@ def chat(chat_url=None):
         chat_meta=chat_meta,
         lines=existing_lines,
         latest_num=latest_num,
-        legacy_bbcode=legacy_bbcode,
-        chatbackground=chatbackground,
+        legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat_url),
         highlight=highlight
     )
 
@@ -161,8 +150,6 @@ def view_log(chat=None):
     for line in lines:
         line['datetime'] = datetime.datetime.fromtimestamp(line['timestamp'])
 
-    legacy_bbcode = g.redis.sismember('use-legacy-bbcode', chat)
-
     return render_template('log.html',
         chat=chat,
         lines=lines,
@@ -170,7 +157,8 @@ def view_log(chat=None):
         current_page=current_page,
         mode=mode,
         paginator=paginator,
-        legacy_bbcode=legacy_bbcode
+        legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat)
+
     )
 
 @blueprint.route('/<chat>/unban', methods=['GET', 'POST'])
@@ -180,9 +168,7 @@ def unbanPage(chat=None):
 
     result = None
 
-    if g.redis.sismember('global-mods', g.user.session_id):
-        isglobal = True
-    elif g.redis.hget("session."+g.user.session_id+".meta."+chat, 'group') == 'mod':
+    if not g.user.globalmod or g.redis.hget("session."+g.user.session_id+".meta."+chat, 'group') == 'mod':
         isglobal = False
     else:
         return render_template('admin_denied.html')
@@ -222,7 +208,7 @@ def unbanPage(chat=None):
 @blueprint.route('/<chat>/mods')
 def manageMods(chat):
     chat_session = g.redis.hgetall("session."+g.user.session_id+".meta."+chat)
-    if "group" not in chat_session or chat_session['group'] != 'globalmod':
+    if chat_session['group'] != 'globalmod':
         return render_template('admin_denied.html')
     counters = g.redis.hgetall("chat."+chat+".counters")
     mods = []

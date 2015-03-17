@@ -48,6 +48,7 @@ class Session(object):
         self.redis = redis
         self.session_id = session_id or str(uuid4())
         self.chat = chat
+        self.globalmod = redis.sismember('global-mods', self.session_id)
 
         original_prefix = 'session.'+self.session_id
         original_meta_prefix = original_prefix+'.meta'

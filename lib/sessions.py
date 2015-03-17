@@ -2,7 +2,6 @@ try:
     import ujson as json
 except:
     import json
-import random
 import re
 import requests
 
@@ -10,6 +9,7 @@ from flask import g, request
 from uuid import uuid4
 
 from lib import DELETE_SESSION_PERIOD, get_time, DogeNotPaidException
+from lib.api import get_online_state
 from characters import CHARACTER_DETAILS
 from messages import send_message
 
@@ -225,6 +225,13 @@ class Session(object):
     def set_group(self, group):
         self.meta['group'] = group
         self.redis.hset(self.meta_prefix, 'group', group)
+
+    def change_state(self, state):
+        current_state = get_online_state(self.redis, self.chat, self.session_id)
+        if state != current_state:
+            self.redis.smove('chat.'+self.chat+'.'+current_state, 'chat.'+self.chat+'.'+state, self.session_id)
+            # Update userlist.
+            send_message(self.redis, self.chat, -1, 'user_change')
 
 
 def get_or_create(redis, key, default):

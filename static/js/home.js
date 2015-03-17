@@ -11,11 +11,6 @@ $(document).ready(function() {
 		$('<p class="error">').text("It seems you have cookies disabled. Unfortunately cookies are essential for MSPARP to work, so you'll need to either enable them or add an exception in order to use MSPARP.").appendTo(document.body);
 	}
 
-	// Home URL params
-	if (getURLParameter('m')) {
-		$('#'+getURLParameter('m')).click();
-	}
-
 	// Skip directly to the errors
 	if (group_chat_error == 1) {
 		$('#group_chat').click();
@@ -66,13 +61,16 @@ $(document).ready(function() {
 		}
 	});
 
-	// Hide the replacements tab.
-	$('div.defaults-off').hide();
-
 	// Toggle replacements
 	$('#typetog').click(function() {
 		$('#typing-quirks').slideToggle();
 		$('#typing-quirks2').slideToggle();
 	});
+
+	// Home URL params
+	if (getURLParameter('m')) {
+		console.log(getURLParameter('m'));
+		$('#'+getURLParameter('m')).click();
+	}
 
 });

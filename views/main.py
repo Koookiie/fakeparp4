@@ -3,7 +3,7 @@ try:
 except:
     import json
 import datetime
-from flask import Flask, g, request, render_template, redirect, url_for, jsonify, abort
+from flask import Blueprint, g, request, render_template, redirect, url_for, jsonify, abort
 from random import randint
 from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
@@ -16,65 +16,39 @@ from lib.archive import archive_chat, get_or_create_log
 from lib.characters import CHARACTER_GROUPS, CHARACTERS
 from lib.messages import parse_line
 from lib.model import Chat, ChatSession, Log, LogPage
-from lib.request_methods import populate_all_chars, connect_redis, connect_mysql, create_normal_session, set_cookie, disconnect_redis, disconnect_mysql
 from lib.sessions import CASE_OPTIONS
 
-app = Flask(__name__)
-
-# Jinja settings
-app.jinja_env.trim_blocks = True
-app.jinja_env.lstrip_blocks = True
-
-# Pre and post request stuff
-app.before_first_request(populate_all_chars)
-app.before_request(connect_redis)
-app.before_request(connect_mysql)
-app.before_request(create_normal_session)
-app.after_request(set_cookie)
-app.after_request(disconnect_redis)
-app.after_request(disconnect_mysql)
+blueprint = Blueprint('main', __name__)
 
 # Helper functions
 
 def show_homepage(error):
     sessions = []
-    pipe = g.redis.pipeline()
 
     for chat in g.redis.smembers("public-chats"):
         metadata = g.redis.hgetall('chat.'+chat+'.meta')
-        pipe.scard('chat.'+chat+'.online')
-        pipe.scard('chat.'+chat+'.idle')
-        metadata['active'], metadata['idle'] = pipe.execute()
-        metadata['url'] = chat
-        metadata['total_online'] = metadata['active'] + metadata['idle']
+
+        # Update NSFW to boolean
         metadata['nsfw'] = metadata.get('nsfw') == "1"
-        if 'topic' in metadata:
-            metadata['topic'] = unicode(metadata['topic'], encoding='utf8')
+
+        # Number of online and idle users
+        active = g.redis.scard('chat.'+chat+'.online')
+        idle = g.redis.scard('chat.'+chat+'.idle')
+
+        # Update the dict
+        data = {
+            "active": active,
+            "idle": idle,
+            "url": chat,
+            "total_online": active + idle
+        }
+
+        metadata.update(data)
+
         sessions.append(metadata)
 
     sessions = sorted(sessions, key=lambda k: k['total_online'])
     sessions = sessions[::-1]
-
-    searchers = g.redis.zrange('searchers', 0, -1)
-    sess = [{
-        'id': session_id,
-        'tags': g.redis.smembers('session.'+session_id+'.tags'),
-    } for session_id in searchers]
-
-    tagsets = []
-
-    for nums in sess:
-        tagsets.append(list(nums['tags']))
-
-    tags = []
-
-    for tagset in tagsets:
-        for tag in tagset:
-            if tag == '' or tag[:1] == '-':
-                pass
-            tags.append(tag)
-
-    tagset = ', '.join(sorted(tags)).decode("utf8")
 
     return render_template('frontpage.html',
         error=error,
@@ -87,18 +61,18 @@ def show_homepage(error):
         users_searching=g.redis.zcard('searchers'),
         users_chatting=g.redis.scard('sessions-chatting'),
         active_pub=sessions,
-        tagset=tagset,
         message=g.redis.get('front_message') or "Blame Nepeat",
     )
 
+@blueprint.route("/")
+def home():
+    return show_homepage(None)
+
 # Chat
 
-@app.route('/chat/')
-@app.route('/chat')
-@app.route('/chat/<chat_url>/')
-@app.route('/chat/<chat_url>')
+@blueprint.route('/chat')
+@blueprint.route('/chat/<chat_url>')
 def chat(chat_url=None):
-
     if chat_url is None:
         chat_meta = {'type': 'unsaved'}
         existing_lines = []
@@ -196,7 +170,7 @@ def chat(chat_url=None):
 
 # Searching
 
-@app.route('/search', methods=['POST'])
+@blueprint.route('/search', methods=['POST'])
 def foundYet():
     target = g.redis.get('session.'+g.user.session_id+'.match')
     if target:
@@ -206,14 +180,14 @@ def foundYet():
         g.redis.zadd('searchers', g.user.session_id, get_time(SEARCH_PERIOD*2))
         abort(404)
 
-@app.route('/stop_search', methods=['POST'])
+@blueprint.route('/stop_search', methods=['POST'])
 def quitSearching():
     g.redis.zrem('searchers', g.user.session_id)
     return 'ok'
 
 # Save
 
-@app.route('/save', methods=['POST'])
+@blueprint.route('/save', methods=['POST'])
 def save():
     try:
         if 'character' in request.form:
@@ -238,24 +212,24 @@ def save():
 
             get_or_create_log(g.redis, g.mysql, chat, 'group')
             g.mysql.commit()
-            return redirect(url_for('chat', chat_url=chat))
+            return redirect(url_for('main.chat', chat_url=chat))
         elif 'tags' in request.form:
             g.user.save_pickiness(request.form)
     except ValueError as e:
         return show_homepage(e.args[0])
 
     if 'search' in request.form:
-        return redirect(url_for('chat'))
+        return redirect(url_for('main.chat'))
     else:
-        return redirect(url_for('configure'))
+        return redirect(url_for('main.home'))
 
 # Logs
-@app.route('/logs/group/<chat>')
+@blueprint.route('/logs/group/<chat>')
 def old_view_log(chat):
-    return redirect(url_for('view_log', chat=chat))
+    return redirect(url_for('main.view_log', chat=chat))
 
-@app.route('/logs/save', methods=['POST'])
-@app.route('/chat/<chat_url>/save_log')
+@blueprint.route('/logs/save', methods=['POST'])
+@blueprint.route('/chat/<chat_url>/save_log')
 def save_log(chat_url=None):
     if 'chat' in request.form:
         if not validate_chat_url(request.form['chat']):
@@ -273,16 +247,16 @@ def save_log(chat_url=None):
         log_id = archive_chat(g.redis, g.mysql, chat)
         g.redis.hset('chat.'+chat+'.meta', 'type', 'saved')
         g.redis.zadd('archive-queue', chat, get_time(ARCHIVE_PERIOD))
-    return redirect(url_for('view_log', chat=chat))
+    return redirect(url_for('main.view_log', chat=chat))
 
-@app.route('/logs/<log_id>')
+@blueprint.route('/logs/<log_id>')
 def view_log_by_id(log_id=None):
     log = g.mysql.query(Log).filter(Log.id == log_id).one()
     if log.url is not None:
-        return redirect(url_for('view_log', chat=log.url))
+        return redirect(url_for('main.view_log', chat=log.url))
     abort(404)
 
-@app.route('/chat/<chat>/log')
+@blueprint.route('/chat/<chat>/log')
 def view_log(chat=None):
 
     # Decide whether or not to put a continue link in.
@@ -327,7 +301,7 @@ def view_log(chat=None):
         legacy_bbcode=legacy_bbcode
     )
 
-@app.route('/chat/<chat>/unban', methods=['GET', 'POST'])
+@blueprint.route('/chat/<chat>/unban', methods=['GET', 'POST'])
 def unbanPage(chat=None):
     if chat is None or not g.redis.hgetall("chat."+chat+".meta"):
         abort(403)
@@ -373,7 +347,7 @@ def unbanPage(chat=None):
         page='unban'
     )
 
-@app.route('/chat/<chat>/mods')
+@blueprint.route('/chat/<chat>/mods')
 def manageMods(chat):
     chat_session = g.redis.hgetall("session."+g.user.session_id+".meta."+chat)
     if "group" not in chat_session or chat_session['group'] != 'globalmod':
@@ -401,7 +375,7 @@ def manageMods(chat):
         page='mods',
     )
 
-@app.route("/admin/changemessages", methods=['GET', 'POST'])
+@blueprint.route("/admin/changemessages", methods=['GET', 'POST'])
 def change_messages():
 
     if not g.redis.sismember('global-mods', g.user.session_id):
@@ -418,7 +392,7 @@ def change_messages():
         page="changemsg",
     )
 
-@app.route("/admin/broadcast", methods=['GET', 'POST'])
+@blueprint.route("/admin/broadcast", methods=['GET', 'POST'])
 def global_broadcast():
     result = None
 
@@ -473,7 +447,7 @@ def global_broadcast():
     )
 
 
-@app.route('/admin/allbans', methods=['GET', 'POST'])
+@blueprint.route('/admin/allbans', methods=['GET', 'POST'])
 def admin_allbans():
     sort = request.args.get('sort', None)
     result = None
@@ -510,12 +484,11 @@ def admin_allbans():
         sort=sort
     )
 
-@app.route('/admin/allchats')
+@blueprint.route('/admin/allchats')
 def show_allchats():
     if g.redis.sismember('global-mods', g.user.session_id):
         pass
     else:
-        #i can't fucking spell ok
         return "denid"
     pipe = g.redis.pipeline()
     sessions = []
@@ -550,7 +523,7 @@ def show_allchats():
         page="allchats",
     )
 
-@app.route('/admin/panda', methods=['GET', 'POST'])
+@blueprint.route('/admin/panda', methods=['GET', 'POST'])
 def admin_panda():
     result = None
     if not g.redis.sismember('global-mods', g.user.session_id):
@@ -575,12 +548,3 @@ def admin_panda():
         result=result,
         page="panda"
     )
-
-#Home
-
-@app.route("/")
-def configure():
-    return show_homepage(None)
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8889, debug=True)

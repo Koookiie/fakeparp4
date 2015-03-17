@@ -25,13 +25,8 @@ def check_compatibility(first, second):
             selected_options.append(option+first_option)
         elif second_option is not None:
             selected_options.append(option+second_option)
-    if len(first['tags']) > 0 and len(second['tags']) > 0:
-        tags_in_common = first['tags'] & second['tags']
-        if len(tags_in_common) == 0:
-            return False, None, None
-    else:
-        tags_in_common = set()
-    return True, selected_options, tags_in_common
+
+    return True, selected_options
 
 if __name__ == '__main__':
 
@@ -46,7 +41,6 @@ if __name__ == '__main__':
             sessions = [{
                 'id': session_id,
                 'options': redis.hgetall('session.'+session_id+'.picky-options'),
-                'tags': redis.smembers('session.'+session_id+'.tags'),
             } for session_id in searchers]
 
             already_matched = set()
@@ -57,15 +51,15 @@ if __name__ == '__main__':
                         sessions[n]['id'] not in already_matched
                         and sessions[m]['id'] not in already_matched
                     ):
-                        compatible, selected_options, tags_in_common = check_compatibility(sessions[n], sessions[m])
+                        compatible, selected_options = check_compatibility(sessions[n], sessions[m])
                         #print compatible, selected_options
                         if not compatible:
                             print compatible, selected_options
                             continue
                         chat = str(uuid.uuid4()).replace('-', '')
                         print 'Match found, sending to %s.' % chat
-                        print '%s: options %s, tags %s.' % (sessions[n]['id'], sessions[n]['options'], sessions[n]['tags'])
-                        print '%s: options %s, tags %s.' % (sessions[m]['id'], sessions[m]['options'], sessions[m]['tags'])
+                        print '%s: options %s' % (sessions[n]['id'], sessions[n]['options'])
+                        print '%s: options %s' % (sessions[m]['id'], sessions[m]['options'])
                         redis.hset('chat.'+chat+'.meta', 'type', 'unsaved')
                         if len(selected_options) > 0:
                             option_text = ', '.join(OPTION_LABELS[_] for _ in selected_options)
@@ -73,18 +67,6 @@ if __name__ == '__main__':
                                 'chat.'+chat,
                                 str(int(time.time()))+',-2,message,000000,This is a '+option_text+' chat.'
                             )
-                        if len(tags_in_common) > 0:
-                            tag_text = ', '.join(_ for _ in sorted(tags_in_common))
-                            if tag_text != '':
-                                redis.rpush(
-                                    'chat.'+chat,
-                                    str(int(time.time()))+',-2,message,000000,Tags in common: '+tag_text+'.'
-                                )
-                            else:
-                                redis.rpush(
-                                    'chat.'+chat,
-                                    str(int(time.time()))+',-2,message,000000,You are connected to a random person.'
-                                )
                         redis.set('session.'+sessions[n]['id']+'.match', chat)
                         redis.set('session.'+sessions[m]['id']+'.match', chat)
                         redis.zrem('searchers', sessions[n]['id'])

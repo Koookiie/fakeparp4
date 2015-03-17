@@ -1,22 +1,15 @@
 from functools import wraps
-from flask import Flask, g, request, make_response, jsonify, abort
+from bcrypt import gensalt, hashpw
+from flask import Blueprint, g, request, make_response, jsonify, abort
 
 from lib import IP_BAN_PERIOD, CHAT_FLAGS, get_time
-from lib.api import ping, change_state, disconnect
+from lib.api import ping, disconnect
 from lib.groups import MOD_GROUPS, GROUP_RANKS, MINIMUM_RANKS
 from lib.messages import send_message, get_userlists, parse_messages
-from lib.request_methods import populate_all_chars, connect_redis, create_chat_session, set_cookie, disconnect_redis
 from lib.characters import CHARACTER_DETAILS
 from lib.punishments import randpunish
 
-app = Flask(__name__)
-
-# Pre and post request stuff
-app.before_first_request(populate_all_chars)
-app.before_request(connect_redis)
-app.before_request(create_chat_session)
-app.after_request(set_cookie)
-app.after_request(disconnect_redis)
+blueprint = Blueprint('chat', __name__)
 
 # Decorators
 
@@ -29,37 +22,20 @@ def mark_alive(f):
 
 # Views
 
-@app.route('/post', methods=['POST'])
+@blueprint.route('/post', methods=['POST'])
 @mark_alive
 def postMessage():
     chat = request.form['chat']
-    if 'line' in request.form and (g.user.meta['group'] == 'user' or g.user.meta['group'] == 'mod3' or g.user.meta['group'] == 'mod2' or g.user.meta['group'] == 'mod' or g.user.meta['group'] == 'globalmod'):
-        # Don't allow people to send their session cookies.
-        if 'session=' in request.form['line'] or g.user.session_id.lower() in request.form['line'].lower():
-            return 'ok'
+    if 'line' in request.form and g.user.meta['group'] != 'silent':
         # Remove linebreaks and truncate to 1500 characters.
         line = request.form['line'].replace('\n', ' ')[:1500]
-        #if g.redis.hexists('punish-scene', request.headers['CF-Connecting-IP']):
+
         if g.redis.hexists('punish-scene', request.headers['X-Forwarded-For']):
             line = randpunish(g.redis, g.user.session_id, chat, line)
         send_message(g.redis, chat, g.user.meta['counter'], 'message', line, g.user.character['color'], g.user.character['acronym'])
     if 'state' in request.form and request.form['state'] in ['online', 'idle']:
-        change_state(g.redis, chat, g.user.session_id, request.form['state'])
-    if 'modPass' in request.form and 'counter' in request.form:
-        if g.redis.hget('chat.'+chat+'.counter', 'modPass') == '':
-            send_message(g.redis, chat, -1, 'meta_change', g.user.character['name']+' failed at becoming a Magical Mod.')
-        else:
-            if request.form['modPass'] == g.redis.hget('chat.'+chat+'.counter', 'modPass'):
-                set_session_id = g.redis.hget('chat.'+chat+'.counters', request.form['counter']) or abort(400)
-                if g.redis.hget('session.'+set_session_id+'.meta.'+chat, 'group') != 'globalmod':
-                    g.redis.hset('session.'+set_session_id+'.meta.'+chat, 'group', 'mod')
-                    send_message(g.redis, chat, -1, 'user_change', g.user.character['name']+' became a Magical Mod.')
-                else:
-                    send_message(g.redis, chat, -1, 'meta_change', g.user.character['name']+' is too cool to be a Magical Mod.')
-            else:
-                send_message(g.redis, chat, -1, 'meta_change', g.user.character['name']+' failed at becoming a Magical Mod.')
-        return 'ok'
-    # Mod options.d
+        g.user.change_state(request.form['state'])
+    # Mod options.
     if g.user.meta['group'] in MOD_GROUPS:
         if 'set_group' in request.form and 'counter' in request.form:
             set_group = request.form['set_group']
@@ -200,7 +176,6 @@ def postMessage():
             else:
                 g.redis.hdel('chat.'+chat+'.meta', 'topic')
                 send_message(g.redis, chat, -1, 'meta_change', '%s removed the conversation topic.' % g.user.character['name'])
-        #dicks x yolo
         if 'background' in request.form:
             if request.form['background'] != '':
                 background_url = request.form['background'].decode('utf-8', 'ignore')
@@ -215,6 +190,7 @@ def postMessage():
                 g.redis.hdel('chat.'+chat+'.meta', 'background')
                 send_message(g.redis, chat, -1, 'meta_change', '%s [%s] removed the conversation background.' % (g.user.character['name'], g.user.character['acronym']))
                 g.redis.srem("chat-backgrounds", chat)
+
         if 'audio' in request.form:
             if request.form['audio'] != '':
                 audio_url = request.form['audio'].decode('utf-8', 'ignore')
@@ -226,16 +202,30 @@ def postMessage():
             else:
                 g.redis.hdel('chat.'+chat+'.meta', 'audio')
                 send_message(g.redis, chat, -1, 'meta_change', '%s removed the conversation audio.' % g.user.character['name'])
-        if 'editPass' in request.form:
-            if g.user.meta['group'] == 'mod' and request.form['oldPass'] == g.redis.hget('chat.'+chat+'.counter', 'modPass'):
-                g.redis.hset('chat.'+chat+'.counter', 'modPass', request.form['editPass'])
-                send_message(g.redis, chat, -1, 'meta_change', g.user.character['name']+' has changed the Admin Password.')
-            elif g.user.meta['group'] == 'globalmod':
-                g.redis.hset('chat.'+chat+'.counter', 'modPass', request.form['editPass'])
-                send_message(g.redis, chat, -1, 'meta_change', g.user.character['name']+' has changed the Admin Password.')
+
+    if 'modPass' in request.form and 'counter' in request.form:
+        if request.form['modPass'] == g.redis.hget('chat.'+chat+'.counter', 'modPass'):
+            set_session_id = g.redis.hget('chat.'+chat+'.counters', request.form['counter']) or abort(400)
+            if g.redis.hget('session.'+set_session_id+'.meta.'+chat, 'group') != 'globalmod':
+                g.redis.hset('session.'+set_session_id+'.meta.'+chat, 'group', 'mod')
+                send_message(g.redis, chat, -1, 'user_change', g.user.character['name']+' became a Magical Mod.')
+            else:
+                send_message(g.redis, chat, -1, 'meta_change', g.user.character['name']+' is too cool to be a Magical Mod.')
+        else:
+            send_message(g.redis, chat, -1, 'meta_change', g.user.character['name']+' failed at becoming a Magical Mod.')
+        return 'ok'
+
+    if 'editPass' in request.form:
+        oldpass = g.redis.hget('chat.'+chat+'.counter', 'modPass')
+
+        if (g.user.meta['group'] == 'mod' and validatepass(request.form["editPass"], oldpass.encode()) != oldpass) or g.user.meta['group'] == 'globalmod':
+            cryptedpw = hashpw(request.form["modPass"].encode("utf8"), gensalt())
+            g.redis.hset('chat.'+chat+'.counter', 'modPass', cryptedpw)
+            send_message(g.redis, chat, -1, 'meta_change', g.user.character['name']+' has changed the Admin Password.')
+
     return 'ok'
 
-@app.route('/highlight', methods=['POST'])
+@blueprint.route('/highlight', methods=['POST'])
 @mark_alive
 def saveHighlight():
     chat = request.form['chat']
@@ -250,12 +240,12 @@ def saveHighlight():
         g.redis.hdel("chat.%s.highlights" % (chat), g.user.meta['counter'])
     return 'ok'
 
-@app.route('/ping', methods=['POST'])
+@blueprint.route('/ping', methods=['POST'])
 @mark_alive
 def pingServer():
     return 'ok'
 
-@app.route('/messages', methods=['POST'])
+@blueprint.route('/messages', methods=['POST'])
 @mark_alive
 def getMessages():
 
@@ -301,13 +291,13 @@ def getMessages():
             resp.headers['Content-type'] = 'application/json'
             return resp
 
-@app.route('/quit', methods=['POST'])
+@blueprint.route('/quit', methods=['POST'])
 def quitChatting():
     disconnect_message = '%s [%s] disconnected.' % (g.user.character['name'], g.user.character['acronym']) if g.user.meta['group'] != 'silent' else None
     disconnect(g.redis, request.form['chat'], g.user.session_id, disconnect_message)
     return 'ok'
 
-@app.route('/save', methods=['POST'])
+@blueprint.route('/save', methods=['POST'])
 @mark_alive
 def save():
     try:
@@ -318,7 +308,7 @@ def save():
 
 # Globalmod stuff.
 
-@app.route('/ip_lookup', methods=['POST'])
+@blueprint.route('/ip_lookup', methods=['POST'])
 def ip_lookup():
     if g.user.session_id in g.redis.smembers("global-mods"):
         pass
@@ -330,6 +320,3 @@ def ip_lookup():
     ip = g.redis.hget("session."+theircookie+".meta", "last_ip")
 
     return ip
-
-if __name__ == "__main__":
-    app.run(port=9001, host="0.0.0.0", debug=True)

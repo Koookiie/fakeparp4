@@ -22,33 +22,34 @@ def populate_all_chars():
 
 # Before request
 
-def connect_redis():
-    # Connect to database
+def connect_db():
+    # Connect to Redis
     g.redis = Redis(connection_pool=redis_pool)
 
-def connect_mysql():
+    # Connect to SQL
     g.mysql = sm()
 
-def create_normal_session():
-    # Create a user object, using session ID.
-    session_id = request.cookies.get('session', None)
-    g.user = Session(g.redis, session_id)
+def create_session():
+    # Do not bother allowing the user in if they are globalbanned.
+    if request.headers['X-Forwarded-For'] in g.redis.smembers("globalbans"):
+        abort(403)
 
-def create_chat_session():
-    # Create a user object, using session and chat IDs.
-    session_id = request.cookies.get('session', None)
-    # Don't accept chat requests if there's no cookie.
-    if session_id is None:
-        abort(400)
-    # Validate chat ID.
+    # Create a user object, using session ID.
     if 'chat' in request.form and validate_chat_url(request.form['chat']):
         chat = request.form['chat']
+
+        session_id = request.cookies.get('session', None)
+        if session_id is None:
+            abort(400)
+        g.user = Session(g.redis, session_id, chat)
+
+        # Chat type
+        g.chat_type = g.redis.hget('chat.'+chat+'.meta', 'type')
+        if g.chat_type is None:
+            abort(404)
     else:
-        abort(400)
-    g.chat_type = g.redis.hget('chat.'+chat+'.meta', 'type')
-    if g.chat_type is None:
-        abort(404)
-    g.user = user = Session(g.redis, session_id, chat)
+        session_id = request.cookies.get('session', None)
+        g.user = Session(g.redis, session_id)
 
 # After request
 
@@ -61,14 +62,17 @@ def set_cookie(response):
         pass
     return response
 
-def disconnect_redis(response):
+def disconnect_db(response):
+    # Close and delete Redis PubSubs
     if 'pubsub' in g:
         g.pubsub.close()
         del g.pubsub
-    del g.redis
-    return response
 
-def disconnect_mysql(response):
+    # Delete Redis object
+    del g.redis
+
+    # Close SQL
     g.mysql.close()
     del g.mysql
+
     return response

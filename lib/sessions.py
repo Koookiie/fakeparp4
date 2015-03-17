@@ -5,7 +5,7 @@ except:
 import re
 import requests
 
-from flask import g, request
+from flask import request
 from uuid import uuid4
 
 from lib import DELETE_SESSION_PERIOD, get_time, DogeNotPaidException
@@ -112,7 +112,7 @@ class Session(object):
         # Unpack the replacement info.
         unpacked_character = dict(self.character)
         unpacked_character['replacements'] = json.loads(unpacked_character['replacements'])
-        return { 'meta': self.meta, 'character': unpacked_character }
+        return {'meta': self.meta, 'character': unpacked_character}
 
     def save(self, form):
         self.save_character(form)
@@ -131,7 +131,7 @@ class Session(object):
         character['acronym'] = form['acronym'][:15]
 
         # Validate name
-        if len(form['name'])>0:
+        if len(form['name']) > 0:
             # Truncate name to 50 characters.
             character['name'] = form['name'][:50]
         else:
@@ -161,7 +161,7 @@ class Session(object):
 
         replacements = zip(form.getlist('quirk_from'), form.getlist('quirk_to'))
         # Strip out any rows where from is blank or the same as to.
-        replacements = [_ for _ in replacements if _[0]!='' and _[0]!=_[1]]
+        replacements = [_ for _ in replacements if _[0] != '' and _[0] != _[1]]
         # And encode as JSON.
         character['replacements'] = json.dumps(replacements)
 
@@ -173,13 +173,13 @@ class Session(object):
 
         # Chat-related things.
         if self.chat is not None:
-            if character['name']!=old_name or character['acronym']!=old_acronym:
-                if self.meta['group']=='silent':
+            if character['name'] != old_name or character['acronym'] != old_acronym:
+                if self.meta['group'] == 'silent':
                     user_change_message = None
                 else:
                     user_change_message = '%s [%s] is now %s [%s].' % (old_name, old_acronym, character['name'], character['acronym'])
                 send_message(redis, request.form['chat'], -1, 'user_change', user_change_message)
-            elif character['color']!=old_color:
+            elif character['color'] != old_color:
                 send_message(redis, request.form['chat'], -1, 'user_change', None)
 
     def save_pickiness(self, form):

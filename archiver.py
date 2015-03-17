@@ -11,7 +11,7 @@ from lib.model import sm
 import sqlalchemy.exc
 import os
 
-if __name__=='__main__':
+if __name__ == '__main__':
 
     print "Archiving script started."
     redis = Redis(host="localhost", port=6379)
@@ -52,7 +52,7 @@ if __name__=='__main__':
                 pipe.scard('chat.'+chat+'.idle')
                 online, idle = pipe.execute()
                 # Delete if no-one is online any more.
-                if online+idle==0:
+                if online+idle == 0:
                     delete_chat(redis, mysql, chat)
                     redis.zrem('archive-queue', chat)
                 else:

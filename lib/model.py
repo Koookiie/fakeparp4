@@ -72,4 +72,3 @@ class Ban(Base):
 Log.pages = relation(LogPage, backref='log')
 Log.chat = relation(Chat, backref='log', uselist=False)
 Log.sessions = relation(ChatSession, backref='log')
-

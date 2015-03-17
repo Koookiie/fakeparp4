@@ -1,4 +1,5 @@
-import re, time
+import re
+import time
 
 # Timeout period for searchers.
 SEARCH_PERIOD = 1
@@ -37,10 +38,9 @@ def get_time(offset=0):
 
 chat_validator = re.compile('^[-a-zA-Z0-9_]+$')
 def validate_chat_url(url):
-    if len(url)<=100:
+    if len(url) <= 100:
         return chat_validator.match(url)
     return False
 
 class DogeNotPaidException(Exception):
     pass
-

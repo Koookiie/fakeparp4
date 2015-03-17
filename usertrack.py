@@ -15,15 +15,15 @@ while True:
         chat, session = chat_session.split("/")
         chats[chat].add(session)
     chat_history.append(chats)
-    if len(chat_history)==6:
+    if len(chat_history) == 6:
         for chat, sessions in sorted(chat_history[-1].items()):
             # Ignore chats which have autosilence on.
             if db.hget("chat.%s.meta" % chat, "autosilence") is not None:
                 continue
             change = len(sessions)-len(chat_history[0][chat])
-            if change!=0:
+            if change != 0:
                 print chat, change
-            if change>=8:
+            if change >= 8:
                 # Silence all sessions which have entered recently.
                 for session in sessions-chat_history[0][chat]:
                     db.hset('session.%s.meta.%s' % (session, chat), 'group', 'silent')
@@ -44,4 +44,3 @@ while True:
         print
         del chat_history[0]
     time.sleep(1)
-

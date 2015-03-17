@@ -3,7 +3,6 @@ try:
 except:
     import json
 import re
-import requests
 
 from flask import request
 from uuid import uuid4

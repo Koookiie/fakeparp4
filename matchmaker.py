@@ -20,7 +20,7 @@ def check_compatibility(first, second):
             and second_option is not None
             and first_option != second_option
         ):
-            return False, None, None
+            return False, None
         if first_option is not None:
             selected_options.append(option+first_option)
         elif second_option is not None:

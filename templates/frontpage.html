@@ -200,7 +200,7 @@
                     {% for chat in active_pub %}
                         <div id="chat_{{chat['url']}}">
                             <h3 class="url"><a href="/chat/{{chat['url']}}">{{chat['url']}}</a></h3>
-                            <p class="topic">{{chat['topic'].decode("utf8")}}</p>
+                            <p class="topic">{% if 'topic' in chat %} {{chat['topic'].decode("utf8")}} {% endif %}</p>
                             <p class="online">
                                 <span class="num_active">Active: {{chat['active']}}</span>
                                 <span class="num_idle">Idle: {{chat['idle']}}</span>

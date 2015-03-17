@@ -1,11 +1,42 @@
 from functools import wraps
-from bcrypt import gensalt, hashpw
-from flask import Blueprint, g, request, make_response, jsonify, abort
 
-from lib import IP_BAN_PERIOD, CHAT_FLAGS, get_time
-from lib.api import ping, disconnect
-from lib.groups import MOD_GROUPS, GROUP_RANKS, MINIMUM_RANKS
-from lib.messages import send_message, get_userlists, parse_messages
+from bcrypt import (
+    gensalt,
+    hashpw
+)
+
+from flask import (
+    Blueprint,
+    g,
+    request,
+    make_response,
+    jsonify,
+    abort
+)
+
+from lib import (
+    IP_BAN_PERIOD,
+    CHAT_FLAGS,
+    get_time
+)
+
+from lib.api import (
+    ping,
+    disconnect
+)
+
+from lib.groups import (
+    MOD_GROUPS,
+    GROUP_RANKS,
+    MINIMUM_RANKS
+)
+
+from lib.messages import (
+    send_message,
+    get_userlists,
+    parse_messages
+)
+
 from lib.characters import CHARACTER_DETAILS
 from lib.punishments import randpunish
 

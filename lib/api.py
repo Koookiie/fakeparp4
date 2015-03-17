@@ -1,4 +1,4 @@
-from flask import request, abort
+from flask import abort
 from lib import get_time, ARCHIVE_PERIOD, PING_PERIOD
 from lib.messages import send_message
 
@@ -6,7 +6,7 @@ def ping(redis, chat, session, chat_type):
     online_state = get_online_state(redis, chat, session.session_id)
     if online_state == 'offline':
         # Check IP bans.
-        if redis.zrank('ip-bans', chat+'/'+request.headers['X-Forwarded-For']) is not None:
+        if redis.zrank('ip-bans', chat+'/'+session.ip) is not None:
             abort(403)
 
         # The user isn't online already. Add them to the chat.
@@ -19,7 +19,7 @@ def ping(redis, chat, session, chat_type):
             redis.zadd('archive-queue', chat, get_time(ARCHIVE_PERIOD))
 
         # Log their IP address.
-        redis.hset('session.'+session.session_id+'.meta', 'last_ip', request.headers['X-Forwarded-For'])
+        redis.hset('session.'+session.session_id+'.meta', 'last_ip', session.ip)
 
         # Set user state.
         redis.sadd('chat.'+chat+'.online', session.session_id)

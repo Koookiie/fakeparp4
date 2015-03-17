@@ -42,7 +42,7 @@ def chat(chat_url=None):
         existing_lines = []
         latest_num = -1
     else:
-        if g.redis.zrank('ip-bans', chat_url+'/'+request.headers['X-Forwarded-For']) is not None:
+        if g.redis.zrank('ip-bans', chat_url+'/'+g.user.ip) is not None:
             if chat_url == OUBLIETTE_ID:
                 abort(403)
             chat_url = OUBLIETTE_ID

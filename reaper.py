@@ -2,6 +2,7 @@
 
 from redis import Redis
 import time
+import os
 
 from lib import get_time
 from lib.api import disconnect
@@ -15,7 +16,7 @@ def get_default(redis, session, chat, key, defaultValue=''):
 
 if __name__ == '__main__':
 
-    redis = Redis(host="localhost", port=6379)
+    redis = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
 
     while True:
 

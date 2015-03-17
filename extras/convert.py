@@ -1,6 +1,7 @@
 from redis import Redis
+import os
 
-db = Redis()
+db = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
 
 print 'Converting session-chats.'
 

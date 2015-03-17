@@ -14,7 +14,7 @@ import os
 if __name__ == '__main__':
 
     print "Archiving script started."
-    redis = Redis(host="localhost", port=6379)
+    redis = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
 
     current_time = datetime.datetime.now()
 

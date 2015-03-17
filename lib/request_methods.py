@@ -69,7 +69,7 @@ def create_session():
 
 def set_cookie(response):
     try:
-        response.set_cookie('session', g.user.session_id, max_age=365*24*60*60, domain=".terminallycapricio.us")
+        response.set_cookie('session', g.user.session_id, max_age=365*24*60*60, domain="." + os.environ.get("BASE_DOMAIN", "terminallycapricio.us"))
         response.set_cookie('session', g.user.session_id, max_age=365*24*60*60)
     except AttributeError:
         # That isn't gonna work if we don't have a user object, just ignore it.

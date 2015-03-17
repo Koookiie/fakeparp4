@@ -4,15 +4,10 @@
 body {
     font-family: Courier New, Monospace;;
     font-size: 12px;
-}
-
-body {
-    margin: 5px;
     background-color: #cccccc;
     background-attachment: fixed;
-    background-image:none;
+    background-image: none;
     /*main one: http://i.imgur.com/1gA5miD.jpg*/
-    /*KARRY LOVES ANUS*/
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
@@ -80,14 +75,7 @@ optgroup option {
 }
 
 h1 {
-    font-size: 14pt;
     word-wrap: break-word;
-    margin: 0;
-}
-
-p {
-    margin: 0;
-    padding: 2px 5px;
 }
 
 hr {
@@ -200,35 +188,6 @@ div.chat-container {
 
 #hide-preview:link ,#hide-preview:visited {	
 	color: grey;
-}
-
-/* Local Options */
-
-.stoptions h2 {
-    margin: 0px;
-    margin-bottom: 5px;
-}
-
-.labeling {
-    position: relative;
-    top: -2px;
-}
-
-#datadrop {
-    width: 100%;
-    text-overflow: ellipsis;
-    overflow: ellipsis;
-    margin-bottom: 5px;
-}
-
-.fann {
-    display: inline-block;
-    vertical-align: top;
-    width: 30%;
-}
-
-.fandom {
-    margin: 5px;
 }
 
 /* MOBILE */

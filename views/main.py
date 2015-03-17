@@ -10,7 +10,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from time import mktime
 from webhelpers import paginate
 
-from lib import SEARCH_PERIOD, ARCHIVE_PERIOD, OUBLIETTE_ID, get_time, validate_chat_url, DogeNotPaidException
+from lib import SEARCH_PERIOD, ARCHIVE_PERIOD, OUBLIETTE_ID, get_time, validate_chat_url
 from lib.archive import archive_chat, get_or_create_log
 from lib.characters import CHARACTER_GROUPS, CHARACTERS
 from lib.messages import parse_line
@@ -129,10 +129,7 @@ def chat(chat_url=None):
             g.redis.zadd('archive-queue', chat_url, get_time(ARCHIVE_PERIOD))
 
         # Load chat-based session data.
-        try:
-            g.user.set_chat(chat_url)
-        except DogeNotPaidException as e:
-            return render_template('doge_not_paid.html', address=e.message)
+        g.user.set_chat(chat_url)
         existing_lines = [parse_line(line, 0) for line in g.redis.lrange('chat.'+chat_url, 0, -1)]
         latest_num = len(existing_lines)-1
 

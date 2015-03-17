@@ -41,6 +41,3 @@ def validate_chat_url(url):
     if len(url) <= 100:
         return chat_validator.match(url)
     return False
-
-class DogeNotPaidException(Exception):
-    pass

@@ -8,7 +8,7 @@ import requests
 from flask import request
 from uuid import uuid4
 
-from lib import DELETE_SESSION_PERIOD, get_time, DogeNotPaidException
+from lib import DELETE_SESSION_PERIOD, get_time
 from lib.api import get_online_state
 from characters import CHARACTER_DETAILS
 from messages import send_message
@@ -249,18 +249,6 @@ def new_chat_metadata(redis, chat, session_id):
         metadata = {'group': 'silent'}
     else:
         metadata = dict(META_DEFAULTS)
-    if redis.hget('chat.'+chat+'.meta', 'doge') == '1':
-        send_address = redis.hget('session.'+session_id+'.meta', 'doge_send_address')
-        if send_address is None:
-            r = requests.post("http://rcx2.scorpiaproductions.co.uk/eridoge/new")
-            if r.status_code == 200:
-                send_address = r.text
-                redis.hset('session.'+session_id+'.meta', 'doge_send_address', send_address)
-                raise DogeNotPaidException(send_address)
-        else:
-            if requests.post("http://rcx2.scorpiaproductions.co.uk/eridoge/verify/%s" % send_address).status_code != 204:
-                raise DogeNotPaidException(send_address)
-            redis.hdel('session.'+session_id+'.meta', 'doge_send_address')
     metadata['counter'] = redis.hincrby('chat.'+chat+'.meta', 'counter', 1)
     redis.hset('chat.'+chat+'.counters', metadata['counter'], session_id)
     redis.sadd('session.'+session_id+'.chats', chat)

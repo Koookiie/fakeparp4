@@ -184,14 +184,7 @@ class Session(object):
                 send_message(redis, request.form['chat'], -1, 'user_change', None)
 
     def save_pickiness(self, form):
-        # Tags
-        tag_text = form['tags'][:500]
-        pipe = self.redis.pipeline()
-        pipe.set(self.prefix+'.tag-text', tag_text)
-        pipe.delete(self.prefix+'.tags')
-        pipe.sadd(self.prefix+'.tags', *(tag.lower().strip() for tag in form['tags'].split(",")))
-        pipe.execute()
-        # Other options
+        # Para/NSFW
         option_key = self.prefix+'.picky-options'
         for option in ['para', 'nsfw']:
             if option in form and form[option] in ['0', '1', '2']:

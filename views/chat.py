@@ -197,7 +197,7 @@ def unbanPage(chat=None):
             "reason": ban_reasons.get(chat_ip, '').decode('utf-8'),
         })
 
-    return render_template('admin_unban.html',
+    return render_template('mod/unban.html',
         lines=bans,
         result=result,
         chat=chat,
@@ -207,7 +207,7 @@ def unbanPage(chat=None):
 @blueprint.route('/<chat>/mods')
 def manageMods(chat):
     chat_session = g.redis.hgetall("session."+g.user.session_id+".meta."+chat)
-    if chat_session['group'] != 'globalmod':
+    if not chat_session or chat_session['group'] != 'globalmod':
         return render_template('admin_denied.html')
     counters = g.redis.hgetall("chat."+chat+".counters")
     mods = []
@@ -226,7 +226,7 @@ def manageMods(chat):
             mods.append((counter, group, name, acronym, is_you))
     mods.sort(key=lambda tup: int(tup[0]))
     return render_template(
-        'chatmods.html',
+        'mod/mods.html',
         modstatus=mods,
         chat=chat,
         page='mods',

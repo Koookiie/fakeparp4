@@ -1,4 +1,6 @@
-{% include 'header_admin.html' %}
+{% extends 'admin/base.html' %}
+
+{% block content %}
 <style>
     body {
         padding-top: 60px;
@@ -50,7 +52,4 @@
         </tbody>
     </table>
 </div>
-
-</body>
-
-</html>
+{% endblock %}

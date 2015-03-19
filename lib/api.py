@@ -18,9 +18,6 @@ def ping(redis, chat, session, chat_type):
         elif redis.zscore('archive-queue', chat) is None:
             redis.zadd('archive-queue', chat, get_time(ARCHIVE_PERIOD))
 
-        # Log their IP address.
-        redis.hset('session.'+session.session_id+'.meta', 'last_ip', session.ip)
-
         # Set user state.
         redis.sadd('chat.'+chat+'.online', session.session_id)
 

@@ -12,7 +12,8 @@ from views import (
     main,
     backend,
     chat,
-    admin
+    admin,
+    log
 )
 
 app = Flask(__name__)
@@ -36,6 +37,7 @@ app.register_blueprint(main.blueprint)
 app.register_blueprint(backend.blueprint, url_prefix='/chat_ajax')
 app.register_blueprint(chat.blueprint, url_prefix='/chat')
 app.register_blueprint(admin.blueprint, url_prefix='/admin')
+app.register_blueprint(log.blueprint, url_prefix='/log')
 
 # Debug
 if __name__ == "__main__":

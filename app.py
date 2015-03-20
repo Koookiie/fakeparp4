@@ -22,7 +22,7 @@ app.before_first_request(populate_all_chars)
 app.before_request(connect_db)
 app.before_request(create_session)
 app.after_request(set_cookie)
-app.after_request(disconnect_db)
+app.teardown_request(disconnect_db)
 
 # Flask settings
 app.url_map.strict_slashes = False

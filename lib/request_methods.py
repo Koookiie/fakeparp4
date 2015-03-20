@@ -49,15 +49,16 @@ def create_session():
         abort(403)
 
     # Create a user object, using session ID.
-    if 'chat' in request.form and validate_chat_url(request.form['chat']):
-        chat = request.form['chat']
 
-        session_id = request.cookies.get('session', None)
+    session_id = request.cookies.get('session', None)
+    chat = request.form.get('chat', None)
+
+    if chat and validate_chat_url(chat):
         if session_id is None:
             abort(400)
         g.user = Session(g.redis, session_id, chat)
 
-        # Chat type
+        # XXX find out what this is supposed to do
         g.chat_type = g.redis.hget('chat.'+chat+'.meta', 'type')
         if g.chat_type is None:
             abort(404)
@@ -65,18 +66,22 @@ def create_session():
         session_id = request.cookies.get('session', None)
         g.user = Session(g.redis, session_id)
 
+    # Log their IP address.
+    g.redis.hset('session.'+g.user.session_id+'.meta', 'last_ip', g.user.ip)
+
+
 # After request
 
 def set_cookie(response):
     try:
-        response.set_cookie('session', g.user.session_id, max_age=365*24*60*60, domain=".terminallycapricio.us")
+        response.set_cookie('session', g.user.session_id, max_age=365*24*60*60, domain="." + os.environ.get("BASE_DOMAIN", "terminallycapricio.us"))
         response.set_cookie('session', g.user.session_id, max_age=365*24*60*60)
     except AttributeError:
         # That isn't gonna work if we don't have a user object, just ignore it.
         pass
     return response
 
-def disconnect_db(response):
+def disconnect_db(response=None):
     # Close and delete Redis PubSubs
     if hasattr(g, "pubsub"):
         g.pubsub.close()

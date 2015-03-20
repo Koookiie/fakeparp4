@@ -3,7 +3,6 @@ try:
 except:
     import json
 import re
-import requests
 
 from flask import request
 from uuid import uuid4
@@ -49,6 +48,7 @@ class Session(object):
         self.session_id = session_id or str(uuid4())
         self.chat = chat
         self.globalmod = redis.sismember('global-mods', self.session_id)
+        self.ip = request.headers['X-Forwarded-For']
 
         original_prefix = 'session.'+self.session_id
         original_meta_prefix = original_prefix+'.meta'
@@ -184,14 +184,7 @@ class Session(object):
                 send_message(redis, request.form['chat'], -1, 'user_change', None)
 
     def save_pickiness(self, form):
-        # Tags
-        tag_text = form['tags'][:500]
-        pipe = self.redis.pipeline()
-        pipe.set(self.prefix+'.tag-text', tag_text)
-        pipe.delete(self.prefix+'.tags')
-        pipe.sadd(self.prefix+'.tags', *(tag.lower().strip() for tag in form['tags'].split(",")))
-        pipe.execute()
-        # Other options
+        # Para/NSFW
         option_key = self.prefix+'.picky-options'
         for option in ['para', 'nsfw']:
             if option in form and form[option] in ['0', '1', '2']:

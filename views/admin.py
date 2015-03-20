@@ -22,7 +22,7 @@ def change_messages():
 
     front_message = g.redis.get('front_message')
 
-    return render_template('admin_changemsg.html',
+    return render_template('admin/changemsg.html',
         front_message=front_message,
         page="changemsg",
     )
@@ -76,7 +76,7 @@ def global_broadcast():
         else:
             result = '<div class="alert alert-danger"> <strong> Confirm checkbox not checked. </strong> </div>'
 
-    return render_template('admin_globalbroadcast.html',
+    return render_template('admin/broadcast.html',
         result=result,
         page="broadcast",
     )
@@ -110,7 +110,7 @@ def admin_allbans():
         bans.sort(key=lambda tup: inet_aton(tup.split('/')[1]))
         sort = 'ip'
 
-    return render_template('global_allbans.html',
+    return render_template('admin/allbans.html',
         lines=bans,
         result=result,
         page='allbans',
@@ -149,7 +149,7 @@ def show_allchats():
     sessions = sorted(sessions, key=lambda k: k['total_online'])
     sessions = sessions[::-1]
 
-    return render_template('admin_allchats.html',
+    return render_template('admin/allchats.html',
         chats=sessions,
         page="allchats",
     )
@@ -174,7 +174,7 @@ def admin_panda():
 
     pandas = g.redis.hgetall('punish-scene')
 
-    return render_template('global_globalpanda.html',
+    return render_template('admin/panda.html',
         lines=pandas,
         result=result,
         page="panda"

@@ -1,4 +1,6 @@
-{% include 'header_admin.html' %}
+{% extends 'admin/base.html' %}
+
+{% block content %}
 
 <div class="container">
     <h1> All Chats <small>{{chats|length}} chats listed.</small> </h1>
@@ -25,7 +27,4 @@
         </tbody>
     </table>
 </div>
-
-</body>
-
-</html>
+{% endblock %}

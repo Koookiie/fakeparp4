@@ -85,7 +85,7 @@ def save():
     try:
         if 'character' in request.form:
             g.user.save_character(request.form)
-        if 'save_pickiness' in request.form:
+        if 'para' in request.form or 'nsfw' in request.form:
             g.user.save_pickiness(request.form)
         if 'create' in request.form:
             chat = request.form['chaturl']

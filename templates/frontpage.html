@@ -48,7 +48,7 @@
 <div class="jumbotron mainjumbo">
   <div class="container">
     <h1>RP.TC</h1>
-    <strong style="font-size: 18px"> {{message|safe}} </strong>
+    <strong style="font-size: 18px"> {% if message %} {{message.decode("utf8")|safe}} {% endif %} </strong>
     <p style="font-size: 15px">{{users_searching+users_chatting}} users online ({{users_searching}} searching, {{users_chatting}} chatting)</p>
   </div>
 </div>
@@ -200,7 +200,7 @@
                     {% for chat in active_pub %}
                         <div id="chat_{{chat['url']}}">
                             <h3 class="url"><a href="/chat/{{chat['url']}}">{{chat['url']}}</a></h3>
-                            <p class="topic">{{chat['topic']}}</p>
+                            <p class="topic">{% if 'topic' in chat %} {{chat['topic'].decode("utf8")}} {% endif %}</p>
                             <p class="online">
                                 <span class="num_active">Active: {{chat['active']}}</span>
                                 <span class="num_idle">Idle: {{chat['idle']}}</span>

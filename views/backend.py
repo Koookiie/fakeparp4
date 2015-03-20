@@ -61,7 +61,7 @@ def postMessage():
         # Remove linebreaks and truncate to 1500 characters.
         line = request.form['line'].replace('\n', ' ')[:1500]
 
-        if g.redis.hexists('punish-scene', request.headers['X-Forwarded-For']):
+        if g.redis.hexists('punish-scene', g.user.ip):
             line = randpunish(g.redis, g.user.session_id, chat, line)
         send_message(g.redis, chat, g.user.meta['counter'], 'message', line, g.user.character['color'], g.user.character['acronym'])
     if 'state' in request.form and request.form['state'] in ['online', 'idle']:

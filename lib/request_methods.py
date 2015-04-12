@@ -3,7 +3,7 @@ from functools import wraps
 from flask import g, request, abort
 from redis import ConnectionPool, Redis
 
-from lib import validate_chat_url
+from lib import validate_chat_url, session_validator
 from characters import CHARACTER_DETAILS
 from model import sm
 from sessions import Session
@@ -54,7 +54,7 @@ def create_session():
     chat = request.form.get('chat', None)
 
     if chat and validate_chat_url(chat):
-        if session_id is None:
+        if session_id is None or session_validator.match(session_id) is None:
             abort(400)
         g.user = Session(g.redis, session_id, chat)
 

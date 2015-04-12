@@ -5,11 +5,11 @@ import tornado.web
 import tornado.gen
 import ujson as json
 from tornadoredis import Client
-import re
+from lib import session_validator
+import os
 
 print "WS Server started!"
 
-session_validator = re.compile('^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$')
 wsclients = set()
 
 class WSHandler(tornado.websocket.WebSocketHandler):
@@ -17,7 +17,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         return True
 
     def open(self, chat):
-        self.client = Client()
+        self.client = Client(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
         self.chat = chat
         self.redis_listen("chat:"+str(self.chat))
         self.remote_ip = self.request.headers.get('X-Forwarded-For', self.request.headers.get('X-Real-Ip', self.request.remote_ip))
@@ -71,7 +71,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
         self.client.disconnect()
 
 settings = dict(
-    debug=True,
+    debug='DEBUG' in os.environ,
     gzip=True,
 )
 
@@ -81,7 +81,6 @@ application = tornado.web.Application([
 
 
 if __name__ == "__main__":
-    application.autoreload = True
     http_server = tornado.httpserver.HTTPServer(application)
-    http_server.listen(8081)
+    http_server.listen(5000)
     tornado.ioloop.IOLoop.instance().start()

@@ -1,6 +1,6 @@
 import json
 from socket import inet_aton
-
+from functools import wraps
 from flask import (
     Blueprint,
     g,
@@ -10,11 +10,18 @@ from flask import (
 
 blueprint = Blueprint('admin', __name__)
 
-@blueprint.route("/changemessages", methods=['GET', 'POST'])
-def change_messages():
+def require_admin(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Create DB object if it does not exist.
+        if not g.user.globalmod:
+            return render_template('admin_denied.html')
+        return f(*args, **kwargs)
+    return decorated_function
 
-    if not g.user.globalmod:
-        return render_template('admin_denied.html')
+@blueprint.route("/changemessages", methods=['GET', 'POST'])
+@require_admin
+def change_messages():
 
     if 'front_message' in request.form:
         front_message = request.form['front_message']
@@ -28,11 +35,9 @@ def change_messages():
     )
 
 @blueprint.route("/broadcast", methods=['GET', 'POST'])
+@require_admin
 def global_broadcast():
     result = None
-
-    if not g.user.globalmod:
-        return render_template('admin_denied.html')
 
     if 'line' in request.form:
         color = request.form.get('color', "000000")
@@ -81,14 +86,11 @@ def global_broadcast():
         page="broadcast",
     )
 
-
 @blueprint.route('/allbans', methods=['GET', 'POST'])
+@require_admin
 def admin_allbans():
     sort = request.args.get('sort', None)
     result = None
-
-    if not g.user.globalmod:
-        return render_template('admin_denied.html')
 
     if "ip" in request.form and "chat" in request.form:
         chat = request.form['chat']
@@ -118,9 +120,8 @@ def admin_allbans():
     )
 
 @blueprint.route('/allchats')
+@require_admin
 def show_allchats():
-    if not g.user.globalmod:
-        return "denid"
     pipe = g.redis.pipeline()
     sessions = []
     chats = set()
@@ -155,10 +156,9 @@ def show_allchats():
     )
 
 @blueprint.route('/panda', methods=['GET', 'POST'])
+@require_admin
 def admin_panda():
     result = None
-    if not g.user.globalmod:
-        return render_template('admin_denied.html')
 
     if "ip" in request.form:
         ip = request.form['ip']

@@ -8,12 +8,6 @@ from lib import get_time
 from lib.api import disconnect
 from lib.characters import CHARACTER_DETAILS
 
-def get_default(redis, session, chat, key, defaultValue=''):
-    v = redis.hget("session."+session+".chat."+chat, key)
-    if v is not None:
-        return v
-    return defaultValue
-
 if __name__ == '__main__':
 
     redis = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))

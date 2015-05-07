@@ -1,6 +1,5 @@
 import json
 from socket import inet_aton
-from functools import wraps
 from flask import (
     Blueprint,
     g,
@@ -8,16 +7,9 @@ from flask import (
     render_template
 )
 
-blueprint = Blueprint('admin', __name__)
+from lib.decorators import require_admin
 
-def require_admin(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        # Create DB object if it does not exist.
-        if not g.user.globalmod:
-            return render_template('admin_denied.html')
-        return f(*args, **kwargs)
-    return decorated_function
+blueprint = Blueprint('admin', __name__)
 
 @blueprint.route("/changemessages", methods=['GET', 'POST'])
 @require_admin

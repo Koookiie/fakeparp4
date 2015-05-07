@@ -1,10 +1,3 @@
-from functools import wraps
-
-from bcrypt import (
-    gensalt,
-    hashpw
-)
-
 from flask import (
     Blueprint,
     g,
@@ -20,10 +13,7 @@ from lib import (
     get_time
 )
 
-from lib.api import (
-    ping,
-    disconnect
-)
+from lib.api import disconnect
 
 from lib.groups import (
     MOD_GROUPS,
@@ -39,17 +29,8 @@ from lib.messages import (
 
 from lib.characters import CHARACTER_DETAILS
 from lib.punishments import randpunish
-
+from lib.decorators import mark_alive, require_admin
 blueprint = Blueprint('backend', __name__)
-
-# Decorators
-
-def mark_alive(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        g.joining = ping(g.redis, request.form['chat'], g.user, g.chat_type)
-        return f(*args, **kwargs)
-    return decorated_function
 
 # Views
 
@@ -320,9 +301,8 @@ def save():
 # Globalmod stuff.
 
 @blueprint.route('/ip_lookup', methods=['POST'])
+@require_admin
 def ip_lookup():
-    if not g.user.globalmod:
-        return "go away"
     chat = request.form['chat']
     counter = request.form['counter']
     theircookie = g.redis.hget("chat."+chat+".counters", counter)

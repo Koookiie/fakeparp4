@@ -15,8 +15,8 @@ blueprint = Blueprint('log', __name__)
 
 # Logs
 
-@use_db
 @blueprint.route('/id/<logid>')
+@use_db
 def getLogByID(logid=None):
     if not logid:
         return redirect(url_for("main.home"))

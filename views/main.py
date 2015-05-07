@@ -79,8 +79,8 @@ def quitSearching():
 
 # Save
 
-@use_db
 @blueprint.route('/save', methods=['POST'])
+@use_db
 def save():
     try:
         if 'character' in request.form:
@@ -114,9 +114,9 @@ def save():
 
 # Logs
 
-@use_db
 @blueprint.route('/logs/save', methods=['POST'])
 @blueprint.route('/chat/<chat_url>/save_log')
+@use_db
 def save_log(chat_url=None):
     if 'chat' in request.form:
         if not validate_chat_url(request.form['chat']):

@@ -33,9 +33,9 @@ from lib.sessions import CASE_OPTIONS
 
 blueprint = Blueprint('chat', __name__)
 
-@use_db
 @blueprint.route('/')
 @blueprint.route('/<chat_url>')
+@use_db
 def chat(chat_url=None):
     if chat_url is None:
         chat_meta = {'type': 'unsaved'}
@@ -116,8 +116,8 @@ def chat(chat_url=None):
         highlight=highlight
     )
 
-@use_db
 @blueprint.route('/<chat>/log')
+@use_db
 def view_log(chat=None):
 
     # Decide whether or not to put a continue link in.

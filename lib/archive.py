@@ -187,7 +187,6 @@ def delete_chat(redis, mysql, chat_url):
 
     redis.delete('chat.'+chat_url+'.online')
     redis.delete('chat.'+chat_url+'.idle')
-    redis.delete('chat.'+chat_url+'.characters')
 
     for session_id in redis.hvals('chat.'+chat_url+'.counters'):
         redis.srem('session.'+session_id+'.chats', chat_url)

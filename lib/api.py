@@ -27,8 +27,6 @@ def ping(redis, chat, session, chat_type):
             join_message = '%s [%s] joined chat.' % (session.character['name'], session.character['acronym'])
         send_message(redis, chat, -1, 'user_change', join_message)
         redis.sadd('sessions-chatting', session.session_id)
-        # Add character to chat character list.
-        redis.sadd('chat.'+chat+'.characters', session.character['character'])
         redis.zadd('chats-alive', chat+'/'+session.session_id, get_time(PING_PERIOD*2))
         return True
     redis.zadd('chats-alive', chat+'/'+session.session_id, get_time(PING_PERIOD*2))

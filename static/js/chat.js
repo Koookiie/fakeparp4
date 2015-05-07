@@ -951,31 +951,6 @@ $(document).ready(function() {
             }
         });
 
-        $('#inPass').click(function() {
-            var admin_pass = prompt('Enter your Admin Password:');
-            if (admin_pass!=null) {
-                $.post(POST_URL,{'chat': chat, 'modPass': admin_pass.substr(0, 150), 'counter': user.meta.counter});
-            }
-        });
-
-        $('#editPass').click(function() {
-            if (user.meta.group == 'globalmod') {
-                var admin_pass = prompt('Enter the new Admin Password:');
-                if (admin_pass!=null) {
-                    $.post(POST_URL,{'chat': chat, 'editPass': admin_pass.substr(0, 150), 'counter': user.meta.counter});
-                }
-            } else if (user.meta.group == 'mod') {
-                var admin_old_pass = prompt('Enter the old Admin Password:');
-                var admin_pass = prompt('Enter the new Admin Password:');
-                if (admin_pass!=null) {
-                    if (admin_old_pass == null) {
-                        admin_old_pass == '';
-                    }
-                    $.post(POST_URL,{'chat': chat, 'oldPass': admin_old_pass.substr(0, 150), 'editPass': admin_pass.substr(0, 150), 'counter': user.meta.counter});
-                }
-            }
-        });
-
         /* End Charat */
 
         // Activate mobile mode on small screens

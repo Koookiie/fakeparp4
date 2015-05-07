@@ -33,12 +33,12 @@ hr {
 	border-width: 1px 0 0 0;
 }
 
-button, input, select, #conversation, #settings, #userList, #preview, .aButton {
+button, input, select, #conversation, #settings, #userList, #preview, .aButton, #archiveConversation, .pager {
 	border: 1px solid #999999;
 	border-radius: 1px;
 }
 
-#conversation, #settings, #userList, #preview {
+#conversation, #settings, #userList, #preview, #archiveConversation, .pager {
 	background-color: #eeeeee;
 }
 
@@ -364,4 +364,29 @@ body.mobile.withSidebar #conversation, body.mobile.withSidebar #controls {
 
 #topic:not(:empty) {
 	border-bottom: 1px solid #999999;
+}
+
+/* Archive */
+
+#archiveConversation {
+	margin: 5px 0;
+	padding: 2px 0;
+}
+
+#archiveConversation h1 {
+	margin: 5px;
+}
+
+.pager {
+	padding: 2px 5px;
+}
+
+.timestamp {
+	display: none;
+}
+
+p:hover .timestamp {
+	display: block;
+	float: right;
+	color: #666;
 }

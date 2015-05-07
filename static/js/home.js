@@ -48,7 +48,7 @@ $(document).ready(function() {
 		$('.opting').removeClass('sopting');
 
 		// Add active clesses to the current elements
-		$("."+id).addClass('sopting');;
+		$("."+id).addClass('sopting');
 		$(this).parent().addClass('active');
 		window.history.pushState("", $('title').html, "/?m="+id);
 	});

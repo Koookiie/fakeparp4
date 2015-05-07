@@ -89,19 +89,15 @@ def save():
             g.user.save_pickiness(request.form)
         if 'create' in request.form:
             chat = request.form['chaturl']
-            mod_pass = request.form['mod_pass']
-            if g.redis.exists('chat.'+chat+'.counter') or g.redis.exists('chat.'+chat+'.meta') or g.redis.exists('chat.'+chat):
+            if g.redis.exists('chat.'+chat+'.meta') or g.redis.exists('chat.'+chat):
                 raise ValueError('chaturl_taken')
             # USE VALIDATE_CHAT_URL
             if not validate_chat_url(chat):
                 raise ValueError('chaturl_invalid')
-            if mod_pass == '':
-                raise ValueError('password_invalid')
             g.user.set_chat(chat)
             if g.user.meta['group'] != 'globalmod':
                 g.user.set_group('mod')
             g.redis.hmset('chat.'+chat+'.meta', {'type': 'group', 'public': '0'})
-            g.redis.hset('chat.'+chat+'.counter', 'modPass', mod_pass)
 
             get_or_create_log(g.redis, g.mysql, chat, 'group')
             g.mysql.commit()

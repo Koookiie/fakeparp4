@@ -7,7 +7,7 @@
 <script src="/static/js/characters.js?8"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 
-{% if error=="chaturl_taken" or error=="chaturl_invalid" or error=="password_invalid" %}
+{% if error=="chaturl_taken" or error=="chaturl_invalid" %}
 <script>
     group_chat_error = 1;
 </script>
@@ -61,8 +61,6 @@
             <div class="alert alert-danger"><strong>The chat URL you specified has already been taken.</strong></div>
         {% elif error=="chaturl_invalid" %}
             <div class="alert alert-danger"><strong>The chat URL you specified is invalid. Chat URLs can only contain letters, numbers, hyphens and underscores.</strong></div>
-        {% elif error=="password_invalid" %}
-            <div class="alert alert-danger"><strong>Invalid Password.</strong></div>
         {% endif %}
         <div class="row">
             <div class="opting main sopting">
@@ -188,10 +186,9 @@
         <center>
             <div class="form-group">
                 <input class="form-control groups" type="text" name="chaturl" id="groupsub" placeholder="Chat URL" maxlength="100">
-                <input class="form-control groups btn btn-primary" id="groupbut" type="submit" name="create" value="Create Chat Room">
             </div>
             <div class="form-group">
-                <input class="form-control groups" type="password" name="mod_pass" id="modpass" placeholder="Admin Password" maxlength="100">
+                <input class="form-control groups btn btn-primary" id="groupbut" type="submit" name="create" value="Create Chat Room">
             </div>
             <div class="group_container">
                 <h1>Public Groups</h1>

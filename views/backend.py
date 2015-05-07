@@ -234,26 +234,6 @@ def postMessage():
                 g.redis.hdel('chat.'+chat+'.meta', 'audio')
                 send_message(g.redis, chat, -1, 'meta_change', '%s removed the conversation audio.' % g.user.character['name'])
 
-    if 'modPass' in request.form and 'counter' in request.form:
-        if request.form['modPass'] == g.redis.hget('chat.'+chat+'.counter', 'modPass'):
-            set_session_id = g.redis.hget('chat.'+chat+'.counters', request.form['counter']) or abort(400)
-            if g.redis.hget('session.'+set_session_id+'.meta.'+chat, 'group') != 'globalmod':
-                g.redis.hset('session.'+set_session_id+'.meta.'+chat, 'group', 'mod')
-                send_message(g.redis, chat, -1, 'user_change', g.user.character['name']+' became a Magical Mod.')
-            else:
-                send_message(g.redis, chat, -1, 'meta_change', g.user.character['name']+' is too cool to be a Magical Mod.')
-        else:
-            send_message(g.redis, chat, -1, 'meta_change', g.user.character['name']+' failed at becoming a Magical Mod.')
-        return 'ok'
-
-    if 'editPass' in request.form:
-        oldpass = g.redis.hget('chat.'+chat+'.counter', 'modPass')
-
-        if (g.user.meta['group'] == 'mod' and validatepass(request.form["editPass"], oldpass.encode()) != oldpass) or g.user.meta['group'] == 'globalmod':
-            cryptedpw = hashpw(request.form["modPass"].encode("utf8"), gensalt())
-            g.redis.hset('chat.'+chat+'.counter', 'modPass', cryptedpw)
-            send_message(g.redis, chat, -1, 'meta_change', g.user.character['name']+' has changed the Admin Password.')
-
     return 'ok'
 
 @blueprint.route('/highlight', methods=['POST'])

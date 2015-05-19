@@ -24,7 +24,7 @@ def ping(redis, chat, session, chat_type):
         if session.meta['group'] == 'silent':
             join_message = None
         else:
-            join_message = '%s [%s] joined chat.' % (session.character['name'], session.character['acronym'])
+            join_message = '%s [%s] joined chat. ~~ %s ~~' % (session.character['name'], session.character['acronym'], session.meta['counter'])
         send_message(redis, chat, -1, 'user_change', join_message)
         redis.sadd('sessions-chatting', session.session_id)
         redis.zadd('chats-alive', chat+'/'+session.session_id, get_time(PING_PERIOD*2))

@@ -444,10 +444,7 @@ $(document).ready(function() {
                         clearChat();
                         addLine({ counter: -1, color: '000000', line: 'You have been kicked from this chat. Please think long and hard about your behaviour before rejoining.' });
                     } else if (data.exit=='ban') {
-                        latestNum = -1;
-                        chat = 'theoubliette'
-                        $('#userList h1')[0].innerHTML = 'theoubliette';
-                        $('#conversation').empty();
+                        window.location.replace(document.location.origin + "/chat/theoubliette");
                     }
                     return true;
                 }

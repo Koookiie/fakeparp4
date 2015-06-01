@@ -1,0 +1,5 @@
+# Dokku scaling. 1 web, 1 archiver, 1 reaper, 1 matchmaker
+web=1
+archiver=1
+reaper=1
+matchmaker=1

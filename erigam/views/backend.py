@@ -229,7 +229,7 @@ def saveHighlight():
     counter = request.form['counter']
     try:
         counter = int(counter)
-    except TypeError:
+    except (ValueError, TypeError):
         return "error", 500
     if request.form['counter'] != '':
         g.redis.hset("chat.%s.highlights" % (chat), g.user.meta['counter'], counter)

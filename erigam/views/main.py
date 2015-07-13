@@ -100,7 +100,6 @@ def save():
             g.redis.hmset('chat.'+chat+'.meta', {'type': 'group', 'public': '0'})
 
             get_or_create_log(g.redis, g.mysql, chat, 'group')
-            g.mysql.commit()
             return redirect(url_for('chat.chat', chat_url=chat))
         elif 'tags' in request.form:
             g.user.save_pickiness(request.form)

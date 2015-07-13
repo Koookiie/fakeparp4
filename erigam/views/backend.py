@@ -240,7 +240,7 @@ def saveHighlight():
 @blueprint.route('/ping', methods=['POST'])
 @mark_alive
 def pingServer():
-    return 'ok'
+    return '', 204
 
 @blueprint.route('/messages', methods=['POST'])
 @mark_alive

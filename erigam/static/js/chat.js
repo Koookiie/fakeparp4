@@ -26,7 +26,7 @@ $(document).ready(function() {
 
 	var pingInterval;
 	var chatState;
-	var userState;
+	var userState = 'online';
 	var newState;
 	var currentSidebar;
 	var previewHidden = false;
@@ -52,39 +52,30 @@ $(document).ready(function() {
 		$(".stoptions").show();
 
 		if (!localStorage.getItem(chat+"disnot")) {
-			if (!localStorage.disnot) {
-				localStorage.disnot = 1;
-			}
 			localStorage.setItem(chat+"disnot",localStorage.disnot);
 		}
 
-		if (localStorage.getItem(chat+"sysnot") == 'undefined' || localStorage.getItem(chat+"sysnot") === null) {
-			if (!localStorage.sysnot) {
-				localStorage.sysnot = 0;
-			}
+		if (!localStorage.getItem(chat+"sysnot")) {
 			localStorage.setItem(chat+"sysnot",localStorage.sysnot);
 		}
 
-		if (localStorage.getItem(chat+"oocset") == 'undefined' || localStorage.getItem(chat+"oocset") === null) {
+		if (!localStorage.getItem(chat+"oocset")) {
 			localStorage.setItem(chat+"oocset",0);
 		}
 
-		if (localStorage.getItem(chat+"bbset") == 'undefined' || localStorage.getItem(chat+"bbset") === null) {
-			if (!localStorage.bbset) {
-				localStorage.bbset = 1;
-			}
+		if (!localStorage.getItem(chat+"bbset")) {
 			localStorage.setItem(chat+"bbset",localStorage.bbset);
 		}
 
-		if (localStorage.getItem(chat+"audioset") == 'undefined' || localStorage.getItem(chat+"audioset") === null) {
+		if (!localStorage.getItem(chat+"audioset")) {
 			localStorage.setItem(chat+"audioset", 0);
 		}
 
-		if (localStorage.getItem(chat+"bgset") == 'undefined' || localStorage.getItem(chat+"bgset") === null) {
+		if (!localStorage.getItem(chat+"bgset")) {
 			localStorage.setItem(chat+"bgset", 0);
 		}
 
-		if (localStorage.getItem(chat+"highlightall") == 'undefined' || localStorage.getItem(chat+"highlightall") === null) {
+		if (!localStorage.getItem(chat+"highlightall")) {
 			localStorage.setItem(chat+"highlightall", 0);
 		}
 
@@ -147,10 +138,8 @@ $(document).ready(function() {
 		if (Modernizr.localstorage) {
 			if (this.checked) {
 				localStorage.setItem(chat+"disnot",1);
-				localStorage.disnot = 1;
 			} else {
 				localStorage.setItem(chat+"disnot",0);
-				localStorage.disnot = 0;
 			}
 		}
 		if (this.checked) {
@@ -164,7 +153,6 @@ $(document).ready(function() {
 		if (this.checked) {
 			if (Modernizr.localstorage) {
 				localStorage.setItem(chat+"sysnot",1);
-				localStorage.sysnot = 1;
 			}
 			sysnot = 1;
 			$('.system').hide();
@@ -172,7 +160,6 @@ $(document).ready(function() {
 		} else {
 			if (Modernizr.localstorage) {
 				localStorage.setItem(chat+"sysnot",0);
-				localStorage.sysnot = 0;
 			}
 			sysnot = 0;
 			$('.system').show();
@@ -200,13 +187,11 @@ $(document).ready(function() {
 		if (this.checked) {
 			if (Modernizr.localstorage) {
 				localStorage.setItem(chat+"bbset",1);
-				localStorage.bbset = 1;
 			}
 			bbset = 1;
 		} else {
 			if (Modernizr.localstorage) {
 				localStorage.setItem(chat+"bbset",0);
-				localStorage.bbset = 0;
 			}
 			bbset = 0;
 		}
@@ -232,7 +217,6 @@ $(document).ready(function() {
 		if (this.checked) {
 			if (Modernizr.localstorage) {
 				localStorage.setItem(chat+"bgset",1);
-				localStorage.bgset = 1;
 			}
 			bgset = 1;
 			if (typeof background !=='undefined') {
@@ -242,7 +226,6 @@ $(document).ready(function() {
 		} else {
 			if (Modernizr.localstorage) {
 				localStorage.setItem(chat+"bgset",0);
-				localStorage.bgset = 0;
 			}
 			bgset = 0;
 			$("body").css('background-image', 'none');
@@ -253,15 +236,13 @@ $(document).ready(function() {
 	$('.highlightall').click(function() {
 		if (this.checked) {
 			if (Modernizr.localstorage) {
-				localStorage.setItem(chat+"highlightall",1);
-				localStorage.bgset = 1;
+				localStorage.setItem(chat+"highlightall", 1);
 			}
 			highlightall = 1;
 			$(".message").css('background-color', "rgba(0, 0, 0, 0.75)");
 		} else {
 			if (Modernizr.localstorage) {
-				localStorage.setItem(chat+"highlightall",0);
-				localStorage.bgset = 0;
+				localStorage.setItem(chat+"highlightall", 0);
 			}
 			highlightall = 0;
 			$(".message").css('background-color', "");
@@ -297,16 +278,6 @@ $(document).ready(function() {
 
 	$('input, select, button').attr('disabled', 'disabled');
 
-	if (document.cookie === "") {
-
-		$('<p>').css('color', '#FF0000').text('It seems you have cookies disabled. Unfortunately cookies are essential for MSPARP to work, so you\'ll need to either enable them or add an exception in order to use MSPARP.').appendTo(conversation);
-
-		$('#controls').submit(function() {
-			return false;
-		});
-
-	}
-
 	// Search
 
 	function runSearch() {
@@ -328,7 +299,6 @@ $(document).ready(function() {
 
 	function startChat() {
 		chatState = 'chat';
-		userState = 'online';
 		document.title = 'Chat - '+ORIGINAL_TITLE;
 		conversation.removeClass('search');
 		$('input, select, button').removeAttr('disabled');
@@ -504,6 +474,8 @@ $(document).ready(function() {
 		pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
 	}
 
+	$('#disconnectButton').click(disconnect);
+
 	function disconnect() {
 		if (confirm('Are you sure you want to disconnect?')) {
 			$.ajax(QUIT_URL, {'type': 'POST', data: {'chat': chat}});
@@ -512,13 +484,11 @@ $(document).ready(function() {
 				$("#disconnectButton").unbind( "click" );
 				$("#disconnectButton").removeAttr("disabled");
 				$("#disconnectButton").text("New chat" );
-				$('#disconnectButton').click(reconnect);
+				$('#disconnectButton').click(function() {
+					window.location.replace(document.location.origin + "/chat");
+				});
 			}
 		}
-	}
-
-	function reconnect() {
-		window.location.replace(document.location.origin + "/chat");
 	}
 
 	function clearChat() {
@@ -806,8 +776,6 @@ $(document).ready(function() {
 		}
 		return false;
 	});
-
-	$('#disconnectButton').click(disconnect);
 
 	$('#idleButton').click(function() {
 		if (userState=='idle') {

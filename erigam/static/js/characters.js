@@ -851,9 +851,9 @@ $(document).ready(function() {
 				$('input[name="'+characterKeys[i]+'"], select[name="'+characterKeys[i]+'"]').val(newCharacter[characterKeys[i]]);
 			}
 			clearReplacements(null);
-			if (newCharacter['replacements'].length>0) {
-				for (i=0; i<newCharacter['replacements'].length; i++) {
-					addReplacement(null, newCharacter['replacements'][i][0], newCharacter['replacements'][i][1]);
+			if (newCharacter.replacements.length>0) {
+				for (i=0; i<newCharacter.replacements.length; i++) {
+					addReplacement(null, newCharacter.replacements[i][0], newCharacter.replacements[i][1]);
 				}
 			} else {
 				addReplacement();

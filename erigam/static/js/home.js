@@ -7,7 +7,7 @@ $(document).ready(function() {
 	};
 
 	// You need cookies to use this site.
-	if (document.cookie=="") {
+	if (document.cookie === "") {
 		$('<p class="error">').text("It seems you have cookies disabled. Unfortunately cookies are essential for MSPARP to work, so you'll need to either enable them or add an exception in order to use MSPARP.").appendTo(document.body);
 	}
 
@@ -27,7 +27,7 @@ $(document).ready(function() {
 
 		// Text
 		var name = $("select.character-select").val();
-		config.find('#color-preview #quote').text(characters[name]['quote']);
+		config.find('#color-preview #quote').text(characters[name].quote);
 		if (name=="kankri") {
 			$.get('/static/txt/seri9usly_this_is_fucking_ridicul9us.txt', function(reply) {
 				config.find('#color-preview #quote').text(reply);

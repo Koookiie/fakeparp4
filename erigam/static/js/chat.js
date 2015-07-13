@@ -27,7 +27,7 @@ function readCookie(name) {
     for(var i=0;i < ca.length;i++) {
         var c = ca[i];
         while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length,c.length);
     }
     return null;
 }
@@ -47,8 +47,8 @@ $(document).ready(function() {
 
     var CHAT_FLAGS = ['autosilence', 'public', 'nsfw'];
 
-    var MOD_GROUPS = ['globalmod', 'mod', 'mod2', 'mod3']
-    var GROUP_RANKS = { 'globalmod': 6, 'mod': 5, 'mod2': 4, 'mod3': 3, 'user': 2, 'silent': 1 }
+    var MOD_GROUPS = ['globalmod', 'mod', 'mod2', 'mod3'];
+    var GROUP_RANKS = { 'globalmod': 6, 'mod': 5, 'mod2': 4, 'mod3': 3, 'user': 2, 'silent': 1 };
     var GROUP_DESCRIPTIONS = {
         'globalmod': { title: 'God tier moderator', description: 'RP.TC staff.', shorthand: 'Staff' },
         'mod': { title: 'Professional Wet Blanket', description: 'can silence, kick and ban other users.', shorthand: 'Wet Blanket' },
@@ -76,9 +76,9 @@ $(document).ready(function() {
     var globals = [];
 
     // Settings
-    var disnot = 1
+    var disnot = 1;
     var sysnot = 0;
-    var oocset, audioset, bgset, highlightall = 0
+    var oocset, audioset, bgset, highlightall = 0;
     var bbset = 1;
     var audio, background;
 
@@ -89,7 +89,7 @@ $(document).ready(function() {
     ws = null;
 
     if (Modernizr.localstorage) {
-        $(".stoptions").show()
+        $(".stoptions").show();
 
         if (!localStorage.getItem(chat+"disnot")) {
             if (!localStorage.disnot) {
@@ -140,7 +140,7 @@ $(document).ready(function() {
         $('.globalann').show();
     }
 
-    if (disnot == 0) {
+    if (disnot === 0) {
         $('.disnot').removeAttr('checked');
     } else {
         $('.disnot').attr('checked','checked');
@@ -325,7 +325,7 @@ $(document).ready(function() {
         } 
     });
 
-    if ($('#topic').length != 0) {
+    if ($('#topic').length !== 0) {
         if (bbset == 1) {
             text = bbEncode(htmlEncode(linkify($('#topic').html())));
             $('#topic').html(text);
@@ -337,7 +337,7 @@ $(document).ready(function() {
 
     $('input, select, button').attr('disabled', 'disabled');
 
-    if (document.cookie=="") {
+    if (document.cookie === "") {
 
         $('<p>').css('color', '#FF0000').text('It seems you have cookies disabled. Unfortunately cookies are essential for MSPARP to work, so you\'ll need to either enable them or add an exception in order to use MSPARP.').appendTo(conversation);
 
@@ -351,7 +351,7 @@ $(document).ready(function() {
 
         function runSearch() {
             $.post(SEARCH_URL, {}, function(data) {
-                chat = data['target'];
+                chat = data.target;
                 chaturl = '/chat/'+chat;
                 if (typeof window.history.replaceState!="undefined") {
                     window.history.replaceState('', '', chaturl);
@@ -451,7 +451,7 @@ $(document).ready(function() {
                 var messages = data.messages;
                 for (var i=0; i<messages.length; i++) {
                     addLine(messages[i]);
-                    latestNum = Math.max(latestNum, messages[i]['id']);
+                    latestNum = Math.max(latestNum, messages[i].id);
                 }
                 if (typeof data.counter!=="undefined") {
                     user.meta.counter = data.counter;
@@ -467,7 +467,7 @@ $(document).ready(function() {
                     // Reload chat metadata.
                     var chat_meta = data.meta;
                     for (i=0; i<CHAT_FLAGS.length; i++) {
-                        if (typeof data.meta[CHAT_FLAGS[i]] !== 'undefined' && data.meta[CHAT_FLAGS[i]] != 0) {
+                        if (typeof data.meta[CHAT_FLAGS[i]] !== 'undefined' && data.meta[CHAT_FLAGS[i]] !== 0) {
                             $('#'+CHAT_FLAGS[i]).addClass('active');
                             $('#'+CHAT_FLAGS[i]+'Result').show();
                         } else {
@@ -485,9 +485,9 @@ $(document).ready(function() {
 
                     //Backgrounds
                     if (typeof data.meta.background == 'undefined') {
-                        $("#conversation, #userList, #settings").css("background-color", "rgb(238, 238, 238)")
+                        $("#conversation, #userList, #settings").css("background-color", "rgb(238, 238, 238)");
                     } else if (bgset == 1){
-                        $("#conversation, #userList, #settings").css("background-color", "rgba(238, 238, 238, 0.5)")
+                        $("#conversation, #userList, #settings").css("background-color", "rgba(238, 238, 238, 0.5)");
                     }
 
                     if (typeof data.meta.background!=='undefined' && bgset == 1) {
@@ -526,7 +526,7 @@ $(document).ready(function() {
                         $('#inPass').show();
                     }
                 }
-                if (messages.length>0 && typeof hidden!=="undefined" && document[hidden]==true) {
+                if (messages.length>0 && typeof hidden!=="undefined" && document[hidden] === true) {
                     document.title = "New message - "+ORIGINAL_TITLE;
                 }
                 if (typeof data.lol!=="undefined") {
@@ -610,20 +610,20 @@ $(document).ready(function() {
                 var currentUser = users[i];
                 // Get or create a list item.
                 var listItem = $(holdingList).find('#user'+currentUser.meta.counter);
-                if (listItem.length==0) {
-                    var listItem = $('<li />').attr('id', 'user'+currentUser.meta.counter);
+                if (listItem.length === 0) {
+                    listItem = $('<li />').attr('id', 'user'+currentUser.meta.counter);
                     listItem.click(showActionList);
                 }
                 // Name is a reserved word; this may or may not break stuff but whatever.
-                listItem.css('color', '#'+currentUser.character.color).text(currentUser.character['name']);
+                listItem.css('color', '#'+currentUser.character.color).text(currentUser.character.name);
                 listItem.removeClass().addClass(currentUser.meta.group);
                 if (currentUser.meta.group == 'globalmod'){
                     globals.push(currentUser.meta.counter);
                 }
-                var currentGroup = GROUP_DESCRIPTIONS[currentUser.meta.group]
-                var userTitle = currentGroup.title
-                if (currentGroup.description!='') {
-                    userTitle += ' - '+GROUP_DESCRIPTIONS[currentUser.meta.group].description
+                var currentGroup = GROUP_DESCRIPTIONS[currentUser.meta.group];
+                var userTitle = currentGroup.title;
+                if (currentGroup.description !== '') {
+                    userTitle += ' - '+GROUP_DESCRIPTIONS[currentUser.meta.group].description;
                 }
                 listItem.attr('title', userTitle);
                 if (currentUser.meta.counter==user.meta.counter) {
@@ -641,14 +641,14 @@ $(document).ready(function() {
                     } else {
                         $(document.body).addClass('modPowers');
                     }
-                    if (GROUP_RANKS[user.meta.group] >= GROUP_RANKS['mod']) {
+                    if (GROUP_RANKS[user.meta.group] >= GROUP_RANKS.mod) {
                         $(document.body).addClass('pwbPowers');
                     } else {
                         $(document.body).removeClass('pwbPowers');
                     }
                     listItem.addClass('self').append(' (you)');
                 }
-                var userspan = $("<span/>").addClass("userID").text(GROUP_DESCRIPTIONS[currentUser.meta.group].shorthand + " - user" + currentUser.meta.counter)
+                var userspan = $("<span/>").addClass("userID").text(GROUP_DESCRIPTIONS[currentUser.meta.group].shorthand + " - user" + currentUser.meta.counter);
                 listItem.append(userspan); 
                 listItem.removeData().data(currentUser).appendTo(listElement);
             }
@@ -711,10 +711,10 @@ $(document).ready(function() {
             var actionData = {'chat': chat, 'user_action': action, 'counter': counter};
             if (action=='ip_ban') {
                 var reason = prompt('Please enter a reason for this ban (spamming, not following rules, etc.):');
-                if (reason==null) {
+                if (reason === null) {
                     return;
-                } else if (reason!="") {
-                    actionData['reason'] = reason;
+                } else if (reason !== "") {
+                    actionData.reason = reason;
                 }
             }
             if (counter!=user.meta.counter || confirm('You are about to kick and/or ban yourself. Are you sure you want to do this?')) {
@@ -725,8 +725,7 @@ $(document).ready(function() {
         function ipLookup() {
             var counter = $(this).parent().parent().data().meta.counter;
             $.post("/chat_ajax/ip_lookup", { 'chat': chat, 'counter': counter, }, function(ip) {
-                var msg = {counter: "-1", color: "000000", line: "[SYSTEM] user" +counter+ "'s IP: " + ip}
-                addLine(msg);
+                addLine({counter: "-1", color: "000000", line: "[SYSTEM] user" +counter+ "'s IP: " + ip});
             });
         }
 
@@ -735,7 +734,7 @@ $(document).ready(function() {
                 $.post("/chat_ajax/highlight", {chat: chat, counter: counter});
             }
             $('.highlight').removeClass('highlight');
-            if (counter!=null) {
+            if (counter !== null) {
                 $('.user'+counter).addClass('highlight');
             }
             highlightUser = counter;
@@ -783,8 +782,9 @@ $(document).ready(function() {
                 $('#preview').html('&nbsp;');
             }
             $('#conversation').css('bottom',($('#controls').height()+10)+'px');
-            return textPreview.length!=0;
+            return textPreview.length !== 0;
         }
+
         $('#textInput').change(updateChatPreview).keyup(updateChatPreview).change();
 
         $('#hidePreview').click(function() {
@@ -802,7 +802,7 @@ $(document).ready(function() {
 
         if (typeof document.addEventListener!=="undefined" && typeof hidden!=="undefined") {
             document.addEventListener(visibilityChange, function() {
-                if (chatState=='chat' && document[hidden]==false) {
+                if (chatState=='chat' && document[hidden] === false) {
                     if (navigator.userAgent.indexOf('Chrome')!=-1) {
                         // You can't change document.title here in Chrome. #googlehatesyou
                         window.setTimeout(function() {
@@ -813,7 +813,7 @@ $(document).ready(function() {
                     }
                 }
                 // Obnoxiousness limitation.
-                if (document[hidden]==true) {
+                if (document[hidden] === true) {
                     $("#backgroundAudio")[0].pause();
                 } else {
                     $("#backgroundAudio")[0].play();
@@ -834,10 +834,10 @@ $(document).ready(function() {
 
                 if (jQuery.trim($('#textInput').val())=='/usr') {
                     session = readCookie('session');
-                    var msg = {counter:"-2",color:"000000",line:"[SYSTEM] Your cookie: " + session}
+                    var msg = {counter:"-2",color:"000000",line:"[SYSTEM] Your cookie: " + session};
                     addLine(msg);
                     $('#textInput').val('');
-                } else if ($('#textInput').val()!='') {
+                } else if ($('#textInput').val() !== '') {
                     if (pingInterval) {
                         window.clearTimeout(pingInterval);
                     }
@@ -871,15 +871,15 @@ $(document).ready(function() {
             // Trim everything first
             formInputs = $('#settings').find('input, select');
             for (i=0; i<formInputs.length; i++) {
-                formInputs[i].value = jQuery.trim(formInputs[i].value)
+                formInputs[i].value = jQuery.trim(formInputs[i].value);
             }
-            if ($('input[name="name"]').val()=="") {
+            if ($('input[name="name"]').val() === "") {
                 alert("You can't chat with a blank name!");
-            } else if ($('input[name="color"]').val().match(/^[0-9a-fA-F]{6}$/)==null) {
+            } else if ($('input[name="color"]').val().match(/^[0-9a-fA-F]{6}$/) === null) {
                 alert("You entered an invalid hex code. Try using the color picker.");
             } else {
                 var formData = $(this).serializeArray();
-                formData.push({ name: 'chat', value: chat })
+                formData.push({ name: 'chat', value: chat });
                 $.post(SAVE_URL, formData, function(data) {
                     $('#preview').css('color', '#'+$('input[name="color"]').val());
                     var formInputs = $('#settings').find('input, select');
@@ -892,8 +892,8 @@ $(document).ready(function() {
                     var replacementsFrom = $('#settings').find('input[name="quirk_from"]');
                     var replacementsTo = $('#settings').find('input[name="quirk_to"]');
                     for (i=0; i<replacementsFrom.length; i++) {
-                        if (replacementsFrom[i].value!="" && replacementsFrom[i].value!=replacementsTo[i].value) {
-                            user.character.replacements.push([replacementsFrom[i].value, replacementsTo[i].value])
+                        if (replacementsFrom[i].value !== "" && replacementsFrom[i].value!=replacementsTo[i].value) {
+                            user.character.replacements.push([replacementsFrom[i].value, replacementsTo[i].value]);
                         }
                     }
                     closeSettings();
@@ -907,7 +907,7 @@ $(document).ready(function() {
         });
 
         $('.metatog').click(function() {
-            var data = {'chat': chat, 'meta_change': ''}
+            var data = {'chat': chat, 'meta_change': ''};
             // Convert to integer then string.
             if ($(this).hasClass("active")) {
                 data[this.id] = '0';
@@ -922,7 +922,7 @@ $(document).ready(function() {
         $('#topicButton').click(function() {
             if ($.inArray(user.meta.group, MOD_GROUPS)!=-1) {
                 var new_topic = prompt('Please enter a new topic for the chat:');
-                if (new_topic!=null) {
+                if (new_topic !== null) {
                     $.post(POST_URL,{'chat': chat, 'topic': new_topic.substr(0, 1500)});
                 }
             }
@@ -933,7 +933,7 @@ $(document).ready(function() {
         $('#bgButton').click(function() {
             if ($.inArray(user.meta.group, MOD_GROUPS)!=-1) {
                 var new_bg = prompt('Please enter a new background URL for the chat:');
-                if (new_bg!=null) {
+                if (new_bg !== null) {
                     $.post(POST_URL,{'chat': chat, 'background': new_bg});
                 }
             }
@@ -942,7 +942,7 @@ $(document).ready(function() {
         $('#audioButton').click(function() {
             if ($.inArray(user.meta.group, MOD_GROUPS)!=-1) {
                 var new_audio = prompt('Please enter a audio URL for the chat:');
-                if (new_audio!=null) {
+                if (new_audio !== null) {
                     $.post(POST_URL,{'chat': chat, 'audio': new_audio});
                 } 
             }
@@ -973,7 +973,7 @@ $(document).ready(function() {
             } else {
                 localStorage.setItem(chat+"disnot",0);
             }
-        }
+        };
 
         $(window).unload(function() {
             if (chatState=='chat') {
@@ -985,7 +985,7 @@ $(document).ready(function() {
 
         // Initialisation
 
-        if (chat==null) {
+        if (chat === null) {
             chatState = 'search';
             document.title = 'Searching - '+ORIGINAL_TITLE;
             conversation.addClass('search');
@@ -1033,7 +1033,7 @@ $(document).ready(function() {
     // idk
 
     function startedTyping() {
-        if (ws == null || ws.readyState !== 1) {return;} // Don't even bother doing anything if we have no socket or if it's not ready.
+        if (ws === null || ws.readyState !== 1) {return;} // Don't even bother doing anything if we have no socket or if it's not ready.
         window.clearTimeout(typing_timeout);
         if ($('#textInput').val().length < 5 || $('#textInput').val().length % 5 === 0) {
             typing = true;
@@ -1044,14 +1044,14 @@ $(document).ready(function() {
 
     function stoppedTyping() {
         window.clearTimeout(typing_timeout);
-        if (ws == null || ws.readyState !== 1) {return;}
+        if (ws === null || ws.readyState !== 1) {return;}
         typing = false;
         ws.send(JSON.stringify({a: 'stopped_typing', c: user.meta.counter}));
     }
 
     function typingNotifications() {
         if (counterstyping.length === 0) {
-            $("#istyping").animate({opacity: 0})
+            $("#istyping").animate({opacity: 0});
             window.setTimeout(typingNotifications, 500);
             return;
         } else if (chatState == "inactive") {
@@ -1081,7 +1081,7 @@ $(document).ready(function() {
                 message = JSON.parse(msg.data);
                 //a = action
                 //c = counter
-                var wsaction = message.a
+                var wsaction = message.a;
                 var wscounter = message.c;
                 if (wsaction=="typing") {
                     if ($.inArray(wscounter, counterstyping) !== -1) {
@@ -1097,13 +1097,13 @@ $(document).ready(function() {
                     removeItem(wscounter, counterstyping);
                     window.clearTimeout(counterintervals[wscounter]);
                 }
-            }
+            };
 
             ws.onclose = function(){
                 if (chatState != 'inactive'){
                     setTimeout(start, 10000, 'auto');
                 }
-            }  
+            };
         }
         start('manual');
 
@@ -1111,7 +1111,9 @@ $(document).ready(function() {
         //#nofun
     }
 
-	if (Math.floor(Math.random()*413) == 0) { $("body > *").css("transform", "rotate(180deg)"); }
+	if (Math.floor(Math.random()*413) === 0) {
+        $("body > *").css("transform", "rotate(180deg)");
+    }
 
 });
 

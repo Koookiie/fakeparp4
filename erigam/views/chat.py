@@ -10,6 +10,7 @@ from flask import (
     abort,
     render_template,
     g,
+    redirect,
     url_for
 )
 
@@ -23,7 +24,8 @@ from erigam.lib.model import (
     Log,
     LogPage,
     Chat,
-    ChatSession
+    ChatSession,
+    Ban
 )
 
 from erigam.lib.request_methods import use_db
@@ -42,7 +44,7 @@ def chat(chat_url=None):
         existing_lines = []
         latest_num = -1
     else:
-        if g.redis.zrank('ip-bans', chat_url+'/'+g.user.ip) is not None:
+        if g.mysql.query(Ban).filter(Ban.url == chat_url).filter(Ban.ip == g.user.ip).scalar() is not None:
             if chat_url == OUBLIETTE_ID:
                 abort(403)
             chat_url = OUBLIETTE_ID
@@ -169,40 +171,22 @@ def unbanPage(chat=None):
 
     result = None
 
-    if g.user.globalmod or g.redis.hget("session."+g.user.session_id+".meta."+chat, 'group') == 'mod':
-        pass
-    else:
+    if not g.user.globalmod or not g.redis.hget("session."+g.user.session_id+".meta."+chat, 'group') == 'mod':
         return render_template('admin_denied.html')
 
-    if "timestamp" in request.form:
-        unbanTS = request.form['timestamp']
-        ban = g.redis.zrangebyscore("ip-bans", unbanTS, unbanTS)
+    if "banid" in request.form:
+        # Exequte ban delete
+        ban = g.mysql.query(Ban).filter(Ban.url == chat).filter(Ban.id == request.form['banid']).scalar()
         if ban:
-            banstring = ban[0]
-            g.redis.hdel("ban-reasons", banstring)
-            g.redis.zrem("ip-bans", banstring)
-            result = "Unbanned!"
+            g.mysql.delete(ban)
+            return redirect(url_for("chat.unbanPage", chat=chat))
 
-    raw_bans = g.redis.zrange("ip-bans", 0, -1, withscores=True)
-    ban_reasons = g.redis.hgetall('ban-reasons')
-
-    bans = []
-    for chat_ip, expiry in raw_bans:
-        bchat, ip = chat_ip.split('/')
-        if bchat != chat:
-            continue
-        bans.append({
-            "ip": ip,
-            "timestamp": expiry,
-            "date": datetime.datetime.fromtimestamp(expiry - 2592000),
-            "reason": ban_reasons.get(chat_ip, '').decode('utf-8'),
-        })
+    bans = g.mysql.query(Ban).filter(Ban.url == chat).order_by(Ban.id).all()
 
     return render_template('mod/unban.html',
-        lines=bans,
+        bans=bans,
         result=result,
-        chat=chat,
-        page='unban'
+        chat=chat
     )
 
 @blueprint.route('/<chat>/mods')

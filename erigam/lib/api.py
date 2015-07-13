@@ -1,12 +1,13 @@
-from flask import abort
+from flask import abort, g
 from erigam.lib import get_time, ARCHIVE_PERIOD, PING_PERIOD
 from erigam.lib.messages import send_message
+from erigam.lib.model import Ban
 
 def ping(redis, chat, session, chat_type):
     online_state = get_online_state(redis, chat, session.session_id)
     if online_state == 'offline':
         # Check IP bans.
-        if redis.zrank('ip-bans', chat+'/'+session.ip) is not None:
+        if g.mysql.query(Ban).filter(Ban.url == chat).filter(Ban.ip == session.ip).scalar() is not None:
             abort(403)
 
         # The user isn't online already. Add them to the chat.

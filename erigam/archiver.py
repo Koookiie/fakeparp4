@@ -7,7 +7,7 @@ import datetime
 from erigam.lib import ARCHIVE_PERIOD, get_time
 from erigam.lib.archive import archive_chat, delete_chat_session, delete_chat, delete_session
 from erigam.lib.messages import send_message
-from erigam.lib.model import sm
+from erigam.lib.model import sm, Ban
 import sqlalchemy.exc
 import os
 
@@ -32,19 +32,16 @@ if __name__ == '__main__':
                 send_message(redis, chat, -1, "message")
 
             # Expire IP bans.
-            redis.zremrangebyscore('ip-bans', 0, get_time())
+            mysql.query(Ban).filter(Ban.expires < datetime.utcnow()).delete()
 
             # Archive chats.
             for chat in redis.zrangebyscore('archive-queue', 0, get_time()):
                 try:
                     print "archiving chat: ", chat
                     archive_chat(redis, mysql, chat)
-                except (sqlalchemy.exc.TimeoutError):
+                except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.ProgrammingError, sqlalchemy.exc.TimeoutError):
+                    print "sql error, reconnecting."
                     mysql.close()
-                    mysql = sm()
-                    pass
-                except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.ProgrammingError):
-                    redis = redis = Redis(host="localhost", port=6379)
                     mysql = sm()
                     pass
                 pipe = redis.pipeline()

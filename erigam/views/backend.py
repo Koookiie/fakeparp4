@@ -8,9 +8,7 @@ from flask import (
 )
 
 from erigam.lib import (
-    IP_BAN_PERIOD,
-    CHAT_FLAGS,
-    get_time
+    CHAT_FLAGS
 )
 
 from erigam.lib.api import disconnect
@@ -27,9 +25,13 @@ from erigam.lib.messages import (
     parse_messages
 )
 
+from erigam.lib.model import Ban
+
 from erigam.lib.characters import CHARACTER_DETAILS
 from erigam.lib.punishments import randpunish
 from erigam.lib.decorators import mark_alive, require_admin
+
+import datetime
 
 blueprint = Blueprint('backend', __name__)
 
@@ -132,13 +134,19 @@ def postMessage():
             # Don't ban people from the oubliette because that'll just put us in an infinite loop.
             elif request.form['user_action'] == 'ip_ban' and chat != 'theoubliette':
                 their_ip_address = g.redis.hget('session.'+their_session_id+'.meta', 'last_ip')
-                ban_id = chat+'/'+their_ip_address
-                if their_ip_address is not None:
-                    g.redis.zadd('ip-bans', ban_id, get_time(IP_BAN_PERIOD))
-                if 'reason' in request.form:
-                    g.redis.hset('ban-reasons', ban_id, "[Name: " + their_session_name + "; Counter: " + request.form['counter'] + "] " + request.form['reason'][:1500])
-                else:
-                    g.redis.hset('ban-reasons', ban_id, "[Name: %s; Counter: %s]" % (their_session_name, request.form['counter']))
+
+                if their_ip_address is None:
+                    return jsonify({"error": "baduser"}), 500
+
+                g.mysql.add(Ban(
+                    url=chat,
+                    ip=their_ip_address,
+                    name=their_session_name,
+                    counter=request.form['counter'],
+                    expires=datetime.datetime.utcnow() + datetime.timedelta(weeks=3),
+                    reason=request.form.get('reason', "")[:1500]
+                ))
+
                 g.redis.publish('channel.'+chat+'.'+their_session_id, '{"exit":"ban"}')
 
                 ban_message = "%s [%s] IP banned %s [%s]. " % (
@@ -150,15 +158,11 @@ def postMessage():
 
                 if 'reason' in request.form:
                     ban_message = ban_message + " Reason: %s" % (request.form['reason'][:1500])
-                    if g.redis.sismember('chat.'+chat+'.online', their_session_id) or g.redis.sismember('chat.'+chat+'.idle', their_session_id):
-                        disconnect(g.redis, chat, their_session_id, ban_message)
-                    else:
-                        send_message(g.redis, chat, -1, 'user_change', ban_message)
+
+                if g.redis.sismember('chat.'+chat+'.online', their_session_id) or g.redis.sismember('chat.'+chat+'.idle', their_session_id):
+                    disconnect(g.redis, chat, their_session_id, ban_message)
                 else:
-                    if g.redis.sismember('chat.'+chat+'.online', their_session_id) or g.redis.sismember('chat.'+chat+'.idle', their_session_id):
-                        disconnect(g.redis, chat, their_session_id, ban_message)
-                    else:
-                        send_message(g.redis, chat, -1, 'user_change', ban_message)
+                    send_message(g.redis, chat, -1, 'user_change', ban_message)
 
         if 'meta_change' in request.form:
             chat = request.form['chat']

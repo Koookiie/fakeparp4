@@ -1,13 +1,15 @@
 import json
-from socket import inet_aton
 from flask import (
     Blueprint,
     g,
     request,
-    render_template
+    render_template,
+    redirect,
+    url_for
 )
 
 from erigam.lib.decorators import require_admin
+from erigam.lib.model import Ban
 
 blueprint = Blueprint('admin', __name__)
 
@@ -81,33 +83,28 @@ def global_broadcast():
 @blueprint.route('/allbans', methods=['GET', 'POST'])
 @require_admin
 def admin_allbans():
-    sort = request.args.get('sort', None)
-    result = None
+    sort = request.args.get('sort', "id")
 
-    if "ip" in request.form and "chat" in request.form:
-        chat = request.form['chat']
-        unbanIP = request.form['ip']
-        banstring = "%s/%s" % (chat, unbanIP)
-        g.redis.hdel("ban-reasons", banstring)
-        g.redis.zrem("ip-bans", banstring)
-        result = "Unbanned %s!" % (unbanIP)
+    if "banid" in request.form:
+        # Exequte ban delete
+        ban = g.mysql.query(Ban).filter(Ban.id == request.form['banid']).scalar()
+        if ban:
+            g.mysql.delete(ban)
+            return redirect(url_for("admin.admin_allbans"))
 
-    bans = g.redis.zrange("ip-bans", "0", "-1")
+    sorts = {
+        "chat": Ban.url,
+        "ip": Ban.ip,
+        "id": Ban.id
+    }
 
-    if sort == 'chat':
-        bans.sort(key=lambda tup: tup.split('/')[0])
-        sort = 'chat'
-    elif sort == 'ip':
-        bans.sort(key=lambda tup: inet_aton(tup.split('/')[1]))
-        sort = 'ip'
-    else:
-        bans.sort(key=lambda tup: inet_aton(tup.split('/')[1]))
-        sort = 'ip'
+    if sort not in sorts:
+        sort = "id"
+
+    bans = g.mysql.query(Ban).order_by(sorts[sort]).all()
 
     return render_template('admin/allbans.html',
-        lines=bans,
-        result=result,
-        page='allbans',
+        bans=bans,
         sort=sort
     )
 

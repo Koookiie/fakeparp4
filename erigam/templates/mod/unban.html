@@ -1,5 +1,7 @@
 {% extends 'mod/base.html' %}
 
+{% set page = 'unban' %}
+
 {% block content %}
     <script>
         $(document).ready(function(){
@@ -17,19 +19,19 @@
             <thead>
                 <tr>
                     <th class="col-sm-2">Chat</th>
-                    <th class="col-sm-2">Date</th>
+                    <th class="col-sm-2">Expires</th>
                     <th class="col-sm-7">Reason</th>
                     <th class="col-sm-1">Unban</th>
                 </tr>
             </thead>
             <tbody>
-        {% for line in lines %}
-    			<form name='{{lines.index(line)}}' action='/chat/{{chat}}/unban' method='post'>
-    				<input type="hidden" name="timestamp" value="{{line.timestamp}}"/>
+        {% for ban in bans %}
+    			<form name='{{ban.id}}' action='/chat/{{ban.url}}/unban' method='post'>
+    				<input type="hidden" name="banid" value="{{ban.id}}"/>
                 <tr>
-                    <td><a href="/chat/{{chat}}"> {{chat}} </a></td>
-                    <td>{{line.date}}</td>
-                    <td>Reason: {{line.reason}}</td>
+                    <td><a href="/chat/{{chat}}"> {{ban.url}} </a></td>
+                    <td>{{ban.expires}}</td>
+                    <td>{{ban.reason or "No reason specified"}}</td>
                     <td><button type="submit" class="btn btn-primary unban">Unban</button></td>
                 </tr>
                 </form>

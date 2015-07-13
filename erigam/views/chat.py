@@ -44,7 +44,7 @@ def chat(chat_url=None):
         existing_lines = []
         latest_num = -1
     else:
-        if g.mysql.query(Ban).filter(Ban.url == chat_url).filter(Ban.ip == g.user.ip).scalar() is not None:
+        if g.sql.query(Ban).filter(Ban.url == chat_url).filter(Ban.ip == g.user.ip).scalar() is not None:
             if chat_url == OUBLIETTE_ID:
                 abort(403)
             chat_url = OUBLIETTE_ID
@@ -53,41 +53,41 @@ def chat(chat_url=None):
         # Convert topic to unicode.
         if 'topic' in chat_meta.keys():
             chat_meta['topic'] = unicode(chat_meta['topic'], encoding='utf8')
-        # Try to load the chat from mysql if it doesn't exist in redis.
+        # Try to load the chat from sql if it doesn't exist in redis.
         if len(chat_meta) == 0 or g.redis.exists("chat."+chat_url+".regen"):
             g.redis.delete("chat."+chat_url+".regen")
             try:
-                mysql_log = g.mysql.query(Log).filter(Log.url == chat_url).one()
-                mysql_chat = g.mysql.query(Chat).filter(Chat.log_id == mysql_log.id).one()
+                sql_log = g.sql.query(Log).filter(Log.url == chat_url).one()
+                sql_chat = g.sql.query(Chat).filter(Chat.log_id == sql_log.id).one()
                 chat_meta = {
-                    "type": mysql_chat.type,
-                    "counter": mysql_chat.counter,
+                    "type": sql_chat.type,
+                    "counter": sql_chat.counter,
                     "public": "0",
                 }
-                if mysql_chat.topic is not None and mysql_chat.topic != "":
-                    chat_meta["topic"] = mysql_chat.topic
-                if mysql_chat.background is not None and mysql_chat.background != "":
-                    chat_meta["background"] = mysql_chat.background
+                if sql_chat.topic is not None and sql_chat.topic != "":
+                    chat_meta["topic"] = sql_chat.topic
+                if sql_chat.background is not None and sql_chat.background != "":
+                    chat_meta["background"] = sql_chat.background
 
                 g.redis.hmset('chat.'+chat_url+'.meta', chat_meta)
-                for mysql_session in g.mysql.query(ChatSession).filter(ChatSession.log_id == mysql_log.id):
-                    g.redis.hset('chat.'+chat_url+'.counters', mysql_session.counter, mysql_session.session_id)
-                    g.redis.hmset('session.'+mysql_session.session_id+'.meta.'+chat_url, {
-                        "counter": mysql_session.counter,
-                        "group": mysql_session.group,
+                for sql_session in g.sql.query(ChatSession).filter(ChatSession.log_id == sql_log.id):
+                    g.redis.hset('chat.'+chat_url+'.counters', sql_session.counter, sql_session.session_id)
+                    g.redis.hmset('session.'+sql_session.session_id+'.meta.'+chat_url, {
+                        "counter": sql_session.counter,
+                        "group": sql_session.group,
                     })
-                    g.redis.hmset('session.'+mysql_session.session_id+'.chat.'+chat_url, {
-                        "character": mysql_session.character,
-                        "name": mysql_session.name,
-                        "acronym": mysql_session.acronym,
-                        "color": mysql_session.color,
-                        "case": mysql_session.case,
-                        "replacements": mysql_session.replacements,
-                        "quirk_prefix": mysql_session.quirk_prefix,
-                        "quirk_suffix": mysql_session.quirk_suffix,
+                    g.redis.hmset('session.'+sql_session.session_id+'.chat.'+chat_url, {
+                        "character": sql_session.character,
+                        "name": sql_session.name,
+                        "acronym": sql_session.acronym,
+                        "color": sql_session.color,
+                        "case": sql_session.case,
+                        "replacements": sql_session.replacements,
+                        "quirk_prefix": sql_session.quirk_prefix,
+                        "quirk_suffix": sql_session.quirk_suffix,
                     })
-                    g.redis.sadd('session.'+mysql_session.session_id+'.chats', chat_url)
-                    g.redis.zadd('chat-sessions', chat_url+'/'+mysql_session.session_id, mktime(mysql_session.expiry_time.timetuple()))
+                    g.redis.sadd('session.'+sql_session.session_id+'.chats', chat_url)
+                    g.redis.zadd('chat-sessions', chat_url+'/'+sql_session.session_id, mktime(sql_session.expiry_time.timetuple()))
             except NoResultFound:
                 abort(404)
         # Make sure it's in the archive queue.
@@ -127,7 +127,7 @@ def view_log(chat=None):
     continuable = g.redis.hget('chat.'+chat+'.meta', 'type') is not None
 
     try:
-        log = g.mysql.query(Log).filter(Log.url == chat).one()
+        log = g.sql.query(Log).filter(Log.url == chat).one()
     except:
         abort(404)
 
@@ -135,7 +135,7 @@ def view_log(chat=None):
     mode = request.args.get('mode') or 'normal'
 
     try:
-        log_page = g.mysql.query(LogPage).filter(and_(LogPage.log_id == log.id, LogPage.number == current_page)).one()
+        log_page = g.sql.query(LogPage).filter(and_(LogPage.log_id == log.id, LogPage.number == current_page)).one()
     except NoResultFound:
         abort(404)
 
@@ -176,12 +176,12 @@ def unbanPage(chat=None):
 
     if "banid" in request.form:
         # Exequte ban delete
-        ban = g.mysql.query(Ban).filter(Ban.url == chat).filter(Ban.id == request.form['banid']).scalar()
+        ban = g.sql.query(Ban).filter(Ban.url == chat).filter(Ban.id == request.form['banid']).scalar()
         if ban:
-            g.mysql.delete(ban)
+            g.sql.delete(ban)
             return redirect(url_for("chat.unbanPage", chat=chat))
 
-    bans = g.mysql.query(Ban).filter(Ban.url == chat).order_by(Ban.id).all()
+    bans = g.sql.query(Ban).filter(Ban.url == chat).order_by(Ban.id).all()
 
     return render_template('mod/unban.html',
         bans=bans,

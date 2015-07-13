@@ -22,7 +22,7 @@ def getLogByID(logid=None):
         return redirect(url_for("main.home"))
 
     try:
-        log = g.mysql.query(Log.url).filter(Log.id == logid).one()
+        log = g.sql.query(Log.url).filter(Log.id == logid).one()
     except NoResultFound:
         abort(404)
 

@@ -9,7 +9,7 @@ import os
 def now():
     return datetime.datetime.now()
 
-engine = create_engine(os.environ['MYSQL_URL'], client_encoding='utf8', pool_recycle=3600)
+engine = create_engine(os.environ['SQL_URL'], client_encoding='utf8', pool_recycle=3600)
 sm = sessionmaker(autocommit=False,
                   autoflush=False,
                   bind=engine)

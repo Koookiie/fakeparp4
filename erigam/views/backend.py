@@ -138,7 +138,7 @@ def postMessage():
                 if their_ip_address is None:
                     return jsonify({"error": "baduser"}), 500
 
-                g.mysql.add(Ban(
+                g.sql.add(Ban(
                     url=chat,
                     ip=their_ip_address,
                     name=their_session_name,

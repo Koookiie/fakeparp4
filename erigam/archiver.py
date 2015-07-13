@@ -16,33 +16,33 @@ if __name__ == '__main__':
     print "Archiving script started."
     redis = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
 
-    current_time = datetime.datetime.now()
+    current_time = datetime.datetime.utcnow()
 
     while True:
 
-        new_time = datetime.datetime.now()
+        new_time = datetime.datetime.utcnow()
 
         # Every minute
         if new_time.minute != current_time.minute:
             print "running archiving"
-            mysql = sm()
+            sql = sm()
 
             # Send blank messages to avoid socket timeouts.
             for chat in redis.zrangebyscore('longpoll-timeout', 0, get_time()):
                 send_message(redis, chat, -1, "message")
 
             # Expire IP bans.
-            mysql.query(Ban).filter(Ban.expires < datetime.utcnow()).delete()
+            sql.query(Ban).filter(Ban.expires < datetime.datetime.utcnow()).delete()
 
             # Archive chats.
             for chat in redis.zrangebyscore('archive-queue', 0, get_time()):
                 try:
                     print "archiving chat: ", chat
-                    archive_chat(redis, mysql, chat)
+                    archive_chat(redis, sql, chat)
                 except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.ProgrammingError, sqlalchemy.exc.TimeoutError):
                     print "sql error, reconnecting."
-                    mysql.close()
-                    mysql = sm()
+                    sql.close()
+                    sql = sm()
                     pass
                 pipe = redis.pipeline()
                 pipe.scard('chat.'+chat+'.online')
@@ -50,7 +50,7 @@ if __name__ == '__main__':
                 online, idle = pipe.execute()
                 # Delete if no-one is online any more.
                 if online+idle == 0:
-                    delete_chat(redis, mysql, chat)
+                    delete_chat(redis, sql, chat)
                     redis.zrem('archive-queue', chat)
                 else:
                     redis.zadd('archive-queue', chat, get_time(ARCHIVE_PERIOD))
@@ -62,7 +62,7 @@ if __name__ == '__main__':
 
             # Delete chats.
             for chat in redis.zrangebyscore('delete-queue', 0, get_time()):
-                delete_chat(redis, mysql, chat)
+                delete_chat(redis, sql, chat)
                 redis.zrem('delete-queue', chat)
 
             # Delete sessions.
@@ -70,8 +70,8 @@ if __name__ == '__main__':
                 print "deleting session: ", session_id
                 delete_session(redis, session_id)
 
-            mysql.close()
-            del mysql
+            sql.close()
+            del sql
 
         current_time = new_time
 

@@ -28,8 +28,8 @@ def use_db(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         # Create DB object if it does not exist.
-        if not hasattr(g, "mysql"):
-            g.mysql = sm()
+        if not hasattr(g, "sql"):
+            g.sql = sm()
 
         return f(*args, **kwargs)
     return decorated_function
@@ -41,7 +41,7 @@ def connect_db():
     g.redis = Redis(connection_pool=redis_pool)
 
     # Connect to SQL
-    g.mysql = sm()
+    g.sql = sm()
 
 def create_session():
     # Do not bother allowing the user in if they are globalbanned.
@@ -97,8 +97,8 @@ def db_commit(response=None):
     if response is not None and response.status[0] not in {"2", "3"}:
         return response
 
-    if hasattr(g, "mysql"):
-        g.mysql.commit()
+    if hasattr(g, "sql"):
+        g.sql.commit()
     return response
 
 def disconnect_db(response=None):
@@ -111,8 +111,8 @@ def disconnect_db(response=None):
     del g.redis
 
     # Close SQL
-    if hasattr(g, "mysql"):
-        g.mysql.close()
-        del g.mysql
+    if hasattr(g, "sql"):
+        g.sql.close()
+        del g.sql
 
     return response

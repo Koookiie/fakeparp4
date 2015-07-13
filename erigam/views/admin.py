@@ -87,9 +87,9 @@ def admin_allbans():
 
     if "banid" in request.form:
         # Exequte ban delete
-        ban = g.mysql.query(Ban).filter(Ban.id == request.form['banid']).scalar()
+        ban = g.sql.query(Ban).filter(Ban.id == request.form['banid']).scalar()
         if ban:
-            g.mysql.delete(ban)
+            g.sql.delete(ban)
             return redirect(url_for("admin.admin_allbans"))
 
     sorts = {
@@ -101,7 +101,7 @@ def admin_allbans():
     if sort not in sorts:
         sort = "id"
 
-    bans = g.mysql.query(Ban).order_by(sorts[sort]).all()
+    bans = g.sql.query(Ban).order_by(sorts[sort]).all()
 
     return render_template('admin/allbans.html',
         bans=bans,

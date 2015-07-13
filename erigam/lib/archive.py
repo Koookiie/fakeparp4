@@ -6,45 +6,45 @@ import sys
 from characters import CHARACTER_DETAILS
 from erigam.lib.model import Chat, ChatSession, Log, LogPage
 
-def get_or_create_log(redis, mysql, chat_url, chat_type='saved'):
+def get_or_create_log(redis, sql, chat_url, chat_type='saved'):
     # Find existing Log, LogPage and Chat or create new ones.
     # If the Log doesn't exist, create Log, LogPage and Chat.
     # If the LogPage doesn't exist, create LogPage.
     # If the Chat doesn't exist, create Chat.
     try:
-        log = mysql.query(Log).filter(Log.url == chat_url).one()
+        log = sql.query(Log).filter(Log.url == chat_url).one()
         try:
-            latest_page_query = mysql.query(LogPage).filter(LogPage.log_id == log.id).order_by(LogPage.number.asc())
+            latest_page_query = sql.query(LogPage).filter(LogPage.log_id == log.id).order_by(LogPage.number.asc())
             latest_page = latest_page_query[-1]
             # XXX Is IndexError the right exception?
         except IndexError:
-            latest_page = new_page(mysql, log)
+            latest_page = new_page(sql, log)
         try:
-            chat = mysql.query(Chat).filter(Chat.log_id == log.id).one()
+            chat = sql.query(Chat).filter(Chat.log_id == log.id).one()
         except NoResultFound:
             chat = Chat(log_id=log.id, type=chat_type)
-            mysql.add(chat)
-            mysql.flush()
+            sql.add(chat)
+            sql.flush()
     except NoResultFound:
         log = Log(url=chat_url)
-        mysql.add(log)
-        mysql.flush()
-        latest_page = new_page(mysql, log)
+        sql.add(log)
+        sql.flush()
+        latest_page = new_page(sql, log)
         chat = Chat(log_id=log.id, type=chat_type)
-        mysql.add(chat)
-        mysql.flush()
+        sql.add(chat)
+        sql.flush()
     return log, latest_page, chat
 
-def new_page(mysql, log, last=0):
+def new_page(sql, log, last=0):
     new_page_number = last+1
     latest_page = LogPage(log_id=log.id, number=new_page_number, content=u'')
-    mysql.add(latest_page)
-    mysql.flush()
+    sql.add(latest_page)
+    sql.flush()
     log.page_count = new_page_number
     return latest_page
 
-def archive_chat(redis, mysql, chat_url):
-    log, latest_page, chat = get_or_create_log(redis, mysql, chat_url)
+def archive_chat(redis, sql, chat_url):
+    log, latest_page, chat = get_or_create_log(redis, sql, chat_url)
     # If the chat hasn't saved since the last archive, skip it.
     if redis.llen('chat.'+chat_url) == 0:
         return log.id
@@ -55,8 +55,8 @@ def archive_chat(redis, mysql, chat_url):
     chat.topic = meta.get('topic', None)
     chat.background = meta.get('background', None)
     # Sessions
-    mysql_sessions = mysql.query(ChatSession).filter(ChatSession.log_id == log.id)
-    #print "mysql sessions", mysql_sessions
+    sql_sessions = sql.query(ChatSession).filter(ChatSession.log_id == log.id)
+    #print "sql sessions", sql_sessions
     redis_sessions = redis.hgetall('chat.'+chat_url+'.counters')
     t = [(k, redis_sessions[k]) for k in redis_sessions]
     t.sort()
@@ -70,31 +70,31 @@ def archive_chat(redis, mysql, chat_url):
     #print "redis sessions", redis_sessions
     # Update the sessions which are already in the database.
     try:
-        for mysql_session in mysql_sessions:
-            default_character = CHARACTER_DETAILS[mysql_session.character]
-            redis_session = redis.hgetall('session.'+mysql_session.session_id+'.chat.'+chat_url)
-            redis_session_meta = redis.hgetall('session.'+mysql_session.session_id+'.meta.'+chat_url)
-            # Delete the session from mysql if it's been deleted from redis.
+        for sql_session in sql_sessions:
+            default_character = CHARACTER_DETAILS[sql_session.character]
+            redis_session = redis.hgetall('session.'+sql_session.session_id+'.chat.'+chat_url)
+            redis_session_meta = redis.hgetall('session.'+sql_session.session_id+'.meta.'+chat_url)
+            # Delete the session from sql if it's been deleted from redis.
             if len(redis_session) == 0 or len(redis_session_meta) == 0:
-                mysql.delete(mysql_session)
+                sql.delete(sql_session)
                 continue
             expiry_time = datetime.datetime.fromtimestamp(
-                redis.zscore('chat-sessions', chat_url+'/'+mysql_session.session_id) or 0
+                redis.zscore('chat-sessions', chat_url+'/'+sql_session.session_id) or 0
             )
-            mysql_session.expiry_time = expiry_time
-            mysql_session.group = redis_session_meta.get('group', 'user')
-            mysql_session.character = redis_session.get('character', 'anonymous/other')
-            mysql_session.name = redis_session.get('name', default_character['name'])
-            mysql_session.acronym = redis_session.get('acronym', default_character['acronym'])
-            mysql_session.color = redis_session.get('color', default_character['color'])
-            mysql_session.case = redis_session.get('case', default_character['case'])
-            mysql_session.replacements = redis_session.get('replacements', default_character['replacements'])
-            mysql_session.quirk_prefix = redis_session.get('quirk_prefix', '')[:1500]
-            mysql_session.quirk_suffix = redis_session.get('quirk_suffix', '')[:1500]
+            sql_session.expiry_time = expiry_time
+            sql_session.group = redis_session_meta.get('group', 'user')
+            sql_session.character = redis_session.get('character', 'anonymous/other')
+            sql_session.name = redis_session.get('name', default_character['name'])
+            sql_session.acronym = redis_session.get('acronym', default_character['acronym'])
+            sql_session.color = redis_session.get('color', default_character['color'])
+            sql_session.case = redis_session.get('case', default_character['case'])
+            sql_session.replacements = redis_session.get('replacements', default_character['replacements'])
+            sql_session.quirk_prefix = redis_session.get('quirk_prefix', '')[:1500]
+            sql_session.quirk_suffix = redis_session.get('quirk_suffix', '')[:1500]
             try:
-                del redis_sessions[str(mysql_session.counter)]
+                del redis_sessions[str(sql_session.counter)]
             except KeyError:
-                print "=== KeyError for SQL session %s ===" % (mysql_session.counter)
+                print "=== KeyError for SQL session %s ===" % (sql_session.counter)
     except (UnicodeDecodeError, TypeError, KeyError):
         print "=== Error encountered. Not updating this existing session."
         print traceback.print_exc()
@@ -113,7 +113,7 @@ def archive_chat(redis, mysql, chat_url):
             )
             default_character = CHARACTER_DETAILS[redis_session.get('character', 'anonymous/other')]
             #print "about to add chatsession log.id", log.id, "session id", session_id
-            mysql_session = ChatSession(
+            sql_session = ChatSession(
                 log_id=log.id,
                 session_id=session_id,
                 counter=counter,
@@ -128,16 +128,16 @@ def archive_chat(redis, mysql, chat_url):
                 quirk_prefix=redis_session.get('quirk_prefix', '')[:1500],
                 quirk_suffix=redis_session.get('quirk_suffix', '')[:1500],
             )
-            mysql.merge(mysql_session)
+            sql.merge(sql_session)
             try:
-                mysql.flush()
+                sql.flush()
             except (IntegrityError, FlushError) as e:
                 reason = e.message
                 print "=== Error inside loop: ", reason
-                mysql.rollback()
+                sql.rollback()
             except DataError as e:
                 print "=== Unicode error. Removing session %s in chat %s" % (session_id, chat_url)
-                mysql.rollback()
+                sql.rollback()
                 delete_chat_session(redis, chat_url, session_id)
         except (TypeError, KeyError, UnicodeDecodeError):
             print "=== Error encountered. Skipping this key."
@@ -145,11 +145,11 @@ def archive_chat(redis, mysql, chat_url):
             traceback.print_exc(file=sys.stdout)
             print '-'*60
         try:
-            mysql.flush()
+            sql.flush()
         except (IntegrityError, FlushError) as e:
             reason = e.message
             print "=== Error: ", reason
-            mysql.rollback()
+            sql.rollback()
     # Text
     # XXX MAKE REALLY REALLY REALLY GODDAMN SURE THIS WORKS WITH MINUS NUMBERS
     # XXX FOR GOD'S SAKE
@@ -159,11 +159,11 @@ def archive_chat(redis, mysql, chat_url):
         #if len(latest_page.content.encode('utf8'))+len(line)>65535:
         if len(latest_page.content.encode('utf8'))+len(line) > 65535:
             print "creating a new page"
-            latest_page = latest_page = new_page(mysql, log, latest_page.number)
+            latest_page = latest_page = new_page(sql, log, latest_page.number)
             print "page "+str(latest_page.number)
         latest_page.content += unicode(line, encoding='utf8')+'\n'
     log.time_saved = datetime.datetime.now()
-    mysql.commit()
+    sql.commit()
     # Don't delete from redis until we've successfully committed.
     redis.ltrim('chat.'+chat_url, len(lines), -1)
     return log.id
@@ -178,7 +178,7 @@ def delete_chat_session(redis, chat_url, session_id):
     pipe.zrem('chat-sessions', chat_url+'/'+session_id)
     pipe.execute()
 
-def delete_chat(redis, mysql, chat_url):
+def delete_chat(redis, sql, chat_url):
 
     # XXX PIPELINE THIS???
 

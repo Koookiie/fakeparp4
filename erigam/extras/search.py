@@ -21,7 +21,7 @@ args = parser.parse_args()
 
 chat = args.chat
 
-engine = create_engine('mysql://msparp:SfPAAhnAJb5xven4@localhost/msparp', convert_unicode=True, pool_recycle=3600)
+engine = create_engine(os.environ["SQL_URL"], convert_unicode=True, pool_recycle=3600)
 sm = sessionmaker(autocommit=False,
                   autoflush=False,
                   bind=engine)
@@ -37,10 +37,10 @@ def zipdir(path, zip, chat):
             zip.write(os.path.join(root, file), '%s/%s' % (chat, file))
 
 def searchWorker():
-    mysql = sm()
+    sql = sm()
     for current_page in iter(q.get, '<<STOP>>'):
         try:
-            log_page = mysql.query(LogPage).filter(and_(LogPage.log_id == log.id, LogPage.number == current_page)).one()
+            log_page = sql.query(LogPage).filter(and_(LogPage.log_id == log.id, LogPage.number == current_page)).one()
         except NoResultFound:
             print "Page %s not found." % (current_page)
             continue

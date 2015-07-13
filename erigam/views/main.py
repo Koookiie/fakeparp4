@@ -99,7 +99,7 @@ def save():
                 g.user.set_group('mod')
             g.redis.hmset('chat.'+chat+'.meta', {'type': 'group', 'public': '0'})
 
-            get_or_create_log(g.redis, g.mysql, chat, 'group')
+            get_or_create_log(g.redis, g.sql, chat, 'group')
             return redirect(url_for('chat.chat', chat_url=chat))
         elif 'tags' in request.form:
             g.user.save_pickiness(request.form)
@@ -127,10 +127,10 @@ def save_log(chat_url=None):
         chat = chat_url
     chat_type = g.redis.hget('chat.'+chat+'.meta', 'type')
     if chat_type not in ['unsaved', 'saved']:
-        log_id = archive_chat(g.redis, g.mysql, chat)
+        log_id = archive_chat(g.redis, g.sql, chat)
         g.redis.zadd('archive-queue', chat, get_time(ARCHIVE_PERIOD))
     else:
-        log_id = archive_chat(g.redis, g.mysql, chat)
+        log_id = archive_chat(g.redis, g.sql, chat)
         g.redis.hset('chat.'+chat+'.meta', 'type', 'saved')
         g.redis.zadd('archive-queue', chat, get_time(ARCHIVE_PERIOD))
     return redirect(url_for('chat.view_log', chat=chat))

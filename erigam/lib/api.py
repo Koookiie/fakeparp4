@@ -7,7 +7,7 @@ def ping(redis, chat, session, chat_type):
     online_state = get_online_state(redis, chat, session.session_id)
     if online_state == 'offline':
         # Check IP bans.
-        if g.mysql.query(Ban).filter(Ban.url == chat).filter(Ban.ip == session.ip).scalar() is not None:
+        if g.sql.query(Ban).filter(Ban.url == chat).filter(Ban.ip == session.ip).scalar() is not None:
             abort(403)
 
         # The user isn't online already. Add them to the chat.

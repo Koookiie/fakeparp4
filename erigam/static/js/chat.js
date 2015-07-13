@@ -445,28 +445,24 @@ $(document).ready(function() {
 				}
 
 				//Backgrounds
-				if (typeof data.meta.background == 'undefined') {
-					$("#conversation, #userList, #settings").css("background-color", "rgb(238, 238, 238)");
-				} else if (bgset == 1){
-					$("#conversation, #userList, #settings").css("background-color", "rgba(238, 238, 238, 0.5)");
-				}
-
-				if (typeof data.meta.background!=='undefined' && bgset == 1) {
-					$("body").css('background-image', 'url("' + data.meta.background + '")' );
-				} else {
-					$("body").css('background-image', 'none');
-				}
-
-				if (typeof data.meta.background !=='undefined'){
+				if (typeof data.meta.background !== 'undefined') {
 					background = data.meta.background;
 				}
 
+				if (typeof data.meta.background !== 'undefined' && bgset == 1) {
+					$("#conversation, #userList, #settings").css("background-color", "rgba(238, 238, 238, 0.5)");
+					$("body").css('background-image', 'url("' + data.meta.background + '")' );
+				} else {
+					$("#conversation, #userList, #settings").css("background-color", "rgb(238, 238, 238)");
+					$("body").css('background-image', 'none');
+				}
+
 				// Audio
-				if (typeof data.meta.audio !=='undefined'){
+				if (typeof data.meta.audio !== 'undefined'){
 					audio = data.meta.audio;
 				}
 
-				if (typeof data.meta.audio!=='undefined' && audioset == 1) {
+				if (typeof data.meta.audio !== 'undefined' && audioset == 1) {
 					// Only update the element if the URL has changed, otherwise it restarts it.
 					if (data.meta.audio!=$("#backgroundAudio").attr('src')) {
 						$("#backgroundAudio").attr('src', data.meta.audio);

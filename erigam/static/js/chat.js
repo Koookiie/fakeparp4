@@ -33,7 +33,7 @@ $(document).ready(function() {
 
 	var actionListUser = null;
 	if (highlightUser !== null) {
-		highlightPosts(highlightUser, false);
+		highlightPosts(highlightUser);
 	}
 
 	var ORIGINAL_TITLE = document.title;
@@ -590,9 +590,9 @@ $(document).ready(function() {
 			var actionList = $('<ul />').attr('id', 'actionList');
 			var userData = $(this).data();
 			if (userData.meta.counter==highlightUser) {
-				$('<li />').text('Clear highlight').appendTo(actionList).click(function() { highlightPosts(null, 1); });
+				$('<li />').text('Clear highlight').appendTo(actionList).click(function() { highlightPosts(null); });
 			} else {
-				$('<li />').text('Highlight posts').appendTo(actionList).click(function() { highlightPosts(userData.meta.counter, 1); });
+				$('<li />').text('Highlight posts').appendTo(actionList).click(function() { highlightPosts(userData.meta.counter); });
 			}
 			// Mod actions. You can only do these if you're (a) a mod, and (b) higher than the person you're doing it to.
 			if ($.inArray(user.meta.group, MOD_GROUPS)!=-1 && GROUP_RANKS[user.meta.group]>=GROUP_RANKS[userData.meta.group]) {
@@ -658,10 +658,11 @@ $(document).ready(function() {
 		});
 	}
 
-	function highlightPosts(counter, byUser) {
-		if (byUser == 1) {
+	function highlightPosts(counter) {
+		if (counter != highlightUser) {
 			$.post("/chat_ajax/highlight", {chat: chat, counter: counter});
 		}
+
 		$('.highlight').removeClass('highlight');
 		if (counter !== null) {
 			$('.user'+counter).addClass('highlight');

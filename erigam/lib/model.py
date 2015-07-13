@@ -62,6 +62,17 @@ class ChatSession(Base):
     quirk_prefix = Column(Unicode(1500), nullable=False, default=u"")
     quirk_suffix = Column(Unicode(1500), nullable=False, default=u"")
 
+class Ban(Base):
+    __tablename__ = 'bans'
+    id = Column(Integer, primary_key=True)
+    url = Column(String(100), ForeignKey('logs.url'), primary_key=True)
+    ip = Column(Unicode, nullable=False)
+    name = Column(Unicode(100))
+    counter = Column(Integer)
+    reason = Column(UnicodeText)
+    expires = Column(DateTime(), nullable=False)
+
 Log.pages = relation(LogPage, backref='log')
 Log.chat = relation(Chat, backref='log', uselist=False)
 Log.sessions = relation(ChatSession, backref='log')
+Log.bans = relation(Ban, backref='log')

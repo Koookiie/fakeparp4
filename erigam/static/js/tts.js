@@ -1,6 +1,5 @@
 $(document).ready(function() {
 	if('speechSynthesis' in window) {
-
 		var speechUtteranceChunker = function (utt, settings, callback) {
 			settings = settings || {};
 
@@ -47,7 +46,14 @@ $(document).ready(function() {
 	}
 
 	$('#conversation').bind('DOMNodeInserted DOMNodeRemoved DOMSubTreeModified', function(event) {
-		if (!document.getElementsByClassName('ttsset')[0].checked) return;
+		// Disable TTS if there is no localstorage
+		if (!Modernizr.localstorage) return;
+
+		if (localStorage.getItem("tts") == 'undefined' || localStorage.getItem("tts") === null) {
+			localStorage.setItem("tts", 0);
+		}
+
+		if (localStorage.getItem("tts") === "0") return;
 
 		if (event.target.nodeName != "P") {
 			console.log($('#conversation > p:last-child').text());
@@ -68,4 +74,17 @@ $(document).ready(function() {
 		});
 
 	});
+
+	$(".ttsset").click(function(){
+		if (this.checked) {
+			localStorage.setItem("tts", 1);
+		} else {
+			localStorage.setItem("tts", 0);
+		}
+	});
+
+	var init = function() {
+		var state = localStorage.getItem("tts") == "1" ? true : false;
+		$("input.ttsset").prop("checked", state);
+	}();
 });

@@ -570,7 +570,9 @@ $(document).ready(function() {
 			listItem.css('color', '#'+currentUser.character.color).text(currentUser.character.name);
 			listItem.removeClass().addClass(currentUser.meta.group);
 			if (currentUser.meta.group == 'globalmod'){
-				globals.push(currentUser.meta.counter);
+				if ($.inArray(currentUser.meta.counter, globals) === -1 ) {
+					globals.push(currentUser.meta.counter);
+				}
 			}
 			var currentGroup = GROUP_DESCRIPTIONS[currentUser.meta.group];
 			var userTitle = currentGroup.title;

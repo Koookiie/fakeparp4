@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError, DataError
 import traceback
 import sys
 from characters import CHARACTER_DETAILS
-from model import Chat, ChatSession, Log, LogPage
+from erigam.lib.model import Chat, ChatSession, Log, LogPage
 
 def get_or_create_log(redis, mysql, chat_url, chat_type='saved'):
     # Find existing Log, LogPage and Chat or create new ones.

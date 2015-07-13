@@ -4,8 +4,8 @@ try:
 except:
     import json
 
-from lib import DELETE_UNSAVED_PERIOD, get_time, LONGPOLL_TIMEOUT_PERIOD
-from characters import CHARACTER_DETAILS
+from erigam.lib import DELETE_UNSAVED_PERIOD, get_time, LONGPOLL_TIMEOUT_PERIOD
+from erigam.lib.characters import CHARACTER_DETAILS
 
 FULL_CHARACTER_LENGTH = len(CHARACTER_DETAILS['anonymous/other'])+1
 

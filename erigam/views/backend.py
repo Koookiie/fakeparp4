@@ -7,29 +7,30 @@ from flask import (
     abort
 )
 
-from lib import (
+from erigam.lib import (
     IP_BAN_PERIOD,
     CHAT_FLAGS,
     get_time
 )
 
-from lib.api import disconnect
+from erigam.lib.api import disconnect
 
-from lib.groups import (
+from erigam.lib.groups import (
     MOD_GROUPS,
     GROUP_RANKS,
     MINIMUM_RANKS
 )
 
-from lib.messages import (
+from erigam.lib.messages import (
     send_message,
     get_userlists,
     parse_messages
 )
 
-from lib.characters import CHARACTER_DETAILS
-from lib.punishments import randpunish
-from lib.decorators import mark_alive, require_admin
+from erigam.lib.characters import CHARACTER_DETAILS
+from erigam.lib.punishments import randpunish
+from erigam.lib.decorators import mark_alive, require_admin
+
 blueprint = Blueprint('backend', __name__)
 
 # Views

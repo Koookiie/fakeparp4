@@ -1,6 +1,6 @@
 from flask import abort
-from lib import get_time, ARCHIVE_PERIOD, PING_PERIOD
-from lib.messages import send_message
+from erigam.lib import get_time, ARCHIVE_PERIOD, PING_PERIOD
+from erigam.lib.messages import send_message
 
 def ping(redis, chat, session, chat_type):
     online_state = get_online_state(redis, chat, session.session_id)

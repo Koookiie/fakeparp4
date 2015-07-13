@@ -5,7 +5,7 @@ import json
 import time
 import os
 
-from lib.api import disconnect
+from erigam.lib.api import disconnect
 
 db = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
 pubsub = db.pubsub()

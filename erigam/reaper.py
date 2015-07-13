@@ -4,9 +4,9 @@ from redis import Redis
 import time
 import os
 
-from lib import get_time
-from lib.api import disconnect
-from lib.characters import CHARACTER_DETAILS
+from erigam.lib import get_time
+from erigam.lib.api import disconnect
+from erigam.lib.characters import CHARACTER_DETAILS
 
 if __name__ == '__main__':
 

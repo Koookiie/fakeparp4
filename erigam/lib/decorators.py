@@ -1,6 +1,6 @@
 from flask import g, render_template, request
 from functools import wraps
-from lib.api import ping
+from erigam.lib.api import ping
 
 def require_admin(f):
     @wraps(f)

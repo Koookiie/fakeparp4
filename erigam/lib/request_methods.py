@@ -3,10 +3,10 @@ from functools import wraps
 from flask import g, request, abort
 from redis import ConnectionPool, Redis
 
-from lib import validate_chat_url, session_validator
-from characters import CHARACTER_DETAILS
-from model import sm
-from sessions import Session
+from erigam.lib import validate_chat_url, session_validator
+from erigam.lib.characters import CHARACTER_DETAILS
+from erigam.lib.model import sm
+from erigam.lib.sessions import Session
 
 # Connection pooling. This takes far too much effort.
 redis_pool = ConnectionPool(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
@@ -45,7 +45,7 @@ def connect_db():
 
 def create_session():
     # Do not bother allowing the user in if they are globalbanned.
-    if request.headers['X-Forwarded-For'] in g.redis.smembers("globalbans"):
+    if g.redis.sismember("globalbans", request.headers.get('X-Forwarded-For', request.remote_addr)):
         abort(403)
 
     # Create a user object, using session ID.

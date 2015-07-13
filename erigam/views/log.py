@@ -6,8 +6,8 @@ from flask import (
     abort
 )
 
-from lib.request_methods import use_db
-from lib.model import Log
+from erigam.lib.request_methods import use_db
+from erigam.lib.model import Log
 
 from sqlalchemy.orm.exc import NoResultFound
 

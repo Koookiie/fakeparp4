@@ -4,11 +4,11 @@ except:
     import json
 from flask import Blueprint, g, request, render_template, redirect, url_for, jsonify, abort
 
-from lib import SEARCH_PERIOD, ARCHIVE_PERIOD, get_time, validate_chat_url
-from lib.archive import archive_chat, get_or_create_log
-from lib.characters import CHARACTER_GROUPS, CHARACTERS
-from lib.sessions import CASE_OPTIONS
-from lib.request_methods import use_db
+from erigam.lib import SEARCH_PERIOD, ARCHIVE_PERIOD, get_time, validate_chat_url
+from erigam.lib.archive import archive_chat, get_or_create_log
+from erigam.lib.characters import CHARACTER_GROUPS, CHARACTERS
+from erigam.lib.sessions import CASE_OPTIONS
+from erigam.lib.request_methods import use_db
 
 blueprint = Blueprint('main', __name__)
 

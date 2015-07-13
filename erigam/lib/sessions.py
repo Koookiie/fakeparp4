@@ -7,10 +7,10 @@ import re
 from flask import request
 from uuid import uuid4
 
-from lib import DELETE_SESSION_PERIOD, get_time
-from lib.api import get_online_state
-from characters import CHARACTER_DETAILS
-from messages import send_message
+from erigam.lib import DELETE_SESSION_PERIOD, get_time
+from erigam.lib.api import get_online_state
+from erigam.lib.characters import CHARACTER_DETAILS
+from erigam.lib.messages import send_message
 
 CASE_OPTIONS = {
     'normal': 'Normal',
@@ -48,7 +48,7 @@ class Session(object):
         self.session_id = session_id or str(uuid4())
         self.chat = chat
         self.globalmod = redis.sismember('global-mods', self.session_id)
-        self.ip = request.headers['X-Forwarded-For']
+        self.ip = request.headers.get('X-Forwarded-For', request.remote_addr)
 
         original_prefix = 'session.'+self.session_id
         original_meta_prefix = original_prefix+'.meta'

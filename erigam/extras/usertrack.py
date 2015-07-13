@@ -4,7 +4,7 @@ import os
 from collections import defaultdict
 from redis import Redis
 
-from lib.messages import send_message
+from erigam.lib.messages import send_message
 
 db = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
 

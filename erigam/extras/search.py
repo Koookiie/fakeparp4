@@ -9,8 +9,8 @@ from sqlalchemy import and_, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.exc import NoResultFound
 
-from lib.model import Log, LogPage
-from lib.messages import parse_line
+from erigam.lib.model import Log, LogPage
+from erigam.lib.messages import parse_line
 
 parser = argparse.ArgumentParser(description='log search')
 

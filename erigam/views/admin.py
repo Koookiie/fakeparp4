@@ -7,7 +7,7 @@ from flask import (
     render_template
 )
 
-from lib.decorators import require_admin
+from erigam.lib.decorators import require_admin
 
 blueprint = Blueprint('admin', __name__)
 

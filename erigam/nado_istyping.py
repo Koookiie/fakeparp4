@@ -5,7 +5,7 @@ import tornado.web
 import tornado.gen
 import ujson as json
 from tornadoredis import Client
-from lib import session_validator
+from erigam.lib import session_validator
 import os
 
 print "WS Server started!"

@@ -4,10 +4,10 @@ from redis import Redis
 import time
 import datetime
 
-from lib import ARCHIVE_PERIOD, get_time
-from lib.archive import archive_chat, delete_chat_session, delete_chat, delete_session
-from lib.messages import send_message
-from lib.model import sm
+from erigam.lib import ARCHIVE_PERIOD, get_time
+from erigam.lib.archive import archive_chat, delete_chat_session, delete_chat, delete_session
+from erigam.lib.messages import send_message
+from erigam.lib.model import sm
 import sqlalchemy.exc
 import os
 

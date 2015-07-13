@@ -13,23 +13,23 @@ from flask import (
     url_for
 )
 
-from lib import (
+from erigam.lib import (
     OUBLIETTE_ID,
     ARCHIVE_PERIOD,
     get_time
 )
 
-from lib.model import (
+from erigam.lib.model import (
     Log,
     LogPage,
     Chat,
     ChatSession
 )
 
-from lib.request_methods import use_db
-from lib.messages import parse_line
-from lib.characters import CHARACTER_GROUPS, CHARACTERS
-from lib.sessions import CASE_OPTIONS
+from erigam.lib.request_methods import use_db
+from erigam.lib.messages import parse_line
+from erigam.lib.characters import CHARACTER_GROUPS, CHARACTERS
+from erigam.lib.sessions import CASE_OPTIONS
 
 blueprint = Blueprint('chat', __name__)
 

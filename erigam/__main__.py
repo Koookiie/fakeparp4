@@ -1,6 +1,6 @@
 from flask import Flask
 
-from lib.request_methods import (
+from erigam.lib.request_methods import (
     populate_all_chars,
     connect_db,
     create_session,
@@ -8,7 +8,7 @@ from lib.request_methods import (
     disconnect_db
 )
 
-from views import (
+from erigam.views import (
     main,
     backend,
     chat,
@@ -31,6 +31,9 @@ app.url_map.strict_slashes = False
 # Jinja settings
 app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True
+
+# Throw tracebacks to console
+app.config['PROPAGATE_EXCEPTIONS'] = True
 
 # Register Blueprints
 app.register_blueprint(main.blueprint)

@@ -66,7 +66,6 @@ def create_session():
 
         g.user = Session(g.redis, session_id, chat)
     else:
-        session_id = request.cookies.get('session', None)
         g.user = Session(g.redis, session_id)
 
     # Log their IP address.

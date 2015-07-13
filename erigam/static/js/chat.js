@@ -933,9 +933,6 @@ $(document).ready(function() {
 				}
 				return 'Are you sure you want to leave? Your chat is still running.';
 			}
-		localStorage.setItem(chat+"disnot",1);
-		} else {
-			localStorage.setItem(chat+"disnot",0);
 		}
 	};
 

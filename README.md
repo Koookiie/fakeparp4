@@ -6,3 +6,16 @@ Code for [rp.terminallycapricio.us](http://rp.terminallycapricio.us). Used to be
 It's driven by Python, Redis and MySQL.
 
 Disclaimer: This code is literal garbage and you shouldn't use any parts of it seriously.
+
+# Dev testing
+
+```
+virtualenv env
+source env/bin/activate
+python setup.py develop
+export REDIS_HOST=127.0.0.1
+export REDIS_PORT=6379
+export REDIS_DB=0
+export MYSQL_URL=postgres://yourusername:yourpassword@yourhost/yourdatabase
+python erigam
+```

@@ -4,6 +4,29 @@ function htmlEncode(value){
   return $('<div/>').text(value).html();
 }
 
+function linkify(inputText) {
+    var replacedText, replacePattern1, replacePattern2;
+    if (inputText.indexOf("[img]") !=-1) {
+    return inputText;
+    }
+    //URLs starting with http://, https://, or ftp://
+    replacePattern1 = /]?=?https?:\/\/[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gim;
+    replacedText = inputText.replace(replacePattern1,
+    function(m) {
+        if (m.substr(0,1) == "=" || m.substr(0,1) == "]") {
+            return m;
+        } else {
+            return "[url]"+m+"[/url]";
+        }
+    });
+
+    //Change email addresses to mailto:: links.
+    replacePattern2 = /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/gim;
+    replacedText = replacedText.replace(replacePattern2, '[email]$1[/email]');
+
+    return replacedText;
+}
+
 function bbEncode(S, isglobal) {
 
     if (S.indexOf('[') < 0 || S.indexOf(']') < 0) return S;

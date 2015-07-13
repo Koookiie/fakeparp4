@@ -410,10 +410,19 @@ $(document).ready(function() {
 			}
 			if (typeof data.online!=="undefined") {
 				// Reload user lists.
-				actionListUser = null;
 				$("#online > li, #idle > li").appendTo(holdingList);
 				generateUserlist(data.online, $('#online')[0]);
 				generateUserlist(data.idle, $('#idle')[0]);
+
+				// Render user actions list
+				if (actionListUser !== null) {
+					var counter = $(actionListUser).data().meta.counter;
+					var user_li = $("#user"+counter);
+					if (user_li.length !== 0) {
+						actionListUser = null;
+						user_li.click();
+					}
+				}
 			}
 			if (typeof data.meta!=='undefined') {
 				// Reload chat metadata.

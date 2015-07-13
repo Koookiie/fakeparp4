@@ -5,6 +5,7 @@ from erigam.lib.request_methods import (
     connect_db,
     create_session,
     set_cookie,
+    db_commit,
     disconnect_db
 )
 
@@ -23,6 +24,7 @@ app.before_first_request(populate_all_chars)
 app.before_request(connect_db)
 app.before_request(create_session)
 app.after_request(set_cookie)
+app.after_request(db_commit)
 app.teardown_request(disconnect_db)
 
 # Flask settings

@@ -84,6 +84,23 @@ def set_cookie(response):
         pass
     return response
 
+# Shamlessly copy and pasted from newparp. Original comments after the cut
+
+# Disconnect is run on every request and commit is run on every successful
+# request.
+
+# They skip if there isn't a database connection because not all requests will
+# be connecting to the database.
+
+def db_commit(response=None):
+    # Don't commit on 4xx and 5xx.
+    if response is not None and response.status[0] not in {"2", "3"}:
+        return response
+
+    if hasattr(g, "mysql"):
+        g.mysql.commit()
+    return response
+
 def disconnect_db(response=None):
     # Close and delete Redis PubSubs
     if hasattr(g, "pubsub"):

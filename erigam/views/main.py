@@ -4,8 +4,8 @@ except:
     import json
 from flask import Blueprint, g, request, render_template, redirect, url_for, jsonify, abort
 
-from erigam.lib import SEARCH_PERIOD, ARCHIVE_PERIOD, get_time, validate_chat_url
-from erigam.lib.archive import archive_chat, get_or_create_log
+from erigam.lib import SEARCH_PERIOD, get_time, validate_chat_url
+from erigam.lib.archive import get_or_create_log
 from erigam.lib.characters import CHARACTER_GROUPS, CHARACTERS
 from erigam.lib.sessions import CASE_OPTIONS
 from erigam.lib.request_methods import use_db
@@ -110,27 +110,3 @@ def save():
         return redirect(url_for('chat.chat'))
     else:
         return redirect(url_for('main.home'))
-
-# Logs
-
-@blueprint.route('/logs/save', methods=['POST'])
-@blueprint.route('/chat/<chat_url>/save_log')
-@use_db
-def save_log(chat_url=None):
-    if 'chat' in request.form:
-        if not validate_chat_url(request.form['chat']):
-            abort(400)
-        chat = request.form['chat']
-    elif chat_url is not None:
-        if not validate_chat_url(chat_url):
-            abort(400)
-        chat = chat_url
-    chat_type = g.redis.hget('chat.'+chat+'.meta', 'type')
-    if chat_type not in ['unsaved', 'saved']:
-        log_id = archive_chat(g.redis, g.sql, chat)
-        g.redis.zadd('archive-queue', chat, get_time(ARCHIVE_PERIOD))
-    else:
-        log_id = archive_chat(g.redis, g.sql, chat)
-        g.redis.hset('chat.'+chat+'.meta', 'type', 'saved')
-        g.redis.zadd('archive-queue', chat, get_time(ARCHIVE_PERIOD))
-    return redirect(url_for('chat.view_log', chat=chat))

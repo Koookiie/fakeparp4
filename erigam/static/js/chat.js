@@ -267,17 +267,13 @@ $(document).ready(function() {
 	}
 
 	function addLine(msg){
-		if (msg.counter==-1) {
+		if (msg.counter == -1) {
 			msgClass = 'system';
-		} else if (msg.counter==-2){
-			msgClass = 'system_important';
-		} else if (msg.counter==-3) {
-			msgClass = 'globalann';
 		} else {
 			msgClass = 'user'+msg.counter;
 		}
 
-		if ($.inArray(msg.counter, globals) !== -1 || msg.counter == -123 || msg.counter == -3){
+		if ($.inArray(msg.counter, globals) !== -1 || msg.counter == -2){
 			message = bbEncode(htmlEncode(linkify(msg.line)), true);
 		} else {
 			message = bbEncode(htmlEncode(linkify(msg.line)), false);
@@ -292,11 +288,9 @@ $(document).ready(function() {
 		if (highlightUser==msg.counter) {
 			mp.addClass('highlight');
 		}
+
 		if (sysnot == 1 && msgClass == 'system') {
 			$('.system').hide();
-		}
-		if (sysnot == 1 && msgClass == 'globalann') {
-			$('.globalann').hide();
 		}
 
 		return mp.appendTo('#conversation');

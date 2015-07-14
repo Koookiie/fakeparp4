@@ -37,12 +37,6 @@ def global_broadcast():
         color = request.form.get('color', "000000")
         line = request.form.get('line', None)
         confirm = bool(request.form.get('confirm', False))
-        serious = bool(request.form.get('serious', False))
-
-        if serious is True:
-            counter = -123
-        else:
-            counter = -3
 
         if confirm is True:
             if line in ('\n', '\r\n', '', ' '):
@@ -59,7 +53,7 @@ def global_broadcast():
                         {
                             "color": color,
                             "timestamp": 0,
-                            "counter": counter,
+                            "counter": -2,
                             "type": "global",
                             "line": line
                         }

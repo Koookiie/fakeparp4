@@ -16,12 +16,11 @@ blueprint = Blueprint('admin', __name__)
 @blueprint.route("/changemessages", methods=['GET', 'POST'])
 @require_admin
 def change_messages():
-
     if 'front_message' in request.form:
         front_message = request.form['front_message']
         g.redis.set('front_message', front_message)
-
-    front_message = g.redis.get('front_message')
+    else:
+        front_message = g.redis.get('front_message')
 
     return render_template('admin/changemsg.html',
         front_message=front_message,
@@ -31,8 +30,6 @@ def change_messages():
 @blueprint.route("/broadcast", methods=['GET', 'POST'])
 @require_admin
 def global_broadcast():
-    result = None
-
     if 'line' in request.form:
         color = request.form.get('color', "000000")
         line = request.form.get('line', None)
@@ -42,7 +39,6 @@ def global_broadcast():
             if line in ('\n', '\r\n', '', ' '):
                 result = '<div class="alert alert-danger"> <strong> Global cannot be blank! </strong> </div>'
             else:
-                pipe = g.redis.pipeline()
                 chats = set()
                 chat_sessions = g.redis.zrange('chats-alive', 0, -1)
                 for chat_session in chat_sessions:
@@ -62,16 +58,16 @@ def global_broadcast():
 
                 for chat in chats:
                     message['messages'][0]['id'] = g.redis.llen("chat."+chat)-1
-                    pipe.publish("channel."+chat, json.dumps(message))
+                    g.redis.publish("channel."+chat, json.dumps(message))
 
-                pipe.execute()
                 result = '<div class="alert alert-success"> <strong> Global sent! </strong> <br> %s </div>' % (line)
         else:
             result = '<div class="alert alert-danger"> <strong> Confirm checkbox not checked. </strong> </div>'
+    else:
+        result = ""
 
     return render_template('admin/broadcast.html',
-        result=result,
-        page="broadcast",
+        result=result
     )
 
 @blueprint.route('/allbans', methods=['GET', 'POST'])

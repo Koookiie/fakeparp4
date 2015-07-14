@@ -132,7 +132,6 @@ def view_log(chat=None):
         abort(404)
 
     current_page = request.args.get('page') or log.page_count
-    mode = request.args.get('mode') or 'normal'
 
     try:
         log_page = g.sql.query(LogPage).filter(and_(LogPage.log_id == log.id, LogPage.number == current_page)).one()
@@ -158,7 +157,6 @@ def view_log(chat=None):
         lines=lines,
         continuable=continuable,
         current_page=current_page,
-        mode=mode,
         paginator=paginator,
         legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat)
 

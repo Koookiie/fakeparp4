@@ -273,11 +273,9 @@ $(document).ready(function() {
 			msgClass = 'user'+msg.counter;
 		}
 
-		if ($.inArray(msg.counter, globals) !== -1 || msg.counter == -2){
-			message = bbEncode(htmlEncode(linkify(msg.line)), true);
-		} else {
-			message = bbEncode(htmlEncode(linkify(msg.line)), false);
-		}
+		var globalmod = ($.inArray(msg.counter, globals) !== -1 || msg.counter == -2);
+
+		message = bbEncode(htmlEncode(linkify(msg.line)), globalmod);
 
 		var mp = $('<p>').addClass(msgClass).addClass("message").attr('title', msgClass).css('color', '#'+msg.color).html(message); //.appendTo('#conversation');
 

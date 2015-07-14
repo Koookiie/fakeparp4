@@ -42,7 +42,6 @@ $(document).ready(function() {
 	var globals = [];
 
 	// Settings
-	var disnot = 1;
 	var sysnot = 0;
 	var audioset, bgset, highlightall = 0;
 	var bbset = 1;
@@ -50,10 +49,6 @@ $(document).ready(function() {
 
 	if (Modernizr.localstorage) {
 		$(".stoptions").show();
-
-		if (!localStorage.getItem(chat+"disnot")) {
-			localStorage.setItem(chat+"disnot",localStorage.disnot);
-		}
 
 		if (!localStorage.getItem(chat+"sysnot")) {
 			localStorage.setItem(chat+"sysnot",localStorage.sysnot);
@@ -75,7 +70,6 @@ $(document).ready(function() {
 			localStorage.setItem(chat+"highlightall", 0);
 		}
 
-		disnot = localStorage.getItem(chat+"disnot");
 		sysnot = localStorage.getItem(chat+"sysnot");
 		bbset = localStorage.getItem(chat+"bbset");
 		audioset = localStorage.getItem(chat+"audioset");
@@ -84,12 +78,6 @@ $(document).ready(function() {
 	} else {
 		$('.system').show();
 		$('.globalann').show();
-	}
-
-	if (disnot === 0) {
-		$('.disnot').removeAttr('checked');
-	} else {
-		$('.disnot').attr('checked','checked');
 	}
 
 	if (sysnot == 1) {
@@ -123,21 +111,6 @@ $(document).ready(function() {
 	}
 
 	// Toggles
-	$('.disnot').click(function() {
-		if (Modernizr.localstorage) {
-			if (this.checked) {
-				localStorage.setItem(chat+"disnot",1);
-			} else {
-				localStorage.setItem(chat+"disnot",0);
-			}
-		}
-		if (this.checked) {
-			disnot = 1;
-		} else {
-			disnot = 0;
-		}
-	});
-
 	$('.sysnot').click(function() {
 		if (this.checked) {
 			if (Modernizr.localstorage) {
@@ -860,13 +833,11 @@ $(document).ready(function() {
 	}
 
 	window.onbeforeunload = function (e) {
-		if (disnot == 1) {
-			if (chatState=='chat') {
-				if (typeof e!="undefined") {
-					e.preventDefault();
-				}
-				return 'Are you sure you want to leave? Your chat is still running.';
+		if (chatState=='chat') {
+			if (typeof e!="undefined") {
+				e.preventDefault();
 			}
+			return 'Are you sure you want to leave? Your chat is still running.';
 		}
 	};
 

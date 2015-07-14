@@ -44,7 +44,7 @@ $(document).ready(function() {
 	// Settings
 	var disnot = 1;
 	var sysnot = 0;
-	var oocset, audioset, bgset, highlightall = 0;
+	var audioset, bgset, highlightall = 0;
 	var bbset = 1;
 	var audio, background;
 
@@ -57,10 +57,6 @@ $(document).ready(function() {
 
 		if (!localStorage.getItem(chat+"sysnot")) {
 			localStorage.setItem(chat+"sysnot",localStorage.sysnot);
-		}
-
-		if (!localStorage.getItem(chat+"oocset")) {
-			localStorage.setItem(chat+"oocset",0);
 		}
 
 		if (!localStorage.getItem(chat+"bbset")) {
@@ -81,7 +77,6 @@ $(document).ready(function() {
 
 		disnot = localStorage.getItem(chat+"disnot");
 		sysnot = localStorage.getItem(chat+"sysnot");
-		oocset = localStorage.getItem(chat+"oocset");
 		bbset = localStorage.getItem(chat+"bbset");
 		audioset = localStorage.getItem(chat+"audioset");
 		bgset = localStorage.getItem(chat+"bgset");
@@ -107,12 +102,6 @@ $(document).ready(function() {
 		$('.bbset').attr('checked','checked');
 	} else {
 		$('.bbset').removeAttr('checked');
-	}
-
-	if (oocset == 1) {
-		$('.oocset').attr('checked','checked');
-	} else {
-		$('.oocset').removeAttr('checked');
 	}
 
 	if (audioset == 1) {
@@ -166,21 +155,6 @@ $(document).ready(function() {
 			$('.globalann').show();
 			conversation.scrollTop(conversation[0].scrollHeight);
 		}
-	});
-
-	$('.oocset').click(function() {
-		if (this.checked) {
-			if (Modernizr.localstorage) {
-				localStorage.setItem(chat+"oocset",1);
-			}
-			oocset = 1;
-		} else {
-			if (Modernizr.localstorage) {
-				localStorage.setItem(chat+"oocset",0);
-			}
-			oocset = 0;
-		}
-		updateChatPreview();
 	});
 
 	$('.bbset').click(function() {
@@ -699,8 +673,6 @@ $(document).ready(function() {
 
 		if (textPreview.substr(0,4)=='/ooc') {
 			textPreview = jQuery.trim(textPreview.substr(4));
-			textPreview = "(( "+textPreview+" ))";
-		} else if (oocset == 1) {
 			textPreview = "(( "+textPreview+" ))";
 		}
 

@@ -3,16 +3,6 @@
 {% block header %}
 <link rel="stylesheet" href="/static/css/chat.css?3">
 <link rel="stylesheet" media="screen" type="text/css" href="/static/colorpicker/css/colorpicker.css"/>
-<script type="text/javascript" src="/static/colorpicker/js/colorpicker.js"></script>
-<script src="/static/js/characters.js?2"></script>
-<script type="text/javascript">
-	var user = {{character_dict|tojson|safe}};
-	var chat = {{(chat)|tojson|safe}};
-	var chat_meta = {{chat_meta|tojson|safe}};
-	var latestNum = {{latest_num}};
-	var highlightUser = {{highlight if highlight else "null"}};
-</script>
-<script src="/static/js/chat.js?8"></script>
 {% endblock %}
 {% block content %}
 <div id="conversation">
@@ -109,7 +99,6 @@
 		<label><input type="checkbox" class="disnot" name="disnot" checked><span class="labeling disnota"> Confirm Window Close</span></label>
 		<label><input type="checkbox" class="ttsset" name="ttsset" checked><span class="labeling ttsset"> Enable Moonbase Alpha Mode</span></label>
 		<label><input type="checkbox" class="sysnot" name="sysnot"><span class="labeling sysnota"> Hide System Notifications</span></label>
-		<label><input type="checkbox" class="oocset" name="oocset"><span class="labeling oocseta"> Out Of Character</span></label>
 		<label><input type="checkbox" class="bbset" name="bbset"><span class="labeling bbseta"> Sho BBCode Colors (Refresh)</span></label>
 		<label><input type="checkbox" class="audioset" name="audioset"><span class="labeling audioseta"> Enable Audio</span></label>
 		<label><input type="checkbox" class="bgset" name="bgset"><span class="labeling bgseta"> Enable Backgrounds</span></label>
@@ -144,6 +133,20 @@
 		<input type="submit" name="tumblr" value="Save log and post to Tumblr">
 	</p></form>
 </div>
+
+<script type="text/javascript" src="/static/colorpicker/js/colorpicker.js"></script>
+<script src="/static/js/characters.js?2"></script>
+<script src="/static/js/chat.js?9"></script>
 <script src="/static/js/tts.js?2"></script>
+
+<script type="text/javascript">
+	var user = {{character_dict|tojson|safe}};
+	var chat = {{(chat)|tojson|safe}};
+	var chat_meta = {{chat_meta|tojson|safe}};
+	var latestNum = {{latest_num}};
+	var highlightUser = {{highlight if highlight else "null"}};
+
+	erigam.chat()
+</script>
 
 {% endblock %}

@@ -841,17 +841,6 @@ $(document).ready(function() {
 		}
 	});
 
-	// Initialisation
-
-	if (chat === null) {
-		chatState = 'search';
-		document.title = 'Searching - '+ORIGINAL_TITLE;
-		conversation.addClass('search');
-		runSearch();
-	} else {
-		startChat();
-	}
-
 	$('#conversation').scrollTop($('#conversation')[0].scrollHeight);
 	$("#textInput").focus();
 
@@ -885,6 +874,17 @@ $(document).ready(function() {
 
 	if (Math.floor(Math.random()*413) === 0) {
 		$("body > *").css("transform", "rotate(180deg)");
+	}
+
+	// Initialisation / Main
+
+	if (chat === null) {
+		chatState = 'search';
+		document.title = 'Searching - '+ORIGINAL_TITLE;
+		conversation.addClass('search');
+		runSearch();
+	} else {
+		startChat();
 	}
 
 });

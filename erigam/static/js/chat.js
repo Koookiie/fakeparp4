@@ -227,19 +227,27 @@ $(document).ready(function() {
 
 	// Search
 
+	var searching;
+
 	function runSearch() {
+		document.title = 'Searching - '+ORIGINAL_TITLE;
+		conversation.addClass('search');
+		searching = true;
+
 		$.post(SEARCH_URL, {}, function(data) {
 			chat = data.target;
-			chaturl = '/chat/'+chat;
-			if (typeof window.history.replaceState!="undefined") {
-				window.history.replaceState('', '', chaturl);
+			searching = false;
+			if (typeof window.history.replaceState != "undefined") {
+				window.history.replaceState('', '', '/chat/'+chat);
 				startChat();
 			} else {
 				window.location.replace(chaturl);
 			}
 		}).complete(function() {
-			if (chatState=='search') {
+			if (searching === true) {
 				window.setTimeout(runSearch, 1000);
+			} else {
+				conversation.removeClass('search');
 			}
 		});
 	}
@@ -247,7 +255,6 @@ $(document).ready(function() {
 	function startChat() {
 		chatState = 'chat';
 		document.title = 'Chat - '+ORIGINAL_TITLE;
-		conversation.removeClass('search');
 		$('input, select, button').removeAttr('disabled');
 		$('#preview').css('color', '#'+user.character.color);
 		$('#logLink').attr('href', '/chat/'+chat+'/log');
@@ -836,8 +843,6 @@ $(document).ready(function() {
 	$(window).unload(function() {
 		if (chatState=='chat') {
 			$.ajax(QUIT_URL, {'type': 'POST', data: {'chat': chat}, 'async': false});
-		} else if (chatState=='search') {
-			$.ajax(SEARCH_QUIT_URL, {'type': 'POST', 'async': false});
 		}
 	});
 
@@ -879,10 +884,10 @@ $(document).ready(function() {
 	// Initialisation / Main
 
 	if (chat === null) {
-		chatState = 'search';
-		document.title = 'Searching - '+ORIGINAL_TITLE;
-		conversation.addClass('search');
 		runSearch();
+		$(window).unload(function() {
+			if (searching) $.ajax(SEARCH_QUIT_URL, { "type": "POST", data: { "id": searcher_id }, "async": false });
+		});
 	} else {
 		startChat();
 	}

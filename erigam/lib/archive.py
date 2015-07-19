@@ -56,7 +56,6 @@ def archive_chat(redis, sql, chat_url):
     chat.background = meta.get('background', None)
     # Sessions
     sql_sessions = sql.query(ChatSession).filter(ChatSession.log_id == log.id)
-    #print "sql sessions", sql_sessions
     redis_sessions = redis.hgetall('chat.'+chat_url+'.counters')
     t = [(k, redis_sessions[k]) for k in redis_sessions]
     t.sort()
@@ -67,7 +66,6 @@ def archive_chat(redis, sql, chat_url):
             continue
         redis_sessions[k] = v
 
-    #print "redis sessions", redis_sessions
     # Update the sessions which are already in the database.
     try:
         for sql_session in sql_sessions:
@@ -112,7 +110,6 @@ def archive_chat(redis, sql, chat_url):
                 redis.zscore('chat-sessions', chat_url+'/'+session_id) or 0
             )
             default_character = CHARACTER_DETAILS[redis_session.get('character', 'anonymous/other')]
-            #print "about to add chatsession log.id", log.id, "session id", session_id
             sql_session = ChatSession(
                 log_id=log.id,
                 session_id=session_id,
@@ -150,13 +147,11 @@ def archive_chat(redis, sql, chat_url):
             reason = e.message
             print "=== Error: ", reason
             sql.rollback()
-    # Text
-    # XXX MAKE REALLY REALLY REALLY GODDAMN SURE THIS WORKS WITH MINUS NUMBERS
-    # XXX FOR GOD'S SAKE
+
+    # Text archiving
     lines = redis.lrange('chat.'+chat_url, 0, -1)
     for line in lines:
         # Create a new page if the line won't fit on this one.
-        #if len(latest_page.content.encode('utf8'))+len(line)>65535:
         if len(latest_page.content.encode('utf8'))+len(line) > 65535:
             print "creating a new page"
             latest_page = latest_page = new_page(sql, log, latest_page.number)
@@ -164,6 +159,7 @@ def archive_chat(redis, sql, chat_url):
         latest_page.content += unicode(line, encoding='utf8')+'\n'
     log.time_saved = datetime.datetime.now()
     sql.commit()
+
     # Don't delete from redis until we've successfully committed.
     redis.ltrim('chat.'+chat_url, len(lines), -1)
     return log.id

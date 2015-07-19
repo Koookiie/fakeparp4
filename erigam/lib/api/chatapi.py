@@ -6,7 +6,7 @@ from erigam.lib.model import Log, Chat, ChatSession
 from sqlalchemy.orm.exc import NoResultFound
 
 def create_chat(sql, redis, url, chattype="group"):
-    if g.sql.query(Log).filter(Log.url == url).scalar():
+    if sql.query(Log).filter(Log.url == url).scalar():
         raise ValueError('chaturl_taken')
 
     if not validate_chat_url(url):

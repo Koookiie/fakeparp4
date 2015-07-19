@@ -141,7 +141,7 @@ def postMessage():
             )
             if request.form['user_action'] == 'kick':
                 g.redis.publish('channel.'+chat+'.'+their_session_id, '{"exit":"kick"}')
-                disconnect(g.redis, chat, their_session_id, "%s [%s] kicked %s [%s] from the chat." % (
+                disconnect(g.sql, g.redis, g.log, their_session_id, "%s [%s] kicked %s [%s] from the chat." % (
                     g.user.character['name'],
                     g.user.character['acronym'],
                     their_session_name,
@@ -338,7 +338,7 @@ def getMessages():
 @blueprint.route('/quit', methods=['POST'])
 def quitChatting():
     disconnect_message = '%s [%s] disconnected.' % (g.user.character['name'], g.user.character['acronym']) if g.user.meta['group'] != 'silent' else None
-    disconnect(g.redis, request.form['chat'], g.user.session_id, disconnect_message)
+    disconnect(g.sql, g.redis, g.log, g.user.session_id, disconnect_message)
     return 'ok'
 
 @blueprint.route('/save', methods=['POST'])

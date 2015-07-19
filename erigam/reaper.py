@@ -7,9 +7,11 @@ import os
 from erigam.lib import get_time, LONGPOLL_TIMEOUT_PERIOD
 from erigam.lib.api import disconnect
 from erigam.lib.characters import CHARACTER_DETAILS
+from erigam.lib.model import sm, Log
 
 if __name__ == '__main__':
 
+    db = sm()
     redis = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
 
     while True:
@@ -27,14 +29,19 @@ if __name__ == '__main__':
                 redis.zadd("longpoll-timeout", chat, get_time(LONGPOLL_TIMEOUT_PERIOD))
 
         for dead in redis.zrangebyscore('chats-alive', 0, get_time()):
-            chat, session = dead.split('/')
-            disconnect_message = None
-            if redis.hget('session.'+session+'.meta.'+chat, 'group') != 'silent':
+            chat, session = dead.split('/', 1)
+            log = db.query(Log).filter(Log.url == chat).scalar()
+
+            if redis.hget('session.'+session+'.meta.'+chat, 'group') == 'silent':
+                disconnect_message = None
+            else:
                 session_name = redis.hget('session.'+session+'.chat.'+chat, 'name')
                 if session_name is None:
                     session_name = CHARACTER_DETAILS[redis.hget('session.'+session+'.chat.'+chat, 'character')]['name']
                 disconnect_message = '%s\'s connection timed out. Please don\'t quit straight away; they could be back.' % (session_name)
-            disconnect(redis, chat, session, disconnect_message)
+
+            if log:
+                disconnect(db, redis, log, session, disconnect_message)
             print 'dead', dead
 
         for dead in redis.zrangebyscore('searchers', 0, get_time()):

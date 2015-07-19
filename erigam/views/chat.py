@@ -1,7 +1,3 @@
-import json
-from time import mktime
-from sqlalchemy.orm.exc import NoResultFound
-
 from flask import (
     Blueprint,
     request,
@@ -20,14 +16,13 @@ from erigam.lib import (
 
 from erigam.lib.model import (
     Log,
-    Chat,
-    ChatSession,
     Ban,
     Message
 )
 
 from erigam.lib.characters import CHARACTER_GROUPS, CHARACTERS
 from erigam.lib.sessions import CASE_OPTIONS
+from erigam.lib import api
 
 blueprint = Blueprint('chat', __name__)
 
@@ -36,7 +31,7 @@ blueprint = Blueprint('chat', __name__)
 def chat(chat_url=None):
     if chat_url is None:
         chat_meta = {'type': 'unsaved'}
-        existing_lines = []
+        messages = []
         latest_num = -1
     else:
         if g.sql.query(Ban).filter(Ban.url == chat_url).filter(Ban.ip == g.user.ip).scalar() is not None:
@@ -45,51 +40,20 @@ def chat(chat_url=None):
             chat_url = OUBLIETTE_ID
         # Check if chat exists
         chat_meta = g.redis.hgetall('chat.'+chat_url+'.meta')
+
         # Convert topic to unicode.
         if 'topic' in chat_meta.keys():
             chat_meta['topic'] = unicode(chat_meta['topic'], encoding='utf8')
+
         # Try to load the chat from sql if it doesn't exist in redis.
         if len(chat_meta) == 0 or g.redis.exists("chat."+chat_url+".regen"):
-            g.redis.delete("chat."+chat_url+".regen")
-            try:
-                sql_log = g.sql.query(Log).filter(Log.url == chat_url).one()
-                sql_chat = g.sql.query(Chat).filter(Chat.log_id == sql_log.id).one()
-                chat_meta = {
-                    "type": sql_chat.type,
-                    "counter": sql_chat.counter,
-                    "public": "0",
-                }
-                if sql_chat.topic is not None and sql_chat.topic != "":
-                    chat_meta["topic"] = sql_chat.topic
-                if sql_chat.background is not None and sql_chat.background != "":
-                    chat_meta["background"] = sql_chat.background
+            chat_meta = api.chat.load_chat(g.sql, g.redis, chat)
 
-                g.redis.hmset('chat.'+chat_url+'.meta', chat_meta)
-                for sql_session in g.sql.query(ChatSession).filter(ChatSession.log_id == sql_log.id):
-                    g.redis.hset('chat.'+chat_url+'.counters', sql_session.counter, sql_session.session_id)
-                    g.redis.hmset('session.'+sql_session.session_id+'.meta.'+chat_url, {
-                        "counter": sql_session.counter,
-                        "group": sql_session.group,
-                    })
-                    g.redis.hmset('session.'+sql_session.session_id+'.chat.'+chat_url, {
-                        "character": sql_session.character,
-                        "name": sql_session.name,
-                        "acronym": sql_session.acronym,
-                        "color": sql_session.color,
-                        "case": sql_session.case,
-                        "replacements": sql_session.replacements,
-                        "quirk_prefix": sql_session.quirk_prefix,
-                        "quirk_suffix": sql_session.quirk_suffix,
-                    })
-                    g.redis.sadd('session.'+sql_session.session_id+'.chats', chat_url)
-                    g.redis.zadd('chat-sessions', chat_url+'/'+sql_session.session_id, mktime(sql_session.expiry_time.timetuple()))
-            except NoResultFound:
-                abort(404)
         # Make sure it's in the archive queue.
         if g.redis.zscore('archive-queue', chat_url) is None:
             g.redis.zadd('archive-queue', chat_url, get_time(ARCHIVE_PERIOD))
 
-        # Load chat-based session data.
+        # Load the last 50 lines of chat
         log = g.sql.query(Log).filter(Log.url == chat_url).one()
         messages = g.sql.query(Message).filter(
             Message.log_id == log.id,

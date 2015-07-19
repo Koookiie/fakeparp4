@@ -1,7 +1,4 @@
-import datetime
 from time import mktime
-from webhelpers import paginate
-from sqlalchemy import and_
 from sqlalchemy.orm.exc import NoResultFound
 
 from flask import (
@@ -22,7 +19,6 @@ from erigam.lib import (
 
 from erigam.lib.model import (
     Log,
-    LogPage,
     Chat,
     ChatSession,
     Ban
@@ -117,49 +113,6 @@ def chat(chat_url=None):
         latest_num=latest_num,
         legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat_url),
         highlight=highlight
-    )
-
-@blueprint.route('/<chat>/log')
-@use_db
-def view_log(chat=None):
-
-    # Decide whether or not to put a continue link in.
-    continuable = g.redis.hget('chat.'+chat+'.meta', 'type') is not None
-
-    try:
-        log = g.sql.query(Log).filter(Log.url == chat).one()
-    except:
-        abort(404)
-
-    current_page = request.args.get('page') or log.page_count
-
-    try:
-        log_page = g.sql.query(LogPage).filter(and_(LogPage.log_id == log.id, LogPage.number == current_page)).one()
-    except NoResultFound:
-        abort(404)
-
-    url_generator = paginate.PageURL(url_for('chat.view_log', chat=chat), {'page': current_page})
-
-    # It's only one row per page and we want to fetch them via both log id and
-    # page number rather than slicing, so we'll just give it an empty list and
-    # override the count.
-    paginator = paginate.Page([], page=current_page, items_per_page=1, item_count=log.page_count, url=url_generator)
-
-    # Pages end with a line break, so the last line is blank.
-    lines = log_page.content.split('\n')[0:-1]
-    lines = map(lambda _: parse_line(_, 0), lines)
-
-    for line in lines:
-        line['datetime'] = datetime.datetime.fromtimestamp(line['timestamp'])
-
-    return render_template('log.html',
-        chat=chat,
-        lines=lines,
-        continuable=continuable,
-        current_page=current_page,
-        paginator=paginator,
-        legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat)
-
     )
 
 @blueprint.route('/<chat>/unban', methods=['GET', 'POST'])

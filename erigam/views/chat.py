@@ -122,7 +122,7 @@ def unbanPage(chat=None):
 
     result = None
 
-    if not g.user.globalmod or not g.redis.hget("session."+g.user.session_id+".meta."+chat, 'group') == 'mod':
+    if not g.user.globalmod or not g.redis.hget("session."+g.user.session_id+".meta."+chat, 'group') not in ('mod', 'globalmod'):
         return render_template('admin_denied.html')
 
     if "banid" in request.form:

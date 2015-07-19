@@ -72,13 +72,17 @@ def archive_chat(redis, sql, chat_url):
     # Update the sessions which are already in the database.
     try:
         for sql_session in sql_sessions:
-            default_character = CHARACTER_DETAILS[sql_session.character]
             redis_session = redis.hgetall('session.'+sql_session.session_id+'.chat.'+chat_url)
             redis_session_meta = redis.hgetall('session.'+sql_session.session_id+'.meta.'+chat_url)
+
+            # Character defaults
+            default_character = CHARACTER_DETAILS.get(redis_session.get('character'), 'anonymous/other')
+
             # Delete the session from sql if it's been deleted from redis.
             if len(redis_session) == 0 or len(redis_session_meta) == 0:
                 sql.delete(sql_session)
                 continue
+
             expiry_time = datetime.datetime.fromtimestamp(
                 redis.zscore('chat-sessions', chat_url+'/'+sql_session.session_id) or 0
             )
@@ -95,7 +99,7 @@ def archive_chat(redis, sql, chat_url):
             try:
                 del redis_sessions[str(sql_session.counter)]
             except KeyError:
-                print "=== KeyError for SQL session %s ===" % (sql_session.counter)
+                print "=== SQL session %s does not exist in redis counters list ===" % (sql_session.counter)
     except (UnicodeDecodeError, TypeError, KeyError):
         print "=== Error encountered. Not updating this existing session."
         print traceback.print_exc()

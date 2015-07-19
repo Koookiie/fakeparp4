@@ -8,7 +8,6 @@ from erigam.lib import SEARCH_PERIOD, get_time, validate_chat_url
 from erigam.lib.archive import get_or_create_log
 from erigam.lib.characters import CHARACTER_GROUPS, CHARACTERS
 from erigam.lib.sessions import CASE_OPTIONS
-from erigam.lib.request_methods import use_db
 
 blueprint = Blueprint('main', __name__)
 
@@ -80,7 +79,6 @@ def quitSearching():
 # Save
 
 @blueprint.route('/save', methods=['POST'])
-@use_db
 def save():
     try:
         if 'character' in request.form:

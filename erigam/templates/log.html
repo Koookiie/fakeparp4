@@ -15,17 +15,16 @@
 {{ self.pager() }}
 
 <div id="archiveConversation">
-{% if lines|length!=0 %}
+{% if messages|length!=0 %}
 {% set last_date = None %}
-{% for line in lines %}
-{% set current_date = line['datetime'].date() %}
+{% for message in messages %}
+{% set current_date = message['timestamp'].date() %}
 
 {% if current_date!=last_date %}
     <h1>{{current_date.strftime("%A %d %B %Y")}}</h1>
 {% set last_date = current_date %}
 {% endif %}
-
-	<p style="color: #{{line['color']}}" class="{% if line.counter==-1 %}system{% elif line.counter==-2 %}system_important{% else %}user{{line['counter']}}{% endif %}">{{line['line']}}<span class="timestamp">{{line['datetime'].strftime('%X')}}</span></p>
+	{{render_message(message)}}
 {% endfor %}
 {% else %}
 	<p>There isn't a log for this chat - either it hasn't existed long enough to be archived or I've screwed up the archiving system yet again. Chats are archived after about half an hour, so if you're still seeing this message after that then please send a series of <em>very angry</em> asks to eggyeggegg.tumblr.com.</p>

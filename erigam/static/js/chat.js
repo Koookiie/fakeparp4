@@ -257,7 +257,6 @@ $(document).ready(function() {
 		document.title = 'Chat - '+ORIGINAL_TITLE;
 		$('input, select, button').removeAttr('disabled');
 		$('#preview').css('color', '#'+user.character.color);
-		$('#logLink').attr('href', '/chat/'+chat+'/log');
 		closeSettings();
 		getMessages();
 		pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
@@ -282,7 +281,9 @@ $(document).ready(function() {
 
 		var globalmod = ($.inArray(msg.counter, globals) !== -1 || msg.counter == -2);
 
-		message = bbEncode(htmlEncode(linkify(msg.line)), globalmod);
+		if (msg.acronym) msg.text = msg.acronym + ": " + msg.text;
+
+		message = bbEncode(htmlEncode(linkify(msg.text)), globalmod);
 
 		var mp = $('<p>').addClass(msgClass).addClass("message").attr('title', msgClass).css('color', '#'+msg.color).html(message); //.appendTo('#conversation');
 
@@ -307,7 +308,7 @@ $(document).ready(function() {
 			if (typeof data.exit!=='undefined') {
 				if (data.exit=='kick') {
 					clearChat();
-					addLine({ counter: -1, color: '000000', line: 'You have been kicked from this chat. Please think long and hard about your behaviour before rejoining.' });
+					addLine({ counter: -1, color: '000000', text: 'You have been kicked from this chat. Please think long and hard about your behaviour before rejoining.' });
 					scroll_to_bottom();
 				} else if (data.exit=='ban') {
 					window.location.replace(document.location.origin + "/chat/theoubliette");
@@ -600,7 +601,7 @@ $(document).ready(function() {
 	function ipLookup() {
 		var counter = $(this).parent().parent().data().meta.counter;
 		$.post("/chat_ajax/ip_lookup", { 'chat': chat, 'counter': counter, }, function(ip) {
-			addLine({counter: "-1", color: "000000", line: "[SYSTEM] user" +counter+ "'s IP: " + ip});
+			addLine({counter: "-1", color: "000000", text: "[SYSTEM] user" +counter+ "'s IP: " + ip});
 		});
 	}
 
@@ -706,7 +707,7 @@ $(document).ready(function() {
 
 			if (jQuery.trim($('#textInput').val()) == '/usr') {
 				$.post("/chat_ajax/getSession", function(session) {
-					addLine({counter:"-2",color:"000000",line:"[SYSTEM] Your cookie: " + session});
+					addLine({counter:"-2",color:"000000",text:"[SYSTEM] Your cookie: " + session});
 				});
 				$('#textInput').val('');
 			} else if ($('#textInput').val() !== '') {
@@ -848,16 +849,6 @@ $(document).ready(function() {
 
 	$('#conversation').scrollTop($('#conversation')[0].scrollHeight);
 	$("#textInput").focus();
-
-	$('#saveLog').click(function() {
-		if (confirm('Are you sure you want to save the log and disconnect?')) {
-			$.ajax(QUIT_URL, {'type': 'POST', data: {'chat': chat}});
-			clearChat();
-			$('#save input').removeAttr('disabled');
-			$('#saveLink').click();
-		}
-	});
-
 
 	$(document).on('click', '.spoiler', function() {
 		if ($(this).css('opacity') == '0') {

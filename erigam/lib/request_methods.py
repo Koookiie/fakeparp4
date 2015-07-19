@@ -1,11 +1,10 @@
 import os
-from functools import wraps
 from flask import g, request, abort
 from redis import ConnectionPool, Redis
 
 from erigam.lib import validate_chat_url, session_validator
 from erigam.lib.characters import CHARACTER_DETAILS
-from erigam.lib.model import sm
+from erigam.lib.model import sm, Log
 from erigam.lib.sessions import Session
 
 # Connection pooling. This takes far too much effort.
@@ -21,18 +20,6 @@ def populate_all_chars():
     pipe.execute()
     del pipe
     del redis
-
-# SQL functions
-
-def use_db(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        # Create DB object if it does not exist.
-        if not hasattr(g, "sql"):
-            g.sql = sm()
-
-        return f(*args, **kwargs)
-    return decorated_function
 
 # Before request
 
@@ -63,6 +50,9 @@ def create_session():
         # Abort 404 if there's no type because the chat might not be real.
         if g.chat_type is None:
             abort(404)
+
+        if hasattr(g, "sql"):
+            g.log = g.sql.query(Log).filter(Log.url == chat).one()
 
         g.user = Session(g.redis, session_id, chat)
     else:
@@ -109,18 +99,12 @@ def db_commit(response=None):
         g.sql.commit()
     return response
 
-def disconnect_db(response=None):
-    # Close and delete Redis PubSubs
-    if hasattr(g, "pubsub"):
-        g.pubsub.close()
-        del g.pubsub
+def disconnect_sql(response=None):
+    if hasattr(g, "db"):
+        g.db.close()
+        del g.db
+    return response
 
-    # Delete Redis object
+def disconnect_redis(response=None):
     del g.redis
-
-    # Close SQL
-    if hasattr(g, "sql"):
-        g.sql.close()
-        del g.sql
-
     return response

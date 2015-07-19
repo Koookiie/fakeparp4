@@ -1,3 +1,4 @@
+import json
 from time import mktime
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -21,11 +22,10 @@ from erigam.lib.model import (
     Log,
     Chat,
     ChatSession,
-    Ban
+    Ban,
+    Message
 )
 
-from erigam.lib.request_methods import use_db
-from erigam.lib.messages import parse_line
 from erigam.lib.characters import CHARACTER_GROUPS, CHARACTERS
 from erigam.lib.sessions import CASE_OPTIONS
 
@@ -33,7 +33,6 @@ blueprint = Blueprint('chat', __name__)
 
 @blueprint.route('/')
 @blueprint.route('/<chat_url>')
-@use_db
 def chat(chat_url=None):
     if chat_url is None:
         chat_meta = {'type': 'unsaved'}
@@ -91,9 +90,15 @@ def chat(chat_url=None):
             g.redis.zadd('archive-queue', chat_url, get_time(ARCHIVE_PERIOD))
 
         # Load chat-based session data.
-        g.user.set_chat(chat_url)
-        existing_lines = [parse_line(line, 0) for line in g.redis.lrange('chat.'+chat_url, 0, -1)]
-        latest_num = len(existing_lines)-1
+        log = g.sql.query(Log).filter(Log.url == chat_url).one()
+        messages = g.sql.query(Message).filter(
+            Message.log_id == log.id,
+        ).order_by(
+            Message.timestamp.desc(),
+        ).limit(50).all()
+        messages.reverse()
+
+        latest_num = messages[-1].id if len(messages) > 0 else 0
 
     if 'counter' in g.user.meta:
         highlight = g.redis.hget("chat.%s.highlights" % (chat_url), g.user.meta['counter'])
@@ -109,7 +114,7 @@ def chat(chat_url=None):
         characters=CHARACTERS,
         chat=chat_url,
         chat_meta=chat_meta,
-        lines=existing_lines,
+        messages=messages,
         latest_num=latest_num,
         legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat_url),
         highlight=highlight

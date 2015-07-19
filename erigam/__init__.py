@@ -6,7 +6,8 @@ from erigam.lib.request_methods import (
     create_session,
     set_cookie,
     db_commit,
-    disconnect_db
+    disconnect_redis,
+    disconnect_sql
 )
 
 from erigam.views import (
@@ -25,7 +26,8 @@ app.before_request(connect_db)
 app.before_request(create_session)
 app.after_request(set_cookie)
 app.after_request(db_commit)
-app.teardown_request(disconnect_db)
+app.teardown_request(disconnect_redis)
+app.teardown_request(disconnect_sql)
 
 # Flask settings
 app.url_map.strict_slashes = False

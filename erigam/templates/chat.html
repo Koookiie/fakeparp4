@@ -9,15 +9,8 @@
 {% if chat_meta['type']!='unsaved' %}
 	<p><a href="/chat/{{chat}}/log" target="_blank">View earlier messages</a></p>
 {% endif %}
-{% for line in lines %}
-	{% if line.counter== -1 %}
-		{% set class = "system" %}
-	{% elif line.counter== -2 %}
-		{% set class = "system_important" %}
-	{% else %}
-		{% set class = "user" ~ line.counter %}
-	{% endif %}
-	<p class="{{class}} message" title="{{class}}" style="color: #{{line.color}}">{{line.line}}</p>
+{% for message in messages %}
+	{{render_message(message)}}
 {% endfor %}
 </div>
 
@@ -105,10 +98,6 @@
 			</div>
 		</div>
 	</div>
-	<p class="settingshap">
-		<a id="viewLog" class="aButton" target="_blank" href="/chat/{{chat}}/log">Logs</a>
-		<a id="saveLog" class="aButton" href="javascript:void(0)">Save log</a>
-	</p>
 	<p><audio id="backgroundAudio" src="" autoplay loop controls></audio></p>
 </form>
 
@@ -126,10 +115,7 @@
 
 <div id="save">
 	<p>Did you enjoy that chat? If so, remember to save the log - the chat will be deleted from this URL in 7 days.</p>
-	<form action="/logs/save" method="post" target="_blank"><p>
-		<input type="hidden" name="chat" value="">
-		<input id="saveLink" type="submit" name="save" value="Save log">
-	</p></form>
+	<p> <a href="/chat/{{chat}}/log">View log</a> </p>
 </div>
 
 <script type="text/javascript">
@@ -142,7 +128,7 @@
 
 <script type="text/javascript" src="/static/colorpicker/js/colorpicker.js"></script>
 <script src="/static/js/characters.js?2"></script>
-<script src="/static/js/chat.js?9"></script>
+<script src="/static/js/chat.js?10"></script>
 <script src="/static/js/tts.js?2"></script>
 
 {% endblock %}

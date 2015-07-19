@@ -1,10 +1,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import backref, relation, scoped_session, sessionmaker
+from sqlalchemy.schema import Index
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, ForeignKey, Integer, String, Unicode, UnicodeText, DateTime, Enum
 
 import datetime
 import os
+import time
 
 def now():
     return datetime.datetime.now()
@@ -24,6 +26,7 @@ def init_db():
 
 class Log(Base):
     __tablename__ = 'logs'
+
     id = Column(Integer, primary_key=True)
     url = Column(String(100), unique=True)
     page_count = Column(Integer, default=1)
@@ -32,12 +35,14 @@ class Log(Base):
 
 class LogPage(Base):
     __tablename__ = 'log_pages'
+
     log_id = Column(Integer, ForeignKey('logs.id'), primary_key=True)
     number = Column(Integer, primary_key=True, autoincrement=False)
     content = Column(UnicodeText, nullable=False)
 
 class Chat(Base):
     __tablename__ = 'chats'
+
     log_id = Column(Integer, ForeignKey('logs.id'), primary_key=True)
     type = Column(Enum(u"unsaved", u"saved", u"group", u"deleted", name=u"chats_type"), nullable=False, default=u"saved")
     counter = Column(Integer, nullable=False, default=1)
@@ -46,6 +51,7 @@ class Chat(Base):
 
 class ChatSession(Base):
     __tablename__ = 'chat_sessions'
+
     log_id = Column(Integer, ForeignKey('logs.id'), primary_key=True)
     session_id = Column(String(36), primary_key=True)
     counter = Column(Integer, nullable=False)
@@ -72,7 +78,51 @@ class Ban(Base):
     reason = Column(UnicodeText)
     expires = Column(DateTime(), nullable=False)
 
+class Message(Base):
+    __tablename__ = 'messages'
+
+    id = Column(Integer, primary_key=True)
+    log_id = Column(Integer, ForeignKey('logs.id'), nullable=False)
+
+    timestamp = Column(DateTime(), nullable=False, default=now)
+
+    type = Column(Enum(
+        u"message",
+        u"user_change",
+        u"meta_change",
+        name=u"messages_type",
+    ), nullable=False, default=u"ic")
+
+    counter = Column(Integer, nullable=False)
+
+    color = Column(Unicode(6), nullable=False, default=u"000000")
+
+    acronym = Column(Unicode(15), nullable=False, default=u"")
+
+    name = Column(Unicode(100), nullable=False, default=u"")
+
+    text = Column(UnicodeText, nullable=False)
+
+    def to_dict(self, include_user=False):
+        md = {
+            "id": self.id,
+            "counter": self.counter,
+            "timestamp": time.mktime(self.timestamp.timetuple()),
+            "type": self.type,
+            "color": self.color,
+            "acronym": self.acronym,
+            "name": self.name,
+            "text": self.text,
+        }
+
+        return md
+
+# Index to make log rendering easier.
+Index("messages_log_id", Message.log_id, Message.timestamp)
+
 Log.pages = relation(LogPage, backref='log')
 Log.chat = relation(Chat, backref='log', uselist=False)
 Log.sessions = relation(ChatSession, backref='log')
 Log.bans = relation(Ban, backref='log')
+
+Message.log = relation(Log)

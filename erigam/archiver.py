@@ -5,8 +5,7 @@ import time
 import datetime
 
 from erigam.lib import ARCHIVE_PERIOD, get_time
-from erigam.lib.archive import archive_chat, delete_chat_session, delete_chat, delete_session
-from erigam.lib.messages import send_message
+from erigam.lib.archive import archive_chat, delete_chat_session, delete_session
 from erigam.lib.model import sm, Ban
 import sqlalchemy.exc
 import os
@@ -27,10 +26,6 @@ if __name__ == '__main__':
             print "running archiving"
             sql = sm()
 
-            # Send blank messages to avoid socket timeouts.
-            for chat in redis.zrangebyscore('longpoll-timeout', 0, get_time()):
-                send_message(redis, chat, -1, "message")
-
             # Expire IP bans.
             sql.query(Ban).filter(Ban.expires < datetime.datetime.utcnow()).delete()
 
@@ -44,13 +39,10 @@ if __name__ == '__main__':
                     sql.close()
                     sql = sm()
                     pass
-                pipe = redis.pipeline()
-                pipe.scard('chat.'+chat+'.online')
-                pipe.scard('chat.'+chat+'.idle')
-                online, idle = pipe.execute()
-                # Delete if no-one is online any more.
-                if online+idle == 0:
-                    delete_chat(redis, sql, chat)
+                online = redis.scard('chat.'+chat+'.online')
+                idle = redis.scard('chat.'+chat+'.idle')
+                # Stop archiving if no-one is online any more.
+                if online + idle == 0:
                     redis.zrem('archive-queue', chat)
                 else:
                     redis.zadd('archive-queue', chat, get_time(ARCHIVE_PERIOD))
@@ -59,11 +51,6 @@ if __name__ == '__main__':
             for chat_session in redis.zrangebyscore('chat-sessions', 0, get_time()):
                 print "deleting chat session: ", chat_session
                 delete_chat_session(redis, *chat_session.split('/'))
-
-            # Delete chats.
-            for chat in redis.zrangebyscore('delete-queue', 0, get_time()):
-                delete_chat(redis, sql, chat)
-                redis.zrem('delete-queue', chat)
 
             # Delete sessions.
             for session_id in redis.zrangebyscore('all-sessions', 0, get_time()):

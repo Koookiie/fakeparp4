@@ -21,17 +21,21 @@ from erigam.lib.groups import (
 
 from erigam.lib.messages import (
     send_message,
-    get_userlists,
-    parse_messages
+    get_userlists
 )
 
-from erigam.lib.model import Ban
+from erigam.lib.model import Ban, Message
 
 from erigam.lib.characters import CHARACTER_DETAILS
 from erigam.lib.punishments import randpunish
 from erigam.lib.decorators import mark_alive, require_admin
+from erigam.lib.request_methods import (
+    db_commit,
+    disconnect_sql
+)
 
 import datetime
+import json
 
 blueprint = Blueprint('backend', __name__)
 
@@ -47,7 +51,15 @@ def postMessage():
 
         if g.redis.hexists('punish-scene', g.user.ip):
             line = randpunish(g.redis, g.user.session_id, chat, line)
-        send_message(g.redis, chat, g.user.meta['counter'], 'message', line, g.user.character['color'], g.user.character['acronym'])
+
+        send_message(g.sql, g.redis, Message(
+            log_id=g.log.id,
+            type="message",
+            counter=g.user.meta['counter'],
+            color=g.user.character['color'],
+            acronym=g.user.character['acronym'],
+            text=line
+        ))
     if 'state' in request.form and request.form['state'] in ['online', 'idle']:
         g.user.change_state(request.form['state'])
     # Mod options.
@@ -100,7 +112,12 @@ def postMessage():
                         set_session_name,
                         set_session_acronym
                     )
-                send_message(g.redis, chat, -1, 'user_change', set_message)
+                send_message(g.sql, g.redis, Message(
+                    log_id=g.log.id,
+                    type="user_change",
+                    counter=-1,
+                    text=set_message
+                ))
         if 'user_action' in request.form and 'counter' in request.form and request.form['user_action'] in MINIMUM_RANKS:
             # Check if we're high enough to perform this action.
             if GROUP_RANKS[g.user.meta['group']] < MINIMUM_RANKS[request.form['user_action']]:
@@ -162,7 +179,12 @@ def postMessage():
                 if g.redis.sismember('chat.'+chat+'.online', their_session_id) or g.redis.sismember('chat.'+chat+'.idle', their_session_id):
                     disconnect(g.redis, chat, their_session_id, ban_message)
                 else:
-                    send_message(g.redis, chat, -1, 'user_change', ban_message)
+                    send_message(g.sql, g.redis, Message(
+                        log_id=g.log.id,
+                        type="user_change",
+                        counter=-1,
+                        text=ban_message
+                    ))
 
         if 'meta_change' in request.form:
             chat = request.form['chat']
@@ -172,13 +194,16 @@ def postMessage():
                         g.redis.hset('chat.'+chat+'.meta', flag, '1')
                         if flag == 'public':
                             g.redis.sadd("public-chats", chat)
-                        send_message(g.redis, chat, -1, 'meta_change', '%s changed the %s settings.' % (g.user.character['name'], flag))
                     else:
                         g.redis.hdel('chat.'+chat+'.meta', flag)
                         if flag == 'public':
                             g.redis.srem("public-chats", chat)
-                        send_message(g.redis, chat, -1, 'meta_change', '%s changed the %s settings.' % (g.user.character['name'], flag))
-            #send_message(g.redis, chat, -1, 'meta_change')
+                    send_message(g.sql, g.redis, Message(
+                        log_id=g.log.id,
+                        type="meta_change",
+                        counter=-1,
+                        text='%s changed the %s settings.' % (g.user.character['name'], flag)
+                    ))
         if 'topic' in request.form:
             if request.form['topic'] != '':
                 try:
@@ -186,39 +211,58 @@ def postMessage():
                 except UnicodeEncodeError:
                     truncated_topic = request.form['topic'].replace('\n', ' ')[:1500]
                 g.redis.hset('chat.'+chat+'.meta', 'topic', truncated_topic)
-                send_message(g.redis, chat, -1, 'meta_change', '%s changed the conversation topic to "%s".' % (
+                topic_message = '%s changed the conversation topic to "%s".' % (
                     g.user.character['name'],
                     truncated_topic
-                ))
+                )
             else:
                 g.redis.hdel('chat.'+chat+'.meta', 'topic')
-                send_message(g.redis, chat, -1, 'meta_change', '%s removed the conversation topic.' % g.user.character['name'])
+                topic_message = '%s removed the conversation topic.' % (g.user.character['name'])
+            send_message(g.sql, g.redis, Message(
+                log_id=g.log.id,
+                type="meta_change",
+                counter=-1,
+                text=topic_message
+            ))
         if 'background' in request.form:
             if request.form['background'] != '':
                 background_url = request.form['background'].decode('utf-8', 'ignore')
                 g.redis.hset('chat.'+chat+'.meta', 'background', background_url)
                 g.redis.sadd("chat-backgrounds", chat)
-                send_message(g.redis, chat, -1, 'meta_change', '%s [%s] changed the conversation background to "%s".' % (
+                background_message = '%s [%s] changed the conversation background to "%s".' % (
                     g.user.character['name'],
                     g.user.character['acronym'],
                     background_url.replace('\n', ' ')[:1500]
-                ))
+                )
             else:
                 g.redis.hdel('chat.'+chat+'.meta', 'background')
-                send_message(g.redis, chat, -1, 'meta_change', '%s [%s] removed the conversation background.' % (g.user.character['name'], g.user.character['acronym']))
+                background_message = '%s [%s] removed the conversation background.' % (g.user.character['name'], g.user.character['acronym'])
                 g.redis.srem("chat-backgrounds", chat)
+            send_message(g.sql, g.redis, Message(
+                log_id=g.log.id,
+                type="meta_change",
+                counter=-1,
+                text=background_message
+            ))
 
         if 'audio' in request.form:
             if request.form['audio'] != '':
                 audio_url = request.form['audio'].decode('utf-8', 'ignore')
                 g.redis.hset('chat.'+chat+'.meta', 'audio', audio_url)
-                send_message(g.redis, chat, -1, 'meta_change', '%s changed the conversation audio to "%s".' % (
+                audio_message = '%s changed the conversation audio to "%s".' % (
                     g.user.character['name'],
                     audio_url.replace('\n', ' ')[:1500]
-                ))
+                )
             else:
                 g.redis.hdel('chat.'+chat+'.meta', 'audio')
-                send_message(g.redis, chat, -1, 'meta_change', '%s removed the conversation audio.' % g.user.character['name'])
+                audio_message = '%s removed the conversation audio.' % (g.user.character['name'])
+
+            send_message(g.sql, g.redis, Message(
+                log_id=g.log.id,
+                type="meta_change",
+                counter=-1,
+                text=audio_message
+            ))
 
     return 'ok'
 
@@ -245,43 +289,46 @@ def pingServer():
 @blueprint.route('/messages', methods=['POST'])
 @mark_alive
 def getMessages():
+    try:
+        after = int(request.form["after"])
+    except (KeyError, ValueError):
+        after = 0
 
-    chat = request.form['chat']
-    after = int(request.form['after'])
+    # Look for stored messages first, and only subscribe if there aren't any.
+    messages = g.redis.zrangebyscore("chat:%s" % g.log.id, "(%s" % after, "+inf")
 
-    message_dict = None
-
-    # Check for stored messages.
-    messages = g.redis.lrange('chat.'+chat, after+1, -1)
-    if messages:
+    if "joining" in request.form or g.joining:
         message_dict = {
-            'messages': parse_messages(messages, after+1)
-        }
-    elif g.joining:
-        message_dict = {
-            'messages': []
+            "messages": [],
         }
 
-    if message_dict:
-        message_dict['online'], message_dict['idle'] = get_userlists(g.redis, chat)
-        message_dict['meta'] = g.redis.hgetall('chat.'+chat+'.meta')
+        message_dict['online'], message_dict['idle'] = get_userlists(g.redis, g.log.url)
+
         # Newly created matchmaker chats don't know the counter, so we send it here.
         message_dict['counter'] = g.user.meta['counter']
+
+        return jsonify(message_dict)
+    elif len(messages) != 0:
+        message_dict = {"messages": [json.loads(_) for _ in messages]}
         return jsonify(message_dict)
 
-    # Otherwise, listen for a message.
-    g.pubsub = g.redis.pubsub()
+    pubsub = g.redis.pubsub()
 
     # Main channel.
-    g.pubsub.subscribe('channel.'+chat)
+    pubsub.subscribe('channel.'+g.log.url)
 
     # Self channel.
     # Right now this is only used by kick/ban and IP lookup, so only subscribe
     # if we're in a group chat or a global mod.
     if g.chat_type == 'group' or g.user.meta['group'] == 'globalmod':
-        g.pubsub.subscribe('channel.'+chat+'.'+g.user.session_id)
+        pubsub.subscribe('channel.'+g.log.url+'.'+g.user.session_id)
 
-    for msg in g.pubsub.listen():
+    # Get rid of the database connection here so we're not hanging onto it
+    # while waiting for the redis message.
+    db_commit()
+    disconnect_sql()
+
+    for msg in pubsub.listen():
         if msg['type'] == 'message':
             # The pubsub channel sends us a JSON string, so we return that instead of using jsonify.
             resp = make_response(msg['data'])

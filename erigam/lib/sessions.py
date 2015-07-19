@@ -4,13 +4,14 @@ except:
     import json
 import re
 
-from flask import request
+from flask import request, g
 from uuid import uuid4
 
 from erigam.lib import DELETE_SESSION_PERIOD, get_time
 from erigam.lib.api import get_online_state
 from erigam.lib.characters import CHARACTER_DETAILS
-from erigam.lib.messages import send_message
+from erigam.lib.messages import send_message, send_userlist
+from erigam.lib.model import Message
 
 CASE_OPTIONS = {
     'normal': 'Normal',
@@ -121,7 +122,6 @@ class Session(object):
 
     def save_character(self, form):
 
-        redis = self.redis
         character = self.character
 
         old_acronym = character['acronym']
@@ -146,7 +146,7 @@ class Session(object):
 
         # Validate character
         # XXX Get all-chars from CHARACTER_DEFAULTS.keys()?
-        if form['character'] in redis.smembers('all-chars'):
+        if form['character'] in self.redis.smembers('all-chars'):
             character['character'] = form['character']
         else:
             raise ValueError("character")
@@ -167,7 +167,7 @@ class Session(object):
         character['replacements'] = json.dumps(replacements)
 
         saved_character = dict(character)
-        pipe = redis.pipeline()
+        pipe = self.redis.pipeline()
         pipe.delete(self.prefix)
         pipe.hmset(self.prefix, saved_character)
         pipe.execute()
@@ -176,12 +176,17 @@ class Session(object):
         if self.chat is not None:
             if character['name'] != old_name or character['acronym'] != old_acronym:
                 if self.meta['group'] == 'silent':
-                    user_change_message = None
+                    send_userlist(self.redis, g.log)
                 else:
                     user_change_message = '%s [%s] is now %s [%s]. ~~ %s ~~' % (old_name, old_acronym, character['name'], character['acronym'], self.meta['counter'])
-                send_message(redis, request.form['chat'], -1, 'user_change', user_change_message)
+                    send_message(g.sql, self.redis, Message(
+                        log_id=g.log.id,
+                        type="user_change",
+                        counter=-1,
+                        text=user_change_message
+                    ))
             elif character['color'] != old_color:
-                send_message(redis, request.form['chat'], -1, 'user_change', None)
+                send_userlist(self.redis, g.log)
 
     def save_pickiness(self, form):
         # Para/NSFW
@@ -225,7 +230,7 @@ class Session(object):
         if state != current_state:
             self.redis.smove('chat.'+self.chat+'.'+current_state, 'chat.'+self.chat+'.'+state, self.session_id)
             # Update userlist.
-            send_message(self.redis, self.chat, -1, 'user_change')
+            send_userlist(self.redis, g.log)
 
 
 def get_or_create(redis, key, default):

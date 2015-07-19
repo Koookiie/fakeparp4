@@ -4,6 +4,9 @@ import uuid
 import time
 import os
 
+from erigam.lib.model import sm, Message
+from erigam.lib.messages import send_message
+
 OPTION_LABELS = {
     'para0': 'script style',
     'para1': 'paragraph style',
@@ -64,6 +67,7 @@ if __name__ == '__main__':
                         redis.hset('chat.'+chat+'.meta', 'type', 'unsaved')
                         if len(selected_options) > 0:
                             option_text = ', '.join(OPTION_LABELS[_] for _ in selected_options)
+                            ## XXX fix matchmaker chat creation
                             redis.rpush(
                                 'chat.'+chat,
                                 str(int(time.time()))+',-2,message,000000,This is a '+option_text+' chat.'

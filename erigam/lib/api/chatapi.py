@@ -1,5 +1,27 @@
-from flask import abort,
+from time import mktime
+from flask import abort, g
+from erigam.lib import validate_chat_url
+from erigam.lib.archive import get_or_create_log
 from erigam.lib.model import Log, Chat, ChatSession
+from sqlalchemy.orm.exc import NoResultFound
+
+def create_chat(sql, redis, url, chattype="group"):
+    if g.sql.query(Log).filter(Log.url == url).scalar():
+        raise ValueError('chaturl_taken')
+
+    if not validate_chat_url(url):
+        raise ValueError('chaturl_invalid')
+
+    log, c = get_or_create_log(redis, sql, url, chattype)
+
+    if chattype == "group":
+        g.user.set_chat(url)
+        if g.user.meta['group'] != 'globalmod':
+            g.user.set_group('mod')
+
+    redis.hmset('chat.'+url+'.meta', {'type': chattype, 'public': '0'})
+
+    return log
 
 def load_chat(sql, redis, chat):
     redis.delete("chat."+chat+".regen")

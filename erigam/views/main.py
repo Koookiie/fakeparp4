@@ -4,8 +4,8 @@ except:
     import json
 from flask import Blueprint, g, request, render_template, redirect, url_for, jsonify, abort
 
-from erigam.lib import SEARCH_PERIOD, get_time, validate_chat_url
-from erigam.lib.archive import get_or_create_log
+from erigam.lib import SEARCH_PERIOD, get_time
+from erigam.lib.api import chatapi
 from erigam.lib.characters import CHARACTER_GROUPS, CHARACTERS
 from erigam.lib.sessions import CASE_OPTIONS
 
@@ -86,19 +86,8 @@ def save():
         if 'para' in request.form or 'nsfw' in request.form:
             g.user.save_pickiness(request.form)
         if 'create' in request.form:
-            chat = request.form['chaturl']
-            if g.redis.exists('chat.'+chat+'.meta') or g.redis.exists('chat.'+chat):
-                raise ValueError('chaturl_taken')
-            # USE VALIDATE_CHAT_URL
-            if not validate_chat_url(chat):
-                raise ValueError('chaturl_invalid')
-            g.user.set_chat(chat)
-            if g.user.meta['group'] != 'globalmod':
-                g.user.set_group('mod')
-            g.redis.hmset('chat.'+chat+'.meta', {'type': 'group', 'public': '0'})
-
-            get_or_create_log(g.redis, g.sql, chat, 'group')
-            return redirect(url_for('chat.chat', chat_url=chat))
+            log = chatapi.create_chat(g.sql, g.redis, request.form['chaturl'], 'group')
+            return redirect(url_for('chat.chat', chat_url=log.url))
         elif 'tags' in request.form:
             g.user.save_pickiness(request.form)
     except ValueError as e:

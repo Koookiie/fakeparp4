@@ -4,6 +4,7 @@ import uuid
 import time
 import os
 
+from erigam.lib.api import chatapi 
 from erigam.lib.model import sm, Message
 from erigam.lib.messages import send_message
 
@@ -34,6 +35,7 @@ def check_compatibility(first, second):
 
 if __name__ == '__main__':
 
+    db = sm()
     redis = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
 
     while True:
@@ -56,7 +58,6 @@ if __name__ == '__main__':
                         and sessions[m]['id'] not in already_matched
                     ):
                         compatible, selected_options = check_compatibility(sessions[n], sessions[m])
-                        #print compatible, selected_options
                         if not compatible:
                             print compatible, selected_options
                             continue
@@ -64,14 +65,15 @@ if __name__ == '__main__':
                         print 'Match found, sending to %s.' % chat
                         print '%s: options %s' % (sessions[n]['id'], sessions[n]['options'])
                         print '%s: options %s' % (sessions[m]['id'], sessions[m]['options'])
-                        redis.hset('chat.'+chat+'.meta', 'type', 'unsaved')
+                        log = chatapi.create_chat(db, redis, chat, 'saved')
                         if len(selected_options) > 0:
                             option_text = ', '.join(OPTION_LABELS[_] for _ in selected_options)
-                            ## XXX fix matchmaker chat creation
-                            redis.rpush(
-                                'chat.'+chat,
-                                str(int(time.time()))+',-2,message,000000,This is a '+option_text+' chat.'
-                            )
+                            send_message(db, redis, Message(
+                                log_id=log.id,
+                                type="message",
+                                counter=-1,
+                                text="This is a {option} chat.".format(option=option_text)
+                            ))
                         redis.set('session.'+sessions[n]['id']+'.match', chat)
                         redis.set('session.'+sessions[m]['id']+'.match', chat)
                         redis.zrem('searchers', sessions[n]['id'])

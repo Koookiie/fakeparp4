@@ -1,4 +1,4 @@
-from flask import g, render_template, request
+from flask import g, render_template, request, abort
 from functools import wraps
 from erigam.lib.api import ping
 
@@ -14,6 +14,11 @@ def require_admin(f):
 def mark_alive(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        g.joining = ping(g.redis, request.form['chat'], g.user, g.chat_type)
+        if hasattr(g, "chat_type"):
+            g.joining = ping(g.redis, request.form['chat'], g.user, g.chat_type)
+        else:
+            # Abort 404 just in case chat_type isn't defined
+            abort(404)
+
         return f(*args, **kwargs)
     return decorated_function

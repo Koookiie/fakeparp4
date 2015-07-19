@@ -53,6 +53,11 @@ def getLogByID(logid=None):
         return redirect(url_for("main.home"))
 
     try:
+        logid = int(logid)
+    except ValueError:
+        abort(404)
+
+    try:
         log = g.sql.query(Log.url).filter(Log.id == logid).one()
     except NoResultFound:
         abort(404)
@@ -73,7 +78,7 @@ def view_log(chat=None):
         if current_page > log.page_count:
             raise ValueError("badpage")
     except ValueError:
-        return redirect(url_for('log.view_log', chat=chat, page=log.page_count))
+        return redirect(url_for('log.view_log', chat=chat))
 
     try:
         log_page = g.sql.query(LogPage).filter(and_(LogPage.log_id == log.id, LogPage.number == current_page)).one()

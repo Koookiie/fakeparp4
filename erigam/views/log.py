@@ -67,7 +67,13 @@ def view_log(chat=None):
     except:
         abort(404)
 
-    current_page = request.args.get('page') or log.page_count
+    try:
+        current_page = int(request.args.get('page', log.page_count))
+        # Raise ValueError if the page number is larger than the total pages
+        if current_page > log.page_count:
+            raise ValueError("badpage")
+    except ValueError:
+        return redirect(url_for('log.view_log', chat=chat, page=log.page_count))
 
     try:
         log_page = g.sql.query(LogPage).filter(and_(LogPage.log_id == log.id, LogPage.number == current_page)).one()
@@ -94,5 +100,4 @@ def view_log(chat=None):
         current_page=current_page,
         paginator=paginator,
         legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat)
-
     )

@@ -62,10 +62,6 @@ def getLogByID(logid=None):
 @blueprint.route('/chat/<chat>/log')
 @use_db
 def view_log(chat=None):
-
-    # Decide whether or not to put a continue link in.
-    continuable = g.redis.hget('chat.'+chat+'.meta', 'type') is not None
-
     try:
         log = g.sql.query(Log).filter(Log.url == chat).one()
     except:
@@ -95,7 +91,6 @@ def view_log(chat=None):
     return render_template('log.html',
         chat=chat,
         lines=lines,
-        continuable=continuable,
         current_page=current_page,
         paginator=paginator,
         legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat)

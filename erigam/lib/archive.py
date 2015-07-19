@@ -3,7 +3,7 @@ from sqlalchemy.orm.exc import NoResultFound, FlushError
 from sqlalchemy.exc import IntegrityError, DataError
 import traceback
 import sys
-from characters import CHARACTER_DETAILS
+from erigam.lib.characters import CHARACTER_DETAILS
 from erigam.lib.model import Chat, ChatSession, Log, LogPage
 
 def get_or_create_log(redis, sql, chat_url, chat_type='saved'):
@@ -48,23 +48,26 @@ def archive_chat(redis, sql, chat_url):
     # If the chat hasn't saved since the last archive, skip it.
     if redis.llen('chat.'+chat_url) == 0:
         return log.id
+
     # Metadata
     meta = redis.hgetall('chat.'+chat_url+'.meta')
     chat.type = meta.get('type', 'group')
     chat.counter = meta.get('counter', 1)
     chat.topic = meta.get('topic', None)
     chat.background = meta.get('background', None)
-    # Sessions
+
+    # SQL sessions
     sql_sessions = sql.query(ChatSession).filter(ChatSession.log_id == log.id)
-    redis_sessions = redis.hgetall('chat.'+chat_url+'.counters')
-    t = [(k, redis_sessions[k]) for k in redis_sessions]
-    t.sort()
+
+    # Redis sessions
     redis_sessions = {}
-    for k, v in t:
-        if v in redis_sessions.values():
+
+    # Remove duplicate sessions from the list of counters
+    for key, value in redis.hgetall('chat.'+chat_url+'.counters').iteritems():
+        if value in redis_sessions.values():
             print "Duplicate session found, ignoring"
             continue
-        redis_sessions[k] = v
+        redis_sessions[key] = value
 
     # Update the sessions which are already in the database.
     try:

@@ -132,19 +132,17 @@
 	</p></form>
 </div>
 
-<script type="text/javascript" src="/static/colorpicker/js/colorpicker.js"></script>
-<script src="/static/js/characters.js?2"></script>
-<script src="/static/js/chat.js?9"></script>
-<script src="/static/js/tts.js?2"></script>
-
 <script type="text/javascript">
 	var user = {{character_dict|tojson|safe}};
 	var chat = {{(chat)|tojson|safe}};
 	var chat_meta = {{chat_meta|tojson|safe}};
 	var latestNum = {{latest_num}};
 	var highlightUser = {{highlight if highlight else "null"}};
-
-	erigam.chat()
 </script>
+
+<script type="text/javascript" src="/static/colorpicker/js/colorpicker.js"></script>
+<script src="/static/js/characters.js?2"></script>
+<script src="/static/js/chat.js?9"></script>
+<script src="/static/js/tts.js?2"></script>
 
 {% endblock %}

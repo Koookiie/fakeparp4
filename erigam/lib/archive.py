@@ -6,7 +6,7 @@ import sys
 from erigam.lib.characters import CHARACTER_DETAILS
 from erigam.lib.model import Chat, ChatSession, Log
 
-def get_or_create_log(redis, sql, chat_url, chat_type='saved'):
+def get_or_create_log(sql, chat_url, chat_type='saved'):
     # Find existing Log and Chat or create new ones.
     # If the Log doesn't exist, create Log and Chat.
     # If the Chat doesn't exist, create Chat.
@@ -28,7 +28,7 @@ def get_or_create_log(redis, sql, chat_url, chat_type='saved'):
     return log, chat
 
 def archive_chat(redis, sql, chat_url):
-    log, chat = get_or_create_log(redis, sql, chat_url)
+    log, chat = get_or_create_log(sql, chat_url)
     # If the chat hasn't saved since the last archive, skip it.
     if redis.llen('chat.'+chat_url) == 0:
         return log.id

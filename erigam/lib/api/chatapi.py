@@ -12,7 +12,7 @@ def create_chat(sql, redis, url, chattype="group"):
     if not validate_chat_url(url):
         raise ValueError('chaturl_invalid')
 
-    log, c = get_or_create_log(redis, sql, url, chattype)
+    log, c = get_or_create_log(sql, url, chattype)
 
     # Commit here because matchmaker cannot commit
     sql.commit()

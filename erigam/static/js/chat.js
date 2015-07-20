@@ -712,29 +712,17 @@ $(document).ready(function() {
 	}
 
 	$('#controls').submit(function() {
-		if($("#statusInput").is(":focus")){
-			$('#statusButton').click();
-			return false;
-		}
 		if (updateChatPreview()) {
+			// Returns false if there is nothing in the text input box.
+			if (!$('#textInput').val().trim()) return false;
 
-			if (!$('#textInput').val()) {
-				return false;
-			}
+			sendMessage($("#preview").text(), function() {
+				if (pingInterval) window.clearTimeout(pingInterval);
+				pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
+			});
 
-			if (jQuery.trim($('#textInput').val()) == '/usr') {
-				$.post("/chat_ajax/getSession", function(session) {
-					addLine({counter:"-2",color:"000000",text:"[SYSTEM] Your cookie: " + session});
-				});
-				$('#textInput').val('');
-			} else if ($('#textInput').val() !== '') {
-				sendMessage($('#preview').text(), function() {
-					if (pingInterval) window.clearTimeout(pingInterval);
-					pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
-					$('#textInput').val('');
-					updateChatPreview();
-				});
-			}
+			$('#textInput').val('');
+			updateChatPreview();
 		}
 		return false;
 	});

@@ -361,11 +361,6 @@ def save():
         abort(400)
     return 'ok'
 
-# /usr get cookie
-@blueprint.route("/getSession", methods=['POST'])
-def get_session():
-    return g.user.session_id
-
 # Globalmod stuff.
 
 @blueprint.route('/ip_lookup', methods=['POST'])

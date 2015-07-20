@@ -61,14 +61,6 @@ def view_log(chat=None, page=None):
     except:
         abort(404)
 
-    try:
-        current_page = int(request.args.get('page', log.page_count))
-        # Raise ValueError if the page number is larger than the total pages
-        if current_page > log.page_count:
-            raise ValueError("badpage")
-    except ValueError:
-        return redirect(url_for('log.view_log', chat=chat))
-
     message_count = g.sql.query(func.count('*')).select_from(Message).filter(
         Message.log_id == log.id,
     ).scalar()

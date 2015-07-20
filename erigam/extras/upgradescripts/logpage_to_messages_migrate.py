@@ -35,12 +35,17 @@ def parse_line(log, line):
     else:
         msgtype = parts[2]
 
+    if len(parts[3]) != 6:
+        color = "000000"
+    else:
+        color = parts[3]
+
     return {
         "log_id": log.id,
         "timestamp": timestamp,
         "type": msgtype,
         "counter": counter,
-        "color": parts[3],
+        "color": color,
         "acronym": "",
         "name": "",
         "text": parts[4]

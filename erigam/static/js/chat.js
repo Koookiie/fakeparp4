@@ -6,6 +6,7 @@ $(document).ready(function() {
 	var SEARCH_URL = "/search";
 	var SEARCH_QUIT_URL = "/stop_search";
 	var POST_URL = "/chat_ajax/post";
+	var FLAG_URL = "/chat_ajax/flag";
 	var PING_URL = "/chat_ajax/ping";
 	var MESSAGES_URL = "/chat_ajax/messages";
 	var SAVE_URL = "/chat_ajax/save";
@@ -780,7 +781,7 @@ $(document).ready(function() {
 	/* Autosilence, NSFW, Publicity buttons */
 
 	$('.metatog').click(function() {
-		var data = {'chat': chat, 'meta_change': ''};
+		var data = {'chat': chat};
 		// Convert to integer then string.
 		if ($(this).hasClass("active")) {
 			data[this.id] = '0';
@@ -789,7 +790,8 @@ $(document).ready(function() {
 			data[this.id] = '1';
 			$(this).addClass('active');
 		}
-		$.post(POST_URL, data);
+
+		$.post(FLAG_URL, data);
 	});
 
 	/* Meta buttons */

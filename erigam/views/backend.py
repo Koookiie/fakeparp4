@@ -186,24 +186,6 @@ def postMessage():
                         text=ban_message
                     ))
 
-        if 'meta_change' in request.form:
-            chat = request.form['chat']
-            for flag in CHAT_FLAGS:
-                if flag in request.form:
-                    if request.form[flag] == '1':
-                        g.redis.hset('chat.'+chat+'.meta', flag, '1')
-                        if flag == 'public':
-                            g.redis.sadd("public-chats", chat)
-                    else:
-                        g.redis.hdel('chat.'+chat+'.meta', flag)
-                        if flag == 'public':
-                            g.redis.srem("public-chats", chat)
-                    send_message(g.sql, g.redis, Message(
-                        log_id=g.log.id,
-                        type="meta_change",
-                        counter=-1,
-                        text='%s changed the %s settings.' % (g.user.character['name'], flag)
-                    ))
         if 'topic' in request.form:
             if request.form['topic'] != '':
                 try:
@@ -266,20 +248,42 @@ def postMessage():
 
     return 'ok'
 
+@blueprint.route('/flag', methods=['POST'])
+@mark_alive
+def set_flag():
+    for flag in CHAT_FLAGS:
+        if flag in request.form:
+            if request.form[flag] == '1':
+                g.redis.hset('chat.'+g.log.url+'.meta', flag, '1')
+                if flag == 'public':
+                    g.redis.sadd("public-chats", g.log.url)
+            else:
+                g.redis.hdel('chat.'+g.log.url+'.meta', flag)
+                if flag == 'public':
+                    g.redis.srem("public-chats", g.log.url)
+            send_message(g.sql, g.redis, Message(
+                log_id=g.log.id,
+                type="meta_change",
+                counter=-1,
+                text='%s changed the %s settings.' % (g.user.character['name'], flag)
+            ))
+
+    return '', 204
+
 @blueprint.route('/highlight', methods=['POST'])
 @mark_alive
 def saveHighlight():
-    chat = request.form['chat']
-    counter = request.form['counter']
     try:
-        counter = int(counter)
+        counter = int(request.form['counter'])
     except (ValueError, TypeError):
-        return "error", 500
+        return jsonify({"error": "badcounter"}), 500
+
     if request.form['counter'] != '':
-        g.redis.hset("chat.%s.highlights" % (chat), g.user.meta['counter'], counter)
+        g.redis.hset("chat.%s.highlights" % (g.log.url), g.user.meta['counter'], counter)
     else:
-        g.redis.hdel("chat.%s.highlights" % (chat), g.user.meta['counter'])
-    return 'ok'
+        g.redis.hdel("chat.%s.highlights" % (g.log.url), g.user.meta['counter'])
+
+    return '', 204
 
 @blueprint.route('/ping', methods=['POST'])
 @mark_alive

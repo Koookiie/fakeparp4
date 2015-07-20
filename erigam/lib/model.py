@@ -90,6 +90,9 @@ class Message(Base):
         u"message",
         u"user_change",
         u"meta_change",
+        u"ic",
+        u"ooc",
+        u"me",
         name=u"messages_type",
     ), nullable=False, default=u"ic")
 

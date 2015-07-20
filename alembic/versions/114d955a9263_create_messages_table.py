@@ -22,7 +22,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('log_id', sa.Integer(), nullable=False),
     sa.Column('timestamp', sa.DateTime(), nullable=False),
-    sa.Column('type', sa.Enum(u'message', u'user_change', u'meta_change', name='messages_type'), nullable=False),
+    sa.Column('type', sa.Enum(u'message', u'user_change', u'meta_change', u'ic', u'ooc', u'me', name='messages_type'), nullable=False),
     sa.Column('counter', sa.Integer(), nullable=False),
     sa.Column('color', sa.Unicode(length=6), nullable=False),
     sa.Column('acronym', sa.Unicode(length=15), nullable=False),

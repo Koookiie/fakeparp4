@@ -105,10 +105,11 @@ for key in r.keys("chat.*"):
 for x in chats:
     url = x.split(".")[1]
     try:
-        log = sql.query(Log).filter(Log.url == url)
+        log = sql.query(Log).filter(Log.url == url).one()
     except NoResultFound:
         print "Log could not be found for chat {chat}".format(chat=url)
         continue
+
     lines = r.lrange("chat."+url, 0, -1)
 
     conn.execute(

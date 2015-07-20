@@ -196,6 +196,8 @@ $(document).ready(function() {
 	});
 
 	$('#conversation p').each(function() {
+		var line;
+
 		if (bbset == 1) {
 			line = bbEncode(linkify($(this).html()));
 			$(this).html(line);
@@ -213,6 +215,8 @@ $(document).ready(function() {
 	});
 
 	if ($('#topic').length !== 0) {
+		var text;
+
 		if (bbset == 1) {
 			text = bbEncode(htmlEncode(linkify($('#topic').html())));
 			$('#topic').html(text);
@@ -272,6 +276,8 @@ $(document).ready(function() {
 	}
 
 	function addLine(msg){
+		var msgClass;
+
 		if (msg.counter == -1) {
 			msgClass = 'system';
 		} else {
@@ -282,7 +288,7 @@ $(document).ready(function() {
 
 		if (msg.acronym) msg.text = msg.acronym + ": " + msg.text;
 
-		message = bbEncode(htmlEncode(linkify(msg.text)), globalmod);
+		var message = bbEncode(htmlEncode(linkify(msg.text)), globalmod);
 
 		var mp = $('<p>').addClass(msgClass).addClass("message").attr('title', msgClass).css('color', '#'+msg.color).html(message); //.appendTo('#conversation');
 
@@ -744,8 +750,8 @@ $(document).ready(function() {
 
 	$('#settings').submit(function() {
 		// Trim everything first
-		formInputs = $('#settings').find('input, select');
-		for (i=0; i<formInputs.length; i++) {
+		var formInputs = $('#settings').find('input, select');
+		for (var i=0; i<formInputs.length; i++) {
 			formInputs[i].value = jQuery.trim(formInputs[i].value);
 		}
 		if ($('input[name="name"]').val() === "") {
@@ -758,7 +764,7 @@ $(document).ready(function() {
 			$.post(SAVE_URL, formData, function(data) {
 				$('#preview').css('color', '#'+$('input[name="color"]').val());
 				var formInputs = $('#settings').find('input, select');
-				for (i=0; i<formInputs.length; i++) {
+				for (var i=0; i<formInputs.length; i++) {
 					if (formInputs[i].name!="quirk_from" && formInputs[i].name!="quirk_to") {
 						user.character[formInputs[i].name] = formInputs[i].value;
 					}
@@ -766,7 +772,7 @@ $(document).ready(function() {
 				user.character.replacements = [];
 				var replacementsFrom = $('#settings').find('input[name="quirk_from"]');
 				var replacementsTo = $('#settings').find('input[name="quirk_to"]');
-				for (i=0; i<replacementsFrom.length; i++) {
+				for (var i=0; i<replacementsFrom.length; i++) {
 					if (replacementsFrom[i].value !== "" && replacementsFrom[i].value!=replacementsTo[i].value) {
 						user.character.replacements.push([replacementsFrom[i].value, replacementsTo[i].value]);
 					}

@@ -3,8 +3,9 @@ from flask import g, request, abort
 from redis import ConnectionPool, Redis
 
 from erigam.lib import validate_chat_url, session_validator
+from erigam.lib.archive import get_or_create_log
 from erigam.lib.characters import CHARACTER_DETAILS
-from erigam.lib.model import sm, Log
+from erigam.lib.model import sm
 from erigam.lib.sessions import Session
 
 # Connection pooling. This takes far too much effort.
@@ -52,7 +53,7 @@ def create_session():
             abort(404)
 
         if hasattr(g, "sql"):
-            g.log = g.sql.query(Log).filter(Log.url == chat).one()
+            g.log, g.chat = get_or_create_log(g.sql, chat)
 
         g.user = Session(g.redis, session_id, chat)
     else:

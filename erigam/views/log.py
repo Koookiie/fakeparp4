@@ -17,6 +17,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from erigam.lib import validate_chat_url
 from erigam.lib.model import Log, Message
+from erigam.lib.request_methods import use_db
 
 blueprint = Blueprint('log', __name__)
 
@@ -37,6 +38,7 @@ def save_log(chat_url=None):
     return redirect(url_for('log.view_log', chat=chat))
 
 @blueprint.route('/log/id/<logid>')
+@use_db
 def getLogByID(logid=None):
     if not logid:
         return redirect(url_for("main.home"))
@@ -55,10 +57,11 @@ def getLogByID(logid=None):
 
 @blueprint.route('/chat/<chat>/log')
 @blueprint.route('/chat/<chat>/log/<int:page>')
+@use_db
 def view_log(chat=None, page=None):
     try:
         log = g.sql.query(Log).filter(Log.url == chat).one()
-    except:
+    except NoResultFound:
         abort(404)
 
     message_count = g.sql.query(func.count('*')).select_from(Message).filter(

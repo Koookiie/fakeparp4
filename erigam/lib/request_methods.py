@@ -7,6 +7,7 @@ from erigam.lib.archive import get_or_create_log
 from erigam.lib.characters import CHARACTER_DETAILS
 from erigam.lib.model import sm
 from erigam.lib.sessions import Session
+from functools import wraps
 
 # Connection pooling. This takes far too much effort.
 redis_pool = ConnectionPool(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
@@ -24,12 +25,9 @@ def populate_all_chars():
 
 # Before request
 
-def connect_db():
+def connect_redis():
     # Connect to Redis
     g.redis = Redis(connection_pool=redis_pool)
-
-    # Connect to SQL
-    g.sql = sm()
 
 def create_session():
     # Do not bother allowing the user in if they are globalbanned.
@@ -51,9 +49,6 @@ def create_session():
         # Abort 404 if there's no type because the chat might not be real.
         if g.chat_type is None:
             abort(404)
-
-        if hasattr(g, "sql"):
-            g.log, g.chat = get_or_create_log(g.sql, chat)
 
         g.user = Session(g.redis, session_id, chat)
     else:
@@ -90,6 +85,29 @@ def set_cookie(response):
 
 # They skip if there isn't a database connection because not all requests will
 # be connecting to the database.
+
+def db_connect():
+    if not hasattr(g, "sql"):
+        g.sql = sm()
+
+
+def use_db(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        db_connect()
+        return f(*args, **kwargs)
+    return decorated_function
+
+def use_db_chat(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        db_connect()
+        get_log()
+        return f(*args, **kwargs)
+    return decorated_function
+
+def get_log():
+    g.log, g.chat = get_or_create_log(g.sql, g.user.chat)
 
 def db_commit(response=None):
     # Don't commit on 4xx and 5xx.

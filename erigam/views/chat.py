@@ -23,16 +23,19 @@ from erigam.lib.model import (
 from erigam.lib.characters import CHARACTER_GROUPS, CHARACTERS
 from erigam.lib.sessions import CASE_OPTIONS
 from erigam.lib.api import chatapi
+from erigam.lib.request_methods import use_db
 
 blueprint = Blueprint('chat', __name__)
 
 @blueprint.route('/')
 @blueprint.route('/<chat_url>')
+@use_db
 def chat(chat_url=None):
     if chat_url is None:
         chat_meta = {'type': 'unsaved'}
         messages = []
         latest_num = -1
+        log = None
     else:
         if g.sql.query(Ban).filter(Ban.url == chat_url).filter(Ban.ip == g.user.ip).scalar() is not None:
             if chat_url == OUBLIETTE_ID:
@@ -48,7 +51,7 @@ def chat(chat_url=None):
         # Try to load the chat from sql if it doesn't exist in redis.
         if len(chat_meta) == 0 or g.redis.exists("chat."+chat_url+".regen"):
             chat_meta = chatapi.load_chat(g.sql, g.redis, chat_url)
-            g.redis.delete("chat."+chat+".regen")
+            g.redis.delete("chat."+chat_url+".regen")
 
         # Make sure it's in the archive queue.
         if g.redis.zscore('archive-queue', chat_url) is None:
@@ -79,10 +82,12 @@ def chat(chat_url=None):
         chat_meta=chat_meta,
         messages=messages,
         latest_num=latest_num,
-        legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat_url)
+        legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat_url),
+        log=log
     )
 
 @blueprint.route('/<chat>/unban', methods=['GET', 'POST'])
+@use_db
 def unbanPage(chat=None):
     if chat is None or not g.redis.hgetall("chat."+chat+".meta"):
         abort(403)

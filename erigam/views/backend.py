@@ -30,6 +30,7 @@ from erigam.lib.characters import CHARACTER_DETAILS
 from erigam.lib.punishments import randpunish
 from erigam.lib.decorators import mark_alive, require_admin
 from erigam.lib.request_methods import (
+    use_db_chat,
     db_commit,
     disconnect_sql
 )
@@ -43,6 +44,7 @@ blueprint = Blueprint('backend', __name__)
 
 @blueprint.route('/post', methods=['POST'])
 @mark_alive
+@use_db_chat
 def postMessage():
     chat = request.form['chat']
     if 'line' in request.form and g.user.meta['group'] != 'silent':
@@ -301,20 +303,20 @@ def getMessages():
         after = 0
 
     # Look for stored messages first, and only subscribe if there aren't any.
-    messages = g.redis.zrangebyscore("chat:%s" % g.log.id, "(%s" % after, "+inf")
+    messages = g.redis.zrangebyscore("chat:%s" % int(request.form["log_id"]), "(%s" % after, "+inf")
 
-    if "joining" in request.form or g.joining:
+    if "joining" in request.form or (hasattr("g", "joining") and g.joining):
         message_dict = {
             "messages": [],
         }
 
-        message_dict['online'], message_dict['idle'] = get_userlists(g.redis, g.log.url)
+        message_dict['online'], message_dict['idle'] = get_userlists(g.redis, g.user.chat)
 
         # Newly created matchmaker chats don't know the counter, so we send it here.
         message_dict['counter'] = g.user.meta['counter']
 
         # Add on the currently highlighted user if it exists.
-        highlight = g.redis.hget("chat.%s.highlights" % (g.log.url), g.user.meta['counter'])
+        highlight = g.redis.hget("chat.%s.highlights" % (g.user.chat), g.user.meta['counter'])
         if highlight:
             message_dict['highlight'] = highlight
 
@@ -326,13 +328,13 @@ def getMessages():
     pubsub = g.redis.pubsub()
 
     # Main channel.
-    pubsub.subscribe('channel.'+g.log.url)
+    pubsub.subscribe('channel.'+g.user.chat)
 
     # Self channel.
     # Right now this is only used by kick/ban and IP lookup, so only subscribe
     # if we're in a group chat or a global mod.
     if g.chat_type == 'group' or g.user.meta['group'] == 'globalmod':
-        pubsub.subscribe('channel.'+g.log.url+'.'+g.user.session_id)
+        pubsub.subscribe('channel.'+g.user.chat+'.'+g.user.session_id)
 
     # Get rid of the database connection here so we're not hanging onto it
     # while waiting for the redis message.
@@ -347,6 +349,7 @@ def getMessages():
             return resp
 
 @blueprint.route('/quit', methods=['POST'])
+@use_db_chat
 def quitChatting():
     disconnect_message = '%s [%s] disconnected.' % (g.user.character['name'], g.user.character['acronym']) if g.user.meta['group'] != 'silent' else None
     disconnect(g.sql, g.redis, g.log, g.user.session_id, disconnect_message)
@@ -354,6 +357,7 @@ def quitChatting():
 
 @blueprint.route('/save', methods=['POST'])
 @mark_alive
+@use_db_chat
 def save():
     try:
         g.user.save_character(request.form)

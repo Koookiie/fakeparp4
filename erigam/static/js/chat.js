@@ -238,7 +238,8 @@ $(document).ready(function() {
 		searching = true;
 
 		$.post(SEARCH_URL, {}, function(data) {
-			chat = data.target;
+			chat = data.chat;
+			log_id = data.log;
 			searching = false;
 			if (typeof window.history.replaceState != "undefined") {
 				window.history.replaceState('', '', '/chat/'+chat);
@@ -261,7 +262,7 @@ $(document).ready(function() {
 		$('input, select, button').removeAttr('disabled');
 		$('#preview').css('color', '#'+user.character.color);
 		closeSettings();
-		getMessages();
+		getMessages(true);
 		pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
 	}
 
@@ -415,16 +416,18 @@ $(document).ready(function() {
 		}
 	}
 
-	function getMessages() {
-		var messageData = {'chat': chat, 'after': latestNum};
+	function getMessages(joining) {
+		var messageData = {'chat': chat, 'after': latestNum, 'log_id': log_id};
+		if (joining) messageData.joining = 1;
+
 		$.post(MESSAGES_URL, messageData, handleMessages).done(function() {
 			if (chatState=='chat') {
-				window.setTimeout(getMessages, 1000);
+				window.setTimeout(function(){getMessages(false)}, 1000);
 			} else {
 				$('#save').appendTo(conversation);
 			}
 		}).fail(function() {
-			if (chatState=='chat') window.setTimeout(getMessages, 2000);
+			if (chatState=='chat') window.setTimeout(function(){getMessages(false)}, 2000);
 		});
 	}
 

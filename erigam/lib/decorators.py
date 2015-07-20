@@ -1,6 +1,7 @@
 from flask import g, render_template, jsonify
 from functools import wraps
-from erigam.lib.api import ping
+from erigam.lib.api import ping, get_online_state
+from erigam.lib.request_methods import db_connect, get_log
 
 def require_admin(f):
     @wraps(f)
@@ -14,8 +15,11 @@ def require_admin(f):
 def mark_alive(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if hasattr(g, "chat_type") and hasattr(g, "log"):
-            g.joining = ping(g.sql, g.redis, g.log, g.user, g.chat_type)
+        if hasattr(g, "chat_type"):
+            if get_online_state(g.redis, g.user.chat, g.user.session_id) == "offline":
+                db_connect()
+                get_log()
+                g.joining = ping(g.sql, g.redis, g.log, g.user, g.chat_type)
         else:
             # Abort 500 just in case chat_type or log isn't defined
             return jsonify({"error": "nochat"}), 500

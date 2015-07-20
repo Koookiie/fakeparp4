@@ -2,7 +2,7 @@ from flask import Flask
 
 from erigam.lib.request_methods import (
     populate_all_chars,
-    connect_db,
+    connect_redis,
     create_session,
     set_cookie,
     db_commit,
@@ -22,7 +22,7 @@ app = Flask(__name__)
 
 # Pre and post request stuff
 app.before_first_request(populate_all_chars)
-app.before_request(connect_db)
+app.before_request(connect_redis)
 app.before_request(create_session)
 app.after_request(set_cookie)
 app.after_request(db_commit)

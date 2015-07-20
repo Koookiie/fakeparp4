@@ -74,8 +74,10 @@ if __name__ == '__main__':
                                 counter=-1,
                                 text=u"This is a {option} chat.".format(option=option_text)
                             ))
-                        redis.set('session.'+sessions[n]['id']+'.match', chat)
-                        redis.set('session.'+sessions[m]['id']+'.match', chat)
+                        redis.hset('session.'+sessions[n]['id']+'.match', 'chat', chat)
+                        redis.hset('session.'+sessions[m]['id']+'.match', 'chat', chat)
+                        redis.hset('session.'+sessions[n]['id']+'.match', 'log', log.id)
+                        redis.hset('session.'+sessions[m]['id']+'.match', 'log', log.id)
                         redis.zrem('searchers', sessions[n]['id'])
                         redis.zrem('searchers', sessions[m]['id'])
                         already_matched.add(sessions[n]['id'])

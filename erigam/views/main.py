@@ -8,6 +8,7 @@ from erigam.lib import SEARCH_PERIOD, get_time
 from erigam.lib.api import chatapi
 from erigam.lib.characters import CHARACTER_GROUPS, CHARACTERS
 from erigam.lib.sessions import CASE_OPTIONS
+from erigam.lib.request_methods import use_db
 
 blueprint = Blueprint('main', __name__)
 
@@ -63,10 +64,10 @@ def home():
 
 @blueprint.route('/search', methods=['POST'])
 def foundYet():
-    target = g.redis.get('session.'+g.user.session_id+'.match')
+    target = g.redis.hgetall('session.'+g.user.session_id+'.match')
     if target:
         g.redis.delete('session.'+g.user.session_id+'.match')
-        return jsonify(target=target)
+        return jsonify(target)
     else:
         g.redis.zadd('searchers', g.user.session_id, get_time(SEARCH_PERIOD*2))
         abort(404)
@@ -79,6 +80,7 @@ def quitSearching():
 # Save
 
 @blueprint.route('/save', methods=['POST'])
+@use_db
 def save():
     try:
         if 'character' in request.form:

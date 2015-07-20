@@ -10,6 +10,7 @@ from flask import (
 
 from erigam.lib.decorators import require_admin
 from erigam.lib.model import Ban
+from erigam.lib.request_methods import use_db
 
 blueprint = Blueprint('admin', __name__)
 
@@ -73,6 +74,7 @@ def global_broadcast():
 
 @blueprint.route('/allbans', methods=['GET', 'POST'])
 @require_admin
+@use_db
 def admin_allbans():
     sort = request.args.get('sort', "id")
 

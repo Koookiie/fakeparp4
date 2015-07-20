@@ -54,6 +54,9 @@ def chat(chat_url=None):
         if g.redis.zscore('archive-queue', chat_url) is None:
             g.redis.zadd('archive-queue', chat_url, get_time(ARCHIVE_PERIOD))
 
+        # Load chat-based session data.
+        g.user.set_chat(chat_url)
+
         # Load the last 50 lines of chat
         log = g.sql.query(Log).filter(Log.url == chat_url).one()
         messages = g.sql.query(Message).filter(

@@ -18,7 +18,7 @@ print "%s LogPages in database. %s logs in database." % (
 logs = sql.query(Log).order_by(Log.id)
 
 if 'AFTER' in os.environ:
-    logs.filter(Log.id >= os.environ['AFTER'])
+    logs = logs.filter(Log.id >= os.environ['AFTER'])
 
 logs = logs.all()
 

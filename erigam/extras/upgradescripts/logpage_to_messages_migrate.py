@@ -15,7 +15,12 @@ print "%s LogPages in database. %s logs in database." % (
     sql.query(func.count('*')).select_from(Log).scalar()
 )
 
-logs = sql.query(Log).order_by(Log.id).all()
+logs = sql.query(Log).order_by(Log.id)
+
+if 'AFTER' in os.environ:
+    logs.filter(Log.id >= os.environ['AFTER'])
+
+logs = logs.all()
 
 def parse_line(log, line):
     parts = line.split(',', 4)

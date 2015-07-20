@@ -274,11 +274,13 @@ def set_flag():
 @mark_alive
 def saveHighlight():
     try:
-        counter = int(request.form['counter'])
+        counter = request.form['counter']
+        if counter != "":
+            counter = int(counter)
     except (ValueError, TypeError):
         return jsonify({"error": "badcounter"}), 500
 
-    if request.form['counter'] != '':
+    if counter != "":
         g.redis.hset("chat.%s.highlights" % (g.log.url), g.user.meta['counter'], counter)
     else:
         g.redis.hdel("chat.%s.highlights" % (g.log.url), g.user.meta['counter'])
@@ -310,6 +312,11 @@ def getMessages():
 
         # Newly created matchmaker chats don't know the counter, so we send it here.
         message_dict['counter'] = g.user.meta['counter']
+
+        # Add on the currently highlighted user if it exists.
+        highlight = g.redis.hget("chat.%s.highlights" % (g.log.url), g.user.meta['counter'])
+        if highlight:
+            message_dict['highlight'] = highlight
 
         return jsonify(message_dict)
     elif len(messages) != 0:

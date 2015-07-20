@@ -64,11 +64,6 @@ def chat(chat_url=None):
 
         latest_num = messages[-1].id if len(messages) > 0 else 0
 
-    if 'counter' in g.user.meta:
-        highlight = g.redis.hget("chat.%s.highlights" % (chat_url), g.user.meta['counter'])
-    else:
-        highlight = None
-
     return render_template(
         'chat.html',
         user=g.user,
@@ -80,8 +75,7 @@ def chat(chat_url=None):
         chat_meta=chat_meta,
         messages=messages,
         latest_num=latest_num,
-        legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat_url),
-        highlight=highlight
+        legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat_url)
     )
 
 @blueprint.route('/<chat>/unban', methods=['GET', 'POST'])

@@ -33,9 +33,7 @@ $(document).ready(function() {
 	var previewHidden = false;
 
 	var actionListUser = null;
-	if (highlightUser !== null) {
-		highlightPosts(highlightUser);
-	}
+	var highlightUser;
 
 	var ORIGINAL_TITLE = document.title;
 	var conversation = $('#conversation');
@@ -325,6 +323,10 @@ $(document).ready(function() {
 			}
 			if (typeof data.counter!=="undefined") {
 				user.meta.counter = data.counter;
+			}
+			if (typeof data.highlight !== "undefined") {
+				highlightUser = data.highlight;
+				highlightPosts(highlightUser);
 			}
 			if (typeof data.online!=="undefined") {
 				// Reload user lists.

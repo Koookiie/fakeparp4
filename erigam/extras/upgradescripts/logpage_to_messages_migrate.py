@@ -29,10 +29,15 @@ def parse_line(log, line):
     except ValueError:
         counter = -1
 
+    if parts[2] not in ["message", "user_change", "meta_change", "ic", "ooc", "me"]:
+        msgtype = "message"
+    else:
+        msgtype = parts[2]
+
     return {
         "log_id": log.id,
         "timestamp": timestamp,
-        "type": parts[2],
+        "type": msgtype,
         "counter": counter,
         "color": parts[3],
         "acronym": "",

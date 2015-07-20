@@ -1,4 +1,4 @@
-from flask import g, render_template, abort
+from flask import g, render_template, jsonify
 from functools import wraps
 from erigam.lib.api import ping
 
@@ -17,8 +17,8 @@ def mark_alive(f):
         if hasattr(g, "chat_type") and hasattr(g, "log"):
             g.joining = ping(g.sql, g.redis, g.log, g.user, g.chat_type)
         else:
-            # Abort 404 just in case chat_type or log isn't defined
-            abort(404)
+            # Abort 500 just in case chat_type or log isn't defined
+            return jsonify({"error": "nochat"}), 500
 
         return f(*args, **kwargs)
     return decorated_function

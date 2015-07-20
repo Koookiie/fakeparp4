@@ -14,6 +14,9 @@ def create_chat(sql, redis, url, chattype="group"):
 
     log, c = get_or_create_log(redis, sql, url, chattype)
 
+    # Commit here because matchmaker cannot commit
+    sql.commit()
+
     if chattype == "group":
         g.user.set_chat(url)
         if g.user.meta['group'] != 'globalmod':

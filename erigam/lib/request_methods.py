@@ -101,9 +101,9 @@ def db_commit(response=None):
     return response
 
 def disconnect_sql(response=None):
-    if hasattr(g, "db"):
-        g.db.close()
-        del g.db
+    if hasattr(g, "sql"):
+        g.sql.close()
+        del g.sql
     return response
 
 def disconnect_redis(response=None):

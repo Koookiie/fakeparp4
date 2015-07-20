@@ -4,6 +4,7 @@ import os
 
 from erigam.lib.model import sm, engine, Log, LogPage, Message
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
 r = redis.Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
@@ -65,10 +66,20 @@ for log in logs:
             )
             continue
 
-        conn.execute(
-            Message.__table__.insert(),
-            [parse_line(log, line) for line in page.content.split("\n")[0:-1]]
-        )
+        if not page.content.strip():
+            print "Chat {chat} is empty.".format(chat=log.url)
+            continue
+
+        try:
+            conn.execute(
+                Message.__table__.insert(),
+                [parse_line(log, line) for line in page.content.split("\n")[0:-1]]
+            )
+        except IntegrityError as e:
+            print "Encountered exception for chat {chat}: {exception}".format(
+                chat=log.url,
+                exception=e
+            )
 
     print "Completed!"
     print "-"*60

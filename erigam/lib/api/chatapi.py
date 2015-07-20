@@ -27,7 +27,6 @@ def create_chat(sql, redis, url, chattype="group"):
     return log
 
 def load_chat(sql, redis, chat):
-    redis.delete("chat."+chat+".regen")
     try:
         sql_log = sql.query(Log).filter(Log.url == chat).one()
         sql_chat = sql.query(Chat).filter(Chat.log_id == sql_log.id).one()

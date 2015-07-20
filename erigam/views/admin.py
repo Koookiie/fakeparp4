@@ -51,7 +51,8 @@ def global_broadcast():
                             "timestamp": 0,
                             "counter": -2,
                             "type": "global",
-                            "line": line
+                            "acronym": "",
+                            "text": line
                         }
                     ]
                 }

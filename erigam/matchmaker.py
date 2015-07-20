@@ -4,15 +4,15 @@ import uuid
 import time
 import os
 
-from erigam.lib.api import chatapi 
+from erigam.lib.api import chatapi
 from erigam.lib.model import sm, Message
 from erigam.lib.messages import send_message
 
 OPTION_LABELS = {
-    'para0': 'script style',
-    'para1': 'paragraph style',
-    'nsfw0': 'safe for work',
-    'nsfw1': 'not safe for work',
+    'para0': u'script style',
+    'para1': u'paragraph style',
+    'nsfw0': u'safe for work',
+    'nsfw1': u'not safe for work',
 }
 
 def check_compatibility(first, second):
@@ -67,12 +67,12 @@ if __name__ == '__main__':
                         print '%s: options %s' % (sessions[m]['id'], sessions[m]['options'])
                         log = chatapi.create_chat(db, redis, chat, 'saved')
                         if len(selected_options) > 0:
-                            option_text = ', '.join(OPTION_LABELS[_] for _ in selected_options)
+                            option_text = u', '.join(OPTION_LABELS[_] for _ in selected_options)
                             send_message(db, redis, Message(
                                 log_id=log.id,
-                                type="message",
+                                type=u"message",
                                 counter=-1,
-                                text="This is a {option} chat.".format(option=option_text)
+                                text=u"This is a {option} chat.".format(option=option_text)
                             ))
                         redis.set('session.'+sessions[n]['id']+'.match', chat)
                         redis.set('session.'+sessions[m]['id']+'.match', chat)

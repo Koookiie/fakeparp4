@@ -645,7 +645,7 @@ $(document).ready(function() {
 	function updateChatPreview(){
 		var textPreview = $('#textInput').val();
 
-		if (textPreview.substr(0,1)=='/' && textPreview.substr(0,4)!=='/ooc' && textPreview.substr(0,3)!=='/ic' && textPreview.substr(0,3)!=='/me') {
+		if (textPreview.substr(0,1)=='/' && textPreview.substr(0,4)!=='/ooc') {
 			textPreview = jQuery.trim(textPreview.substr(1));
 		} else {
 			textPreview = applyQuirks(jQuery.trim(textPreview));
@@ -882,7 +882,7 @@ $(document).ready(function() {
 	if (chat === null) {
 		runSearch();
 		$(window).unload(function() {
-			if (searching) $.ajax(SEARCH_QUIT_URL, { "type": "POST", data: { "id": searcher_id }, "async": false });
+			if (searching) $.ajax(SEARCH_QUIT_URL, { "type": "POST", "async": false });
 		});
 	} else {
 		startChat();

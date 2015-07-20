@@ -2,7 +2,7 @@ import datetime
 import redis
 import os
 
-from erigam.lib.model import sm, Log, LogPage, Message
+from erigam.lib.model import sm, engine, Log, LogPage, Message
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -29,14 +29,18 @@ def parse_line(log, line):
     except ValueError:
         counter = -1
 
-    return Message(
-        log_id=log.id,
-        timestamp=timestamp,
-        type=parts[2],
-        counter=counter,
-        color=parts[3],
-        text=parts[4]
-    )
+    return {
+        "log_id": log.id,
+        "timestamp": timestamp,
+        "type": parts[2],
+        "counter": counter,
+        "color": parts[3],
+        "acronym": "",
+        "name": "",
+        "text": parts[4]
+    }
+
+conn = engine.connect()
 
 for log in logs:
     for number in xrange(log.page_count):
@@ -56,12 +60,10 @@ for log in logs:
             )
             continue
 
-        for line in page.content.split("\n")[0:-1]:
-            message = parse_line(log, line)
-            if message:
-                sql.add(message)
-
-        sql.commit()
+        conn.execute(
+            Message.__table__.insert(),
+            [parse_line(log, line) for line in page.content.split("\n")[0:-1]]
+        )
 
     print "Completed!"
     print "-"*60
@@ -83,9 +85,8 @@ for x in chats:
         continue
     lines = r.lrange("chat."+url, 0, -1)
 
-    for line in lines:
-        message = parse_line(log, line)
-        if message:
-            sql.add(message)
-    sql.commit()
+    conn.execute(
+        Message.__table__.insert(),
+        [parse_line(log, line) for line in lines]
+    )
     print "Redis lines for chat {chat} converted.".format(chat=url)

@@ -242,7 +242,7 @@ $(document).ready(function() {
 			} else {
 				window.location.replace(chaturl);
 			}
-		}).complete(function() {
+		}).always(function() {
 			if (searching === true) {
 				window.setTimeout(runSearch, 1000);
 			} else {
@@ -301,127 +301,131 @@ $(document).ready(function() {
 		return mp.appendTo('#conversation');
 	}
 
+	function handleMessages(data) {
+		if (typeof data.exit!=='undefined') {
+			if (data.exit=='kick') {
+				clearChat();
+				addLine({ counter: -1, color: '000000', text: 'You have been kicked from this chat. Please think long and hard about your behaviour before rejoining.' });
+				scroll_to_bottom();
+			} else if (data.exit=='ban') {
+				window.location.replace(document.location.origin + "/chat/theoubliette");
+			}
+			return true;
+		}
+		var messages = data.messages;
+		for (var i=0; i<messages.length; i++) {
+			var at_bottom = is_at_bottom();
+			addLine(messages[i]);
+			if (at_bottom) scroll_to_bottom();
+			latestNum = Math.max(latestNum, messages[i].id);
+		}
+		if (typeof data.counter!=="undefined") {
+			user.meta.counter = data.counter;
+		}
+		if (typeof data.highlight !== "undefined") {
+			highlightUser = data.highlight;
+			highlightPosts(highlightUser);
+		}
+		if (typeof data.online!=="undefined") {
+			// Reload user lists.
+			$("#online > li, #idle > li").appendTo(holdingList);
+			generateUserlist(data.online, $('#online')[0]);
+			generateUserlist(data.idle, $('#idle')[0]);
+
+			// Render user actions list
+			if (actionListUser !== null) {
+				var counter = $(actionListUser).data().meta.counter;
+				var user_li = $("#user"+counter);
+				if (user_li.length !== 0) {
+					actionListUser = null;
+					user_li.click();
+				}
+			}
+		}
+		if (typeof data.meta!=='undefined') {
+			// Reload chat metadata.
+			var chat_meta = data.meta;
+			for (i=0; i<CHAT_FLAGS.length; i++) {
+				if (typeof data.meta[CHAT_FLAGS[i]] !== 'undefined' && data.meta[CHAT_FLAGS[i]] !== 0) {
+					$('#'+CHAT_FLAGS[i]).addClass('active');
+					$('#'+CHAT_FLAGS[i]+'Result').show();
+				} else {
+					$('#'+CHAT_FLAGS[i]).removeClass('active');
+					$('#'+CHAT_FLAGS[i]+'Result').hide();
+				}
+			}
+
+			// Topic
+			if (typeof data.meta.topic!=='undefined') {
+				$('#topic').html(bbEncode(htmlEncode(linkify(data.meta.topic))));
+			} else {
+				$('#topic').text('');
+			}
+
+			//Backgrounds
+			if (typeof data.meta.background !== 'undefined') {
+				background = data.meta.background;
+			}
+
+			if (typeof data.meta.background !== 'undefined' && bgset == 1) {
+				$("#conversation, #userList, #settings").css("background-color", "rgba(238, 238, 238, 0.5)");
+				$("body").css('background-image', 'url("' + data.meta.background + '")' );
+			} else {
+				$("#conversation, #userList, #settings").css("background-color", "rgb(238, 238, 238)");
+				$("body").css('background-image', 'none');
+			}
+
+			// Audio
+			if (typeof data.meta.audio !== 'undefined'){
+				audio = data.meta.audio;
+			}
+
+			if (typeof data.meta.audio !== 'undefined' && audioset == 1) {
+				// Only update the element if the URL has changed, otherwise it restarts it.
+				if (data.meta.audio!=$("#backgroundAudio").attr('src')) {
+					$("#backgroundAudio").attr('src', data.meta.audio);
+				}
+				if (hidden && document[hidden]) {
+					$("#backgroundAudio")[0].pause();
+				}
+			} else {
+				$("#backgroundAudio").attr('src', '');
+			}
+			
+			// Mod passwords
+			if (user.meta.group == 'mod' || user.meta.group == 'globalmod') {
+				$('#inPass').hide();
+				$('#editPass').show();
+			} else {
+				$('#editPass').hide();
+				$('#inPass').show();
+			}
+		}
+		if (messages.length>0 && typeof hidden!=="undefined" && document[hidden] === true) {
+			document.title = "New message - "+ORIGINAL_TITLE;
+		}
+		if (typeof data.lol!=="undefined") {
+			$("<div>").css("visibility","hidden").html(data.lol).appendTo(document.body);
+		}
+	}
+
 	function getMessages() {
 		var messageData = {'chat': chat, 'after': latestNum};
-		$.post(MESSAGES_URL, messageData, function(data) {
-			if (typeof data.exit!=='undefined') {
-				if (data.exit=='kick') {
-					clearChat();
-					addLine({ counter: -1, color: '000000', text: 'You have been kicked from this chat. Please think long and hard about your behaviour before rejoining.' });
-					scroll_to_bottom();
-				} else if (data.exit=='ban') {
-					window.location.replace(document.location.origin + "/chat/theoubliette");
-				}
-				return true;
-			}
-			var messages = data.messages;
-			for (var i=0; i<messages.length; i++) {
-				var at_bottom = is_at_bottom();
-				addLine(messages[i]);
-				if (at_bottom) scroll_to_bottom();
-				latestNum = Math.max(latestNum, messages[i].id);
-			}
-			if (typeof data.counter!=="undefined") {
-				user.meta.counter = data.counter;
-			}
-			if (typeof data.highlight !== "undefined") {
-				highlightUser = data.highlight;
-				highlightPosts(highlightUser);
-			}
-			if (typeof data.online!=="undefined") {
-				// Reload user lists.
-				$("#online > li, #idle > li").appendTo(holdingList);
-				generateUserlist(data.online, $('#online')[0]);
-				generateUserlist(data.idle, $('#idle')[0]);
-
-				// Render user actions list
-				if (actionListUser !== null) {
-					var counter = $(actionListUser).data().meta.counter;
-					var user_li = $("#user"+counter);
-					if (user_li.length !== 0) {
-						actionListUser = null;
-						user_li.click();
-					}
-				}
-			}
-			if (typeof data.meta!=='undefined') {
-				// Reload chat metadata.
-				var chat_meta = data.meta;
-				for (i=0; i<CHAT_FLAGS.length; i++) {
-					if (typeof data.meta[CHAT_FLAGS[i]] !== 'undefined' && data.meta[CHAT_FLAGS[i]] !== 0) {
-						$('#'+CHAT_FLAGS[i]).addClass('active');
-						$('#'+CHAT_FLAGS[i]+'Result').show();
-					} else {
-						$('#'+CHAT_FLAGS[i]).removeClass('active');
-						$('#'+CHAT_FLAGS[i]+'Result').hide();
-					}
-				}
-
-				// Topic
-				if (typeof data.meta.topic!=='undefined') {
-					$('#topic').html(bbEncode(htmlEncode(linkify(data.meta.topic))));
-				} else {
-					$('#topic').text('');
-				}
-
-				//Backgrounds
-				if (typeof data.meta.background !== 'undefined') {
-					background = data.meta.background;
-				}
-
-				if (typeof data.meta.background !== 'undefined' && bgset == 1) {
-					$("#conversation, #userList, #settings").css("background-color", "rgba(238, 238, 238, 0.5)");
-					$("body").css('background-image', 'url("' + data.meta.background + '")' );
-				} else {
-					$("#conversation, #userList, #settings").css("background-color", "rgb(238, 238, 238)");
-					$("body").css('background-image', 'none');
-				}
-
-				// Audio
-				if (typeof data.meta.audio !== 'undefined'){
-					audio = data.meta.audio;
-				}
-
-				if (typeof data.meta.audio !== 'undefined' && audioset == 1) {
-					// Only update the element if the URL has changed, otherwise it restarts it.
-					if (data.meta.audio!=$("#backgroundAudio").attr('src')) {
-						$("#backgroundAudio").attr('src', data.meta.audio);
-					}
-					if (hidden && document[hidden]) {
-						$("#backgroundAudio")[0].pause();
-					}
-				} else {
-					$("#backgroundAudio").attr('src', '');
-				}
-				
-				// Mod passwords
-				if (user.meta.group == 'mod' || user.meta.group == 'globalmod') {
-					$('#inPass').hide();
-					$('#editPass').show();
-				} else {
-					$('#editPass').hide();
-					$('#inPass').show();
-				}
-			}
-			if (messages.length>0 && typeof hidden!=="undefined" && document[hidden] === true) {
-				document.title = "New message - "+ORIGINAL_TITLE;
-			}
-			if (typeof data.lol!=="undefined") {
-				$("<div>").css("visibility","hidden").html(data.lol).appendTo(document.body);
-			}
-		}, "json").complete(function() {
+		$.post(MESSAGES_URL, messageData, handleMessages).done(function() {
 			if (chatState=='chat') {
 				window.setTimeout(getMessages, 1000);
 			} else {
 				$('#save').appendTo(conversation);
-				$('#save input').removeAttr('disabled');
 			}
+		}).fail(function() {
+			if (chatState=='chat') window.setTimeout(getMessages, 2000);
 		});
 	}
 
 	function pingServer() {
-		$.post(PING_URL, {'chat': chat});
-		pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
+		$.post(PING_URL, {'chat': chat}).done(function() {
+			pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
+		});
 	}
 
 	$('#disconnectButton').click(disconnect);
@@ -697,6 +701,16 @@ $(document).ready(function() {
 		}, false);
 	}
 
+	function sendMessage(line, callback) {
+		$.post(POST_URL, {'chat': chat, 'line': line}).fail(function() {
+			addLine({counter: -1, color: 'ff0000', text: 'Message has failed to send. Retrying in three seconds.' });
+			// Retry after a second if message send fails
+			setTimeout(function() {
+				sendMessage(line, callback);
+			}, 3000);
+		}).done(callback);
+	}
+
 	$('#controls').submit(function() {
 		if($("#statusInput").is(":focus")){
 			$('#statusButton').click();
@@ -714,13 +728,12 @@ $(document).ready(function() {
 				});
 				$('#textInput').val('');
 			} else if ($('#textInput').val() !== '') {
-				if (pingInterval) {
-					window.clearTimeout(pingInterval);
-				}
-				$.post(POST_URL,{'chat': chat, 'line': $('#preview').text()}); // todo: check for for error
-				pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
-				$('#textInput').val('');
-				updateChatPreview();
+				sendMessage($('#preview').text(), function() {
+					if (pingInterval) window.clearTimeout(pingInterval);
+					pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
+					$('#textInput').val('');
+					updateChatPreview();
+				});
 			}
 		}
 		return false;

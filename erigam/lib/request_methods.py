@@ -122,5 +122,9 @@ def disconnect_sql(response=None):
     return response
 
 def disconnect_redis(response=None):
+    if hasattr(g, "pubsub"):
+        g.pubsub.close()
+        del g.pubsub
+
     del g.redis
     return response

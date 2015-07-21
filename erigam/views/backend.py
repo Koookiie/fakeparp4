@@ -326,21 +326,21 @@ def getMessages():
         message_dict = {"messages": [json.loads(_) for _ in messages]}
         return jsonify(message_dict)
 
-    pubsub = g.redis.pubsub()
+    g.pubsub = g.redis.pubsub()
 
     # Main channel.
-    pubsub.subscribe('channel.'+g.user.chat)
+    g.pubsub.subscribe('channel.'+g.user.chat)
 
     # Self channel.
     # Used for kicking, banning and events directed towards the user.
-    pubsub.subscribe('channel.'+g.user.chat+'.'+g.user.session_id)
+    g.pubsub.subscribe('channel.'+g.user.chat+'.'+g.user.session_id)
 
     # Get rid of the database connection here so we're not hanging onto it
     # while waiting for the redis message.
     db_commit()
     disconnect_sql()
 
-    for msg in pubsub.listen():
+    for msg in g.pubsub.listen():
         if msg['type'] == 'message':
             # The pubsub channel sends us a JSON string, so we return that instead of using jsonify.
             resp = make_response(msg['data'])

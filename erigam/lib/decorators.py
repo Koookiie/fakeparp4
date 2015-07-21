@@ -1,5 +1,6 @@
 from flask import g, render_template, jsonify
 from functools import wraps
+from erigam.lib import get_time, PING_PERIOD
 from erigam.lib.api import ping, get_online_state
 from erigam.lib.request_methods import db_connect, get_log
 
@@ -20,6 +21,9 @@ def mark_alive(f):
                 db_connect()
                 get_log()
                 g.joining = ping(g.sql, g.redis, g.log, g.user, g.chat_type)
+            else:
+                g.redis.zadd('chats-alive', g.user.chat+'/'+g.user.session_id, get_time(PING_PERIOD*2))
+                g.joining = False
         else:
             # Abort 500 just in case chat_type or log isn't defined
             return jsonify({"error": "nochat"}), 500

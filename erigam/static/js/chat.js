@@ -11,6 +11,7 @@ $(document).ready(function() {
 	var MESSAGES_URL = "/chat_ajax/messages";
 	var SAVE_URL = "/chat_ajax/save";
 	var QUIT_URL = "/chat_ajax/quit";
+	var STATE_URL = "/chat_ajax/state";
 
 	var CHAT_FLAGS = ['autosilence', 'public', 'nsfw'];
 
@@ -742,7 +743,7 @@ $(document).ready(function() {
 		} else {
 			newState = 'idle';
 		}
-		$.post(POST_URL, {'chat': chat, 'state': newState}, function(data) {
+		$.post(STATE_URL, {'chat': chat, 'state': newState}, function(data) {
 			userState = newState;
 		});
 	});

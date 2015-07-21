@@ -225,14 +225,6 @@ class Session(object):
         self.meta['group'] = group
         self.redis.hset(self.meta_prefix, 'group', group)
 
-    def change_state(self, state):
-        current_state = get_online_state(self.redis, self.chat, self.session_id)
-        if state != current_state:
-            self.redis.smove('chat.'+self.chat+'.'+current_state, 'chat.'+self.chat+'.'+state, self.session_id)
-            # Update userlist.
-            send_userlist(self.redis, g.log)
-
-
 def get_or_create(redis, key, default):
     data = redis.hgetall(key)
     if data is None or len(data) == 0:

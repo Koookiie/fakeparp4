@@ -11,7 +11,7 @@ from erigam.lib import (
     CHAT_FLAGS
 )
 
-from erigam.lib.api import disconnect
+from erigam.lib.api import disconnect, get_online_state
 
 from erigam.lib.groups import (
     MOD_GROUPS,
@@ -21,6 +21,7 @@ from erigam.lib.groups import (
 
 from erigam.lib.messages import (
     send_message,
+    send_userlist,
     get_userlists
 )
 
@@ -62,8 +63,7 @@ def postMessage():
             acronym=g.user.character['acronym'],
             text=line
         ))
-    if 'state' in request.form and request.form['state'] in ['online', 'idle']:
-        g.user.change_state(request.form['state'])
+
     # Mod options.
     if g.user.meta['group'] in MOD_GROUPS:
         if 'set_group' in request.form and 'counter' in request.form:
@@ -364,6 +364,25 @@ def save():
     except ValueError as e:
         abort(400)
     return 'ok'
+
+@blueprint.route('/state', methods=['POST'])
+@mark_alive
+@use_db_chat
+def change_state():
+    state = request.form['state']
+    if state not in ['idle', 'online']:
+        abort(500)
+
+    current_state = get_online_state(g.redis, g.user.chat, g.user.session_id)
+
+    if state != current_state:
+        g.redis.smove('chat.'+g.user.chat+'.'+current_state, 'chat.'+g.user.chat+'.'+state, g.user.session_id)
+
+    # Update userlist.
+    send_userlist(g.redis, g.log)
+
+    return '', 204
+
 
 # Globalmod stuff.
 

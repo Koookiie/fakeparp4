@@ -4,14 +4,11 @@ except:
     import json
 import re
 
-from flask import request, g
+from flask import request
 from uuid import uuid4
 
 from erigam.lib import DELETE_SESSION_PERIOD, get_time
-from erigam.lib.api import get_online_state
 from erigam.lib.characters import CHARACTER_DETAILS
-from erigam.lib.messages import send_message, send_userlist
-from erigam.lib.model import Message
 
 CASE_OPTIONS = {
     'normal': 'Normal',
@@ -176,17 +173,11 @@ class Session(object):
         if self.chat is not None:
             if character['name'] != old_name or character['acronym'] != old_acronym:
                 if self.meta['group'] == 'silent':
-                    send_userlist(self.redis, g.log)
+                    return None
                 else:
-                    user_change_message = '%s [%s] is now %s [%s]. ~~ %s ~~' % (old_name, old_acronym, character['name'], character['acronym'], self.meta['counter'])
-                    send_message(g.sql, self.redis, Message(
-                        log_id=g.log.id,
-                        type="user_change",
-                        counter=-1,
-                        text=user_change_message
-                    ))
+                    return '%s [%s] is now %s [%s]. ~~ %s ~~' % (old_name, old_acronym, character['name'], character['acronym'], self.meta['counter'])
             elif character['color'] != old_color:
-                send_userlist(self.redis, g.log)
+                return None
 
     def save_pickiness(self, form):
         # Para/NSFW

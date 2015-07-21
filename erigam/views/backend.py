@@ -360,8 +360,17 @@ def quitChatting():
 @use_db_chat
 def save():
     try:
-        g.user.save_character(request.form)
-    except ValueError as e:
+        message = g.user.save_character(request.form)
+        if message:
+            send_message(g.sql, g.redis, Message(
+                log_id=g.log.id,
+                type="user_change",
+                counter=-1,
+                text=message
+            ))
+        else:
+            send_userlist(g.redis, g.log)
+    except ValueError:
         abort(400)
     return 'ok'
 

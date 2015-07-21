@@ -7,10 +7,11 @@ import datetime
 from erigam.lib import ARCHIVE_PERIOD, get_time
 from erigam.lib.archive import archive_chat, delete_chat_session, delete_session
 from erigam.lib.model import sm, Ban
-import sqlalchemy.exc
 import os
 
 if __name__ == '__main__':
+
+    db = sm()
 
     print "Archiving script started."
     redis = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
@@ -24,21 +25,15 @@ if __name__ == '__main__':
         # Every minute
         if new_time.minute != current_time.minute:
             print "running archiving"
-            sql = sm()
 
             # Expire IP bans.
-            sql.query(Ban).filter(Ban.expires < datetime.datetime.utcnow()).delete()
+            db.query(Ban).filter(Ban.expires < datetime.datetime.utcnow()).delete()
 
             # Archive chats.
             for chat in redis.zrangebyscore('archive-queue', 0, get_time()):
-                try:
-                    print "archiving chat: ", chat
-                    archive_chat(redis, sql, chat)
-                except (sqlalchemy.exc.IntegrityError, sqlalchemy.exc.ProgrammingError, sqlalchemy.exc.TimeoutError):
-                    print "sql error, reconnecting."
-                    sql.close()
-                    sql = sm()
-                    pass
+                print "archiving chat: ", chat
+                archive_chat(redis, db, chat)
+
                 online = redis.scard('chat.'+chat+'.online')
                 idle = redis.scard('chat.'+chat+'.idle')
                 # Stop archiving if no-one is online any more.
@@ -56,9 +51,6 @@ if __name__ == '__main__':
             for session_id in redis.zrangebyscore('all-sessions', 0, get_time()):
                 print "deleting session: ", session_id
                 delete_session(redis, session_id)
-
-            sql.close()
-            del sql
 
         current_time = new_time
 

@@ -252,6 +252,7 @@ def postMessage():
 
 @blueprint.route('/flag', methods=['POST'])
 @mark_alive
+@use_db_chat
 def set_flag():
     for flag in CHAT_FLAGS:
         if flag in request.form:

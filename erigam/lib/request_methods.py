@@ -43,11 +43,8 @@ def create_session():
         if session_id is None or session_validator.match(session_id) is None:
             abort(400)
 
-        # Put the chat type into the global scope for the request.
-        g.chat_type = g.redis.hget('chat.'+chat+'.meta', 'type')
-
-        # Abort 404 if there's no type because the chat might not be real.
-        if g.chat_type is None:
+        # Abort 404 if the chat metadata does not exist.
+        if not g.redis.exists('chat.'+chat+'.meta'):
             abort(404)
 
         g.user = Session(g.redis, session_id, chat)

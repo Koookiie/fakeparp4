@@ -332,10 +332,8 @@ def getMessages():
     pubsub.subscribe('channel.'+g.user.chat)
 
     # Self channel.
-    # Right now this is only used by kick/ban and IP lookup, so only subscribe
-    # if we're in a group chat or a global mod.
-    if g.chat_type == 'group' or g.user.meta['group'] == 'globalmod':
-        pubsub.subscribe('channel.'+g.user.chat+'.'+g.user.session_id)
+    # Used for kicking, banning and events directed towards the user.
+    pubsub.subscribe('channel.'+g.user.chat+'.'+g.user.session_id)
 
     # Get rid of the database connection here so we're not hanging onto it
     # while waiting for the redis message.

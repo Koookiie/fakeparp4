@@ -3,7 +3,7 @@ from erigam.lib import get_time, ARCHIVE_PERIOD, PING_PERIOD
 from erigam.lib.messages import send_message, send_userlist
 from erigam.lib.model import Ban, Message
 
-def join(sql, redis, log, session, chat_type):
+def join(sql, redis, log, session):
     # Check IP bans.
     if sql.query(Ban).filter(Ban.url == log.url).filter(Ban.ip == session.ip).scalar() is not None:
         abort(403)

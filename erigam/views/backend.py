@@ -274,6 +274,7 @@ def set_flag():
 
 @blueprint.route('/highlight', methods=['POST'])
 @mark_alive
+@use_db_chat
 def saveHighlight():
     try:
         counter = request.form['counter']

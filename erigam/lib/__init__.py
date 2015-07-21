@@ -5,7 +5,7 @@ import time
 SEARCH_PERIOD = 1
 
 # Timeout period for chats.
-PING_PERIOD = 10
+PING_PERIOD = 15
 
 # Period in which to send blank messages to avoid socket timeouts - 25 seconds.
 LONGPOLL_TIMEOUT_PERIOD = 25

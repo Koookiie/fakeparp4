@@ -279,6 +279,7 @@ $(document).ready(function() {
 
 	function addLine(msg){
 		var msgClass;
+		var at_bottom = is_at_bottom();
 
 		if (msg.counter == -1) {
 			msgClass = 'system';
@@ -306,7 +307,11 @@ $(document).ready(function() {
 			$('.system').hide();
 		}
 
-		return mp.appendTo('#conversation');
+		mp.appendTo('#conversation');
+
+		if (at_bottom) scroll_to_bottom();
+
+		return mp;
 	}
 
 	function handleMessages(data) {
@@ -322,9 +327,7 @@ $(document).ready(function() {
 		}
 		var messages = data.messages;
 		for (var i=0; i<messages.length; i++) {
-			var at_bottom = is_at_bottom();
 			addLine(messages[i]);
-			if (at_bottom) scroll_to_bottom();
 			latestNum = Math.max(latestNum, messages[i].id);
 		}
 		if (typeof data.counter!=="undefined") {
@@ -423,12 +426,12 @@ $(document).ready(function() {
 
 		$.post(MESSAGES_URL, messageData, handleMessages).done(function() {
 			if (chatState=='chat') {
-				window.setTimeout(function(){getMessages(false)}, 1000);
+				getMessages();
 			} else {
 				$('#save').appendTo(conversation);
 			}
 		}).fail(function() {
-			if (chatState=='chat') window.setTimeout(function(){getMessages(false)}, 2000);
+			if (chatState=='chat') window.setTimeout(getMessages, 2000);
 		});
 	}
 

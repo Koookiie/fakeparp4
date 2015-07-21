@@ -7,14 +7,14 @@ import datetime
 from erigam.lib import ARCHIVE_PERIOD, get_time
 from erigam.lib.archive import archive_chat, delete_chat_session, delete_session
 from erigam.lib.model import sm, Ban
-import os
+from erigam.lib.request_methods import redis_pool
 
 if __name__ == '__main__':
 
     db = sm()
 
     print "Archiving script started."
-    redis = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
+    redis = Redis(connection_pool=redis_pool)
 
     current_time = datetime.datetime.utcnow()
 

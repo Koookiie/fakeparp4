@@ -2,11 +2,11 @@
 from redis import Redis
 import uuid
 import time
-import os
 
 from erigam.lib.api import chatapi
 from erigam.lib.model import sm, Message
 from erigam.lib.messages import send_message
+from erigam.lib.request_methods import redis_pool
 
 OPTION_LABELS = {
     'para0': u'script style',
@@ -36,7 +36,7 @@ def check_compatibility(first, second):
 if __name__ == '__main__':
 
     db = sm()
-    redis = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
+    redis = Redis(connection_pool=redis_pool)
 
     while True:
         searchers = redis.zrange('searchers', 0, -1)

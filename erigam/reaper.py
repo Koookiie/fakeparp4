@@ -2,17 +2,17 @@
 
 from redis import Redis
 import time
-import os
 
 from erigam.lib import get_time, LONGPOLL_TIMEOUT_PERIOD
 from erigam.lib.api import disconnect
 from erigam.lib.characters import CHARACTER_DETAILS
 from erigam.lib.model import sm, Log
+from erigam.lib.request_methods import redis_pool
 
 if __name__ == '__main__':
 
     db = sm()
-    redis = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
+    redis = Redis(connection_pool=redis_pool)
 
     while True:
 

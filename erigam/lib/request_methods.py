@@ -104,6 +104,9 @@ def use_db_chat(f):
     return decorated_function
 
 def get_log():
+    if hasattr(g.user, "chat") and g.user.chat is None:
+        abort(400)
+
     g.log, g.chat = get_or_create_log(g.sql, g.user.chat)
 
 def db_commit(response=None):

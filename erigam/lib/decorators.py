@@ -1,4 +1,4 @@
-from flask import g, render_template
+from flask import g, render_template, abort
 from functools import wraps
 from erigam.lib import get_time, PING_PERIOD
 from erigam.lib.api import join, get_online_state
@@ -15,6 +15,9 @@ def require_admin(f):
 def mark_alive(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        if hasattr(g.user, "chat") and g.user.chat is None:
+            abort(400)
+
         if get_online_state(g.redis, g.user.chat, g.user.session_id) == "offline":
             db_connect()
             get_log()

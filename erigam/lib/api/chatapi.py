@@ -22,7 +22,7 @@ def create_chat(sql, redis, url, chattype="group"):
         if g.user.meta['group'] != 'globalmod':
             g.user.set_group('mod')
 
-    redis.hmset('chat.'+url+'.meta', {'type': chattype, 'public': '0'})
+    redis.hmset('chat.'+url+'.meta', {'type': chattype})
 
     return log
 
@@ -32,8 +32,7 @@ def load_chat(sql, redis, chat):
         sql_chat = sql.query(Chat).filter(Chat.log_id == sql_log.id).one()
         chat_meta = {
             "type": sql_chat.type,
-            "counter": sql_chat.counter,
-            "public": "0",
+            "counter": sql_chat.counter
         }
         if sql_chat.topic is not None and sql_chat.topic != "":
             chat_meta["topic"] = sql_chat.topic

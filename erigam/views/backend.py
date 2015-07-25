@@ -312,6 +312,7 @@ def getMessages():
             "messages": [],
         }
 
+        # Send online and idle lists
         message_dict['online'], message_dict['idle'] = get_userlists(g.redis, g.user.chat)
 
         # Newly created matchmaker chats don't know the counter, so we send it here.
@@ -321,6 +322,9 @@ def getMessages():
         highlight = g.redis.hget("chat.%s.highlights" % (g.user.chat), g.user.meta['counter'])
         if highlight:
             message_dict['highlight'] = highlight
+
+        # Send chat meta list to ensure flags and other things are set.
+        message_dict['meta'] = g.redis.hgetall('chat.'+g.user.chat+'.meta')
 
         return jsonify(message_dict)
     elif len(messages) != 0:

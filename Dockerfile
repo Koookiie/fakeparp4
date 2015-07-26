@@ -4,7 +4,7 @@ FROM ubuntu:14.04
 RUN apt-get update -y
 
 # Install pip
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python python-pip python-dev libpq-dev
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python python-pip python-dev libpq-dev libffi-dev
 
 # Set WORKDIR to /src
 WORKDIR /src

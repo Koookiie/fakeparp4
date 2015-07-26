@@ -11,3 +11,4 @@ env/
 *.egg-info
 build/
 dist/
+.dockerenv

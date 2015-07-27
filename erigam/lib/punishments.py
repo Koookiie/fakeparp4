@@ -2,15 +2,11 @@
 
 import re
 import random
+import json
 
 bbcode_regex = re.compile("\[.+?\]")
 
-def randpunish(redis, cookie, chat, line):
-    choice = random.choice([scenify, balon])
-    return choice(redis, cookie, chat, line)
-
-
-def scenify(redis, cookie, chat, line):
+def punish(redis, cookie, chat, line):
     word_regex = re.compile("[^a-zA-Z\s]+")
     bbcode_regex = re.compile("\[.+?\]")
     replacements = [
@@ -189,6 +185,12 @@ def scenify(redis, cookie, chat, line):
         ["own", "pwn"],
     ]
 
+    try:
+        extrapunishments = json.loads(redis.get("panda:additions"))
+        replacements = replacements + extrapunishments
+    except TypeError:
+        pass
+
     r = lambda: random.randint(0, 255)
     color = '%02X%02X%02X' % (r(), r(), r())
 
@@ -212,88 +214,5 @@ def scenify(redis, cookie, chat, line):
     redis.hset(datakey, 'name', 'XxTEH PANDA KINGxX')
     redis.hset(datakey, 'replacements', '[]')
     redis.hset(datakey, 'quirk_prefix', '')
-
-    return line[:1500]
-
-def balon(redis, cookie, chat, line):
-    replacements = {
-        "a": ".-",
-        "b": "-...",
-        "c": "-.-.",
-        "d": "-..",
-        "e": ".",
-        "f": "..-.",
-        "g": "--.",
-        "i": "..",
-        "j": ".---",
-        "k": "-.-",
-        "l": ".-..",
-        "m": "--",
-        "n": "-.",
-        "o": "---",
-        "p": ".--.",
-        "q": "--.-",
-        "r": ".-.",
-        "s": "...",
-        "t": "-",
-        "u": "..-",
-        "v": "...-",
-        "w": ".--",
-        "x": "-..-",
-        "y": "-.--",
-        "z": "--..",
-        "h": "....",
-        "0": "-----",
-        "1": ".----",
-        "2": "..---",
-        "3": "...--",
-        "4": "....-",
-        "5": ".....",
-        "6": "-....",
-        "7": "--...",
-        "8": "---..",
-        "9": "----.",
-        '(': "-.--.-",
-        ')': "-.--.-",
-        ",": "--..--",
-        "?": "..--..",
-        "/": "-..-.",
-        "\"": ".-..-.",
-        "=": "-...-",
-        "@": ".--.-.",
-        ".": ".-.-.-",
-        "-": "-....-",
-        "'": ".----.",
-        " ": "/"
-    }
-
-    # Lower case quirk.
-    line = line.lower()
-
-    # Strip BBCode to prevent sneakyness.
-    line = bbcode_regex.sub("dingleberry", line)
-
-    # Replacements
-    morse = ""
-    for x in line:
-        try:
-            morse += replacements[x] + " "
-        except KeyError:
-            pass
-
-    # Prefix
-    line = u'~O %s' % (morse)
-
-    # Redis
-    datakey = 'session.%s.chat.%s' % (cookie, chat)
-    data = {
-        'case': 'lower',
-        'replacements': '[]',
-        'name': 'inflatedRaisin',
-        'color': '35a9b8',
-        'acronym': '',
-        'quirk_prefix': ''
-    }
-    redis.hmset(datakey, data)
 
     return line[:1500]

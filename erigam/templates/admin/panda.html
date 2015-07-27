@@ -63,6 +63,29 @@
             </table>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h1> Extra replacements </h1>
+            <form role="form" action="/admin/panda" method="post">
+                <input type="hidden" name="action" value="add">
+                <div class="form-group">
+                    <label for="pandaFrom">From</label>
+                    <input type="text" class="form-control" id="pandaFrom" placeholder="127.0.0.1" name="pandaFrom">
+                </div>
+                <div class="form-group">
+                    <label for="pandaTo">To</label>
+                    <input type="text" class="form-control" id="pandaTo" placeholder="No reason." name="pandaTo">
+                </div>
+                <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+            <ul>
+            {% for x in extrapunishments %}
+                <li> Replacing '{{x[0]}}' with '{{x[1]}}' </li>
+                <ul> <li> Remove </li> </ul>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

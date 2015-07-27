@@ -142,6 +142,11 @@ def show_allchats():
 def admin_panda():
     result = None
 
+    try:
+        extrapunishments = json.loads(g.redis.get("panda:additions"))
+    except TypeError:
+        extrapunishments = []
+
     if "ip" in request.form:
         ip = request.form['ip']
         action = request.form.get("action", None)
@@ -154,10 +159,15 @@ def admin_panda():
             g.redis.hdel("punish-scene", ip)
             result = "Panda removed on %s!" % (ip)
 
+    if 'pandaFrom' in request.form and 'pandaTo' in request.form:
+        extrapunishments.append([request.form['pandaFrom'], request.form['pandaTo']])
+        g.redis.set("panda:additions", json.dumps(extrapunishments))
+
     pandas = g.redis.hgetall('punish-scene')
 
     return render_template('admin/panda.html',
         lines=pandas,
         result=result,
+        extrapunishments=extrapunishments,
         page="panda"
     )

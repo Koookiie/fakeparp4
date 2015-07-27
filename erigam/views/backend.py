@@ -28,7 +28,7 @@ from erigam.lib.messages import (
 from erigam.lib.model import Ban, Message
 
 from erigam.lib.characters import CHARACTER_DETAILS
-from erigam.lib.punishments import randpunish
+from erigam.lib.punishments import punish
 from erigam.lib.decorators import mark_alive, require_admin
 from erigam.lib.request_methods import (
     use_db_chat,
@@ -53,7 +53,7 @@ def postMessage():
         line = request.form['line'].replace('\n', ' ')[:1500]
 
         if g.redis.hexists('punish-scene', g.user.ip):
-            line = randpunish(g.redis, g.user.session_id, chat, line)
+            line = punish(g.redis, g.user.session_id, chat, line)
 
         send_message(g.sql, g.redis, Message(
             log_id=g.log.id,

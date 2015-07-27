@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
 import sys
-import os
 from redis import Redis
+from erigam.lib.request_methods import redis_pool
 
-db = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
+db = Redis(connection_pool=redis_pool)
 
 session_id = sys.argv[2]
 

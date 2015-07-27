@@ -3,11 +3,12 @@ import redis
 import os
 
 from erigam.lib.model import sm, engine, Log, LogPage, Message
+from erigam.lib.request_methods import redis_pool
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
-r = redis.Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
+r = redis.Redis(connection_pool=redis_pool)
 sql = sm()
 
 print "%s LogPages in database. %s logs in database." % (

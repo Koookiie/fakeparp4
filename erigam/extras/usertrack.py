@@ -1,12 +1,12 @@
 import time
-import os
 
 from collections import defaultdict
 from redis import Redis
 
 from erigam.lib.messages import send_message
+from erigam.lib.request_methods import redis_pool
 
-db = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
+db = Redis(connection_pool=redis_pool)
 
 chat_history = []
 

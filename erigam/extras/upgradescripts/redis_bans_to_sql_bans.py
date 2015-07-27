@@ -1,10 +1,10 @@
 from redis import Redis
-import os
 import datetime
 
 from erigam.lib.model import sm, Ban
+from erigam.lib.request_methods import redis_pool
 
-r = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
+r = Redis(connection_pool=redis_pool)
 sql = sm()
 
 bans = r.zrange("ip-bans", 0, -1, withscores=True)

@@ -3,11 +3,11 @@
 from redis import Redis
 import json
 import time
-import os
 
 from erigam.lib.api import disconnect
+from erigam.lib.request_methods import redis_pool
 
-db = Redis(host=os.environ['REDIS_HOST'], port=int(os.environ['REDIS_PORT']), db=int(os.environ['REDIS_DB']))
+db = Redis(connection_pool=redis_pool)
 pubsub = db.pubsub()
 pubsub.psubscribe('channel.*')
 

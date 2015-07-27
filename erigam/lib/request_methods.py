@@ -11,8 +11,8 @@ from functools import wraps
 
 # Connection pooling. This takes far too much effort.
 redis_pool = ConnectionPool(
-    host=os.environ.get('REDIS_HOST', os.environ.get('REDIS_PORT_6379_TCP_ADDR', '127.0.0.1')),
-    port=int(os.environ.get('REDIS_PORT', os.environ.get('REDIS_PORT_6379_TCP_PORT', 6379))),
+    host=os.environ.get('REDIS_PORT_6379_TCP_ADDR', os.environ.get('REDIS_HOST', '127.0.0.1')),
+    port=int(os.environ.get('REDIS_PORT_6379_TCP_PORT', os.environ.get('REDIS_PORT', 6379))),
     db=int(os.environ.get('REDIS_DB', 0))
 )
 

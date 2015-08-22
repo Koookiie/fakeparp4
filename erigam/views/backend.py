@@ -179,7 +179,7 @@ def postMessage():
                     ban_message = ban_message + " Reason: %s" % (request.form['reason'][:1500])
 
                 if g.redis.sismember('chat.'+chat+'.online', their_session_id) or g.redis.sismember('chat.'+chat+'.idle', their_session_id):
-                    disconnect(g.redis, chat, their_session_id, ban_message)
+                    disconnect(g.sql, g.redis, g.log, their_session_id, ban_message)
                 else:
                     send_message(g.sql, g.redis, Message(
                         log_id=g.log.id,
@@ -386,10 +386,10 @@ def change_state():
     if state not in ['idle', 'online']:
         abort(500)
 
-    current_state = get_online_state(g.redis, g.user.chat, g.user.session_id)
+    current_state = get_online_state(g.redis, g.log.url, g.user.session_id)
 
     if state != current_state:
-        g.redis.smove('chat.'+g.user.chat+'.'+current_state, 'chat.'+g.user.chat+'.'+state, g.user.session_id)
+        g.redis.smove('chat.'+g.log.url+'.'+current_state, 'chat.'+g.log.url+'.'+state, g.user.session_id)
 
     # Update userlist.
     send_userlist(g.redis, g.log)

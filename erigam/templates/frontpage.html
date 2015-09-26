@@ -144,9 +144,9 @@
                     <div class="form-group">
                         <label>Work-safe or not?</label>
                         <select class="form-control" id="nsfwsfw" name="nsfw">
+                            <option id="nopref" value="">No preference</option>
                             <option id="sfwsel" value="0"{% if picky_options.get('nsfw2')=='0' %} selected="selected"{% endif %}>Safe for work</option>
                             <option id="nsfwsel" value="1"{% if picky_options.get('nsfw2')=='1' %} selected="selected"{% endif %}>Not safe for work</option>
-                            <option id="nopref" value="2"{% if picky_options.get('nsfw2')=='2' %} selected="selected"{% endif %}>No preference</option>
                         </select>
                     </div>
 

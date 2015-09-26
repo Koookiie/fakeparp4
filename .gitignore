@@ -12,3 +12,5 @@ env/
 build/
 dist/
 .dockerenv
+env3/
+*.bak

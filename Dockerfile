@@ -4,7 +4,7 @@ FROM ubuntu:14.04
 RUN apt-get update -y
 
 # Install pip
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python python-pip python-dev libpq-dev libffi-dev
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python3 python3-pip python3-dev libpq-dev libffi-dev
 
 # Set WORKDIR to /src
 WORKDIR /src
@@ -17,7 +17,7 @@ RUN pip install -r requirements.txt
 ADD . /src
 
 # Install main module
-RUN python setup.py install
+RUN python3 setup.py install
 
 # Expose web port
 EXPOSE 5000

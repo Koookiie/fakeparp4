@@ -183,11 +183,6 @@ class Session(object):
         # Para/NSFW
         option_key = self.prefix+'.picky-options'
         for option in ['para', 'nsfw']:
-            if option in form and form[option] in ['0', '1', '2']:
-                self.redis.hset(option_key, option+'2', int(form[option]))
-            else:
-                self.redis.hset(option_key, option+'2', 2)
-        for option in ['para', 'nsfw']:
             if option in form and form[option] in ['0', '1']:
                 self.redis.hset(option_key, option, int(form[option]))
             else:

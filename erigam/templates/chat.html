@@ -115,6 +115,17 @@
 	<p> <a href="/chat/{{chat}}/log">View log</a> </p>
 </div>
 
+{% raw %}
+<script id="user_list_template" type="text/x-handlebars-template">
+{{#each this}}
+    <li style="color: #{{character.color}};" id="user{{meta.counter}}" class="entry {{meta.group}}">
+    	{{character.name}}{{#if (is_you)}} (you){{/if}}
+    	<span class="userID">{{user_group}} - user{{meta.counter}}</span>
+    </li>
+{{/each}}
+</script>
+{% endraw %}
+
 <script type="text/javascript">
 	var user = {{character_dict|tojson|safe}};
 	var chat = {{(chat)|tojson|safe}};
@@ -123,6 +134,7 @@
 	var log_id = {% if log %}{{log.id}}{% else %}null{% endif %};
 </script>
 
+<script src="/static/js/handlebars-v4.0.2.js?1"></script>
 <script type="text/javascript" src="/static/colorpicker/js/colorpicker.js"></script>
 <script src="/static/js/characters.js?2"></script>
 <script src="/static/js/chat.js?15"></script>

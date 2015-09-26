@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
     db = sm()
 
-    print "Archiving script started."
+    print("Archiving script started.")
     redis = Redis(connection_pool=redis_pool)
 
     current_time = datetime.datetime.utcnow()
@@ -24,14 +24,14 @@ if __name__ == '__main__':
 
         # Every minute
         if new_time.minute != current_time.minute:
-            print "running archiving"
+            print("running archiving")
 
             # Expire IP bans.
             db.query(Ban).filter(Ban.expires < datetime.datetime.utcnow()).delete()
 
             # Archive chats.
             for chat in redis.zrangebyscore('archive-queue', 0, get_time()):
-                print "archiving chat: ", chat
+                print("archiving chat: ", chat)
                 archive_chat(redis, db, chat)
 
                 online = redis.scard('chat.'+chat+'.online')
@@ -44,12 +44,12 @@ if __name__ == '__main__':
 
             # Delete chat-sessions.
             for chat_session in redis.zrangebyscore('chat-sessions', 0, get_time()):
-                print "deleting chat session: ", chat_session
+                print("deleting chat session: ", chat_session)
                 delete_chat_session(redis, *chat_session.split('/'))
 
             # Delete sessions.
             for session_id in redis.zrangebyscore('all-sessions', 0, get_time()):
-                print "deleting session: ", session_id
+                print("deleting session: ", session_id)
                 delete_session(redis, session_id)
 
         current_time = new_time

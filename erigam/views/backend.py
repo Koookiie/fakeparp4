@@ -78,41 +78,37 @@ def postMessage():
                 or GROUP_RANKS[set_group] > GROUP_RANKS[g.user.meta['group']]
             ):
                 return 'ok'
-            if current_group != set_group and set_group in GROUP_RANKS.keys():
+            if current_group != set_group and set_group in list(GROUP_RANKS.keys()):
                 g.redis.hset(ss_meta_key, 'group', set_group)
                 set_message = None
                 # XXX make a function for fetching name and acronym?
                 # Convert the name and acronym to unicode.
                 ss_character = g.redis.hget(ss_key, 'character') or 'anonymous/other'
-                set_session_name = unicode(
-                    g.redis.hget(ss_key, 'name') or CHARACTER_DETAILS[ss_character]['name'],
-                    encoding='utf8'
-                )
-                set_session_acronym = unicode(
-                    g.redis.hget(ss_key, 'acronym') or CHARACTER_DETAILS[ss_character]['acronym'],
-                    encoding='utf8'
-                )
+                set_session_name = g.redis.hget(ss_key, 'name') or CHARACTER_DETAILS[ss_character]['name']
+                set_session_acronym = g.redis.hget(ss_key, 'acronym') or CHARACTER_DETAILS[ss_character]['acronym']
+
                 if set_group == 'globalmod':
-                    set_message = '%s [%s] set %s [%s] to Global Moderator. How the hell did this just happen?'
+                    set_message = '{name} [{acronym}] set {set_name} [{set_acronym}] to Global Moderator. How the hell did this just happen?'
                 elif set_group == 'mod':
-                    set_message = '%s [%s] set %s [%s] to Professional Wet Blanket. They can now silence, kick and ban other users.'
+                    set_message = '{name} [{acronym}] set {set_name} [{set_acronym}] to Professional Wet Blanket. They can now silence, kick and ban other users.'
                 elif set_group == 'mod2':
-                    set_message = '%s [%s] set %s [%s] to Bum\'s Rusher. They can now silence and kick other users.'
+                    set_message = '{name} [{acronym}] set {set_name} [{set_acronym}] to Bum\'s Rusher. They can now silence and kick other users.'
                 elif set_group == 'mod3':
-                    set_message = '%s [%s] set %s [%s] to Amateur Gavel-Slinger. They can now silence other users.'
+                    set_message = '{name} [{acronym}] set {set_name} [{set_acronym}] to Amateur Gavel-Slinger. They can now silence other users.'
                 elif set_group == 'user':
                     if current_group in MOD_GROUPS:
-                        set_message = '%s [%s] removed moderator status from %s [%s].'
+                        set_message = '{name} [{acronym}] removed moderator status from {set_name} [{set_acronym}].'
                     else:
-                        set_message = '%s [%s] unsilenced %s [%s].'
+                        set_message = '{name} [{acronym}] unsilenced {set_name} [{set_acronym}].'
                 elif set_group == 'silent':
-                    set_message = '%s [%s] silenced %s [%s].'
+                    set_message = '{name} [{acronym}] silenced {set_name} [{set_acronym}].'
+
                 if set_message is not None:
-                    set_message = set_message % (
-                        g.user.character['name'],
-                        g.user.character['acronym'],
-                        set_session_name,
-                        set_session_acronym
+                    set_message = set_message.format(
+                        name=g.user.character['name'],
+                        acronym=g.user.character['acronym'],
+                        set_name=set_session_name,
+                        set_acronym=set_session_acronym
                     )
                 send_message(g.sql, g.redis, Message(
                     log_id=g.log.id,
@@ -133,14 +129,9 @@ def postMessage():
             # Fetch their name and convert to unicode.
             their_chat_key = 'session.'+their_session_id+'.chat.'+chat
             their_character = g.redis.hget(their_chat_key, 'character')
-            their_session_name = unicode(
-                g.redis.hget(their_chat_key, 'name') or CHARACTER_DETAILS[their_character]['name'],
-                encoding='utf8'
-            )
-            their_session_acronym = unicode(
-                g.redis.hget(their_chat_key, 'acronym') or CHARACTER_DETAILS[their_character]['acronym'],
-                encoding='utf8'
-            )
+            their_session_name = g.redis.hget(their_chat_key, 'name') or CHARACTER_DETAILS[their_character]['name']
+            their_session_acronym = g.redis.hget(their_chat_key, 'acronym') or CHARACTER_DETAILS[their_character]['acronym']
+
             if request.form['user_action'] == 'kick':
                 g.redis.publish('channel.'+chat+'.'+their_session_id, '{"exit":"kick"}')
                 disconnect(g.sql, g.redis, g.log, their_session_id, "%s [%s] kicked %s [%s] from the chat." % (
@@ -190,10 +181,7 @@ def postMessage():
 
         if 'topic' in request.form:
             if request.form['topic'] != '':
-                try:
-                    truncated_topic = request.form['topic'].replace('\n', ' ')[:1500].decode('utf-8', 'ignore')
-                except UnicodeEncodeError:
-                    truncated_topic = request.form['topic'].replace('\n', ' ')[:1500]
+                truncated_topic = request.form['topic'].replace('\n', ' ')[:1500]
                 g.redis.hset('chat.'+chat+'.meta', 'topic', truncated_topic)
                 topic_message = '%s changed the conversation topic to "%s".' % (
                     g.user.character['name'],
@@ -210,13 +198,13 @@ def postMessage():
             ))
         if 'background' in request.form:
             if request.form['background'] != '':
-                background_url = request.form['background'].decode('utf-8', 'ignore')
+                background_url = request.form['background'].strip()[:1500]
                 g.redis.hset('chat.'+chat+'.meta', 'background', background_url)
                 g.redis.sadd("chat-backgrounds", chat)
                 background_message = '%s [%s] changed the conversation background to "%s".' % (
                     g.user.character['name'],
                     g.user.character['acronym'],
-                    background_url.replace('\n', ' ')[:1500]
+                    background_url
                 )
             else:
                 g.redis.hdel('chat.'+chat+'.meta', 'background')
@@ -231,11 +219,11 @@ def postMessage():
 
         if 'audio' in request.form:
             if request.form['audio'] != '':
-                audio_url = request.form['audio'].decode('utf-8', 'ignore')
+                audio_url = request.form['audio'].strip()[:1500]
                 g.redis.hset('chat.'+chat+'.meta', 'audio', audio_url)
                 audio_message = '%s changed the conversation audio to "%s".' % (
                     g.user.character['name'],
-                    audio_url.replace('\n', ' ')[:1500]
+                    audio_url
                 )
             else:
                 g.redis.hdel('chat.'+chat+'.meta', 'audio')

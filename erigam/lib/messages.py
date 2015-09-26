@@ -45,9 +45,23 @@ def send_userlist(redis, log):
 
 def get_userlists(redis, chat):
 
+    ratelimit = redis.incr("chat:" + chat + ":ratelimit")
+    if ratelimit > 25:
+        return [{
+            'character': 'anonymous/other',
+            'acronym': 'RATELIMIT',
+            'name': 'REFRESH LIMITED. PLEASE REFRESH',
+            'color': '000000',
+            'quirk_prefix': '',
+            'quirk_suffix': '',
+            'case': 'normal',
+            'replacements': '[]'
+        }], []
+
     pipe = redis.pipeline()
     pipe.smembers('chat.'+chat+'.online')
     pipe.smembers('chat.'+chat+'.idle')
+    redis.expire("chat:" + chat + ":ratelimit", 1)
     sessions_online, sessions_idle = pipe.execute()
 
     online = get_sublist(redis, chat, sessions_online)

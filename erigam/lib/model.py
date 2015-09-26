@@ -44,7 +44,7 @@ class Chat(Base):
     __tablename__ = 'chats'
 
     log_id = Column(Integer, ForeignKey('logs.id'), primary_key=True)
-    type = Column(Enum(u"unsaved", u"saved", u"group", u"deleted", name=u"chats_type"), nullable=False, default=u"saved")
+    type = Column(Enum("unsaved", "saved", "group", "deleted", name="chats_type"), nullable=False, default="saved")
     counter = Column(Integer, nullable=False, default=1)
     topic = Column(UnicodeText, nullable=True)
     background = Column(UnicodeText, nullable=True)
@@ -56,17 +56,17 @@ class ChatSession(Base):
     session_id = Column(String(36), primary_key=True)
     counter = Column(Integer, nullable=False)
     expiry_time = Column(DateTime(), nullable=False, default=now)
-    group = Column(Enum(u"silent", u"user", u"mod3", u"mod2", u"mod", u"globalmod", name=u"chat_sessions_group"), nullable=False, default=u"user")
+    group = Column(Enum("silent", "user", "mod3", "mod2", "mod", "globalmod", name="chat_sessions_group"), nullable=False, default="user")
     # XXX UTF-8 ISSUES WITH LENGTH?!
     # XXX also check these lengths
-    character = Column(Unicode(100), nullable=False, default=u"anonymous/other")
-    name = Column(Unicode(100), nullable=False, default=u"Anonymous")
-    acronym = Column(Unicode(15), nullable=False, default=u"")
-    color = Column(Unicode(6), nullable=False, default=u"000000")
-    case = Column(Unicode(35), nullable=False, default=u"normal")
-    replacements = Column(UnicodeText, nullable=False, default=u"[]")
-    quirk_prefix = Column(Unicode(1500), nullable=False, default=u"")
-    quirk_suffix = Column(Unicode(1500), nullable=False, default=u"")
+    character = Column(Unicode(100), nullable=False, default="anonymous/other")
+    name = Column(Unicode(100), nullable=False, default="Anonymous")
+    acronym = Column(Unicode(15), nullable=False, default="")
+    color = Column(Unicode(6), nullable=False, default="000000")
+    case = Column(Unicode(35), nullable=False, default="normal")
+    replacements = Column(UnicodeText, nullable=False, default="[]")
+    quirk_prefix = Column(Unicode(1500), nullable=False, default="")
+    quirk_suffix = Column(Unicode(1500), nullable=False, default="")
 
 class Ban(Base):
     __tablename__ = 'bans'
@@ -87,22 +87,22 @@ class Message(Base):
     timestamp = Column(DateTime(), nullable=False, default=now)
 
     type = Column(Enum(
-        u"message",
-        u"user_change",
-        u"meta_change",
-        u"ic",
-        u"ooc",
-        u"me",
-        name=u"messages_type",
-    ), nullable=False, default=u"ic")
+        "message",
+        "user_change",
+        "meta_change",
+        "ic",
+        "ooc",
+        "me",
+        name="messages_type",
+    ), nullable=False, default="ic")
 
     counter = Column(Integer, nullable=False)
 
-    color = Column(Unicode(6), nullable=False, default=u"000000")
+    color = Column(Unicode(6), nullable=False, default="000000")
 
-    acronym = Column(Unicode(15), nullable=False, default=u"")
+    acronym = Column(Unicode(15), nullable=False, default="")
 
-    name = Column(Unicode(100), nullable=False, default=u"")
+    name = Column(Unicode(100), nullable=False, default="")
 
     text = Column(UnicodeText, nullable=False)
 

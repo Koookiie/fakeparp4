@@ -86,26 +86,9 @@ class Session(object):
         # Fill in missing fields from the characters dict.
         self.character = fill_in_data(self.character)
 
-        # Character encodings are stupid.
-        self.unicodify()
-
         redis.zadd('all-sessions', self.session_id, get_time(DELETE_SESSION_PERIOD))
         if chat is not None:
             redis.zadd('chat-sessions', self.chat+'/'+self.session_id, get_time(DELETE_SESSION_PERIOD))
-
-    def unicodify(self):
-        for key in self.meta.keys():
-            try:
-                self.meta[key] = unicode(self.meta[key], encoding='utf-8')
-            except TypeError:
-                # Don't care if it's already unicode.
-                pass
-        for key in self.character.keys():
-            try:
-                self.character[key] = unicode(self.character[key], encoding='utf-8')
-            except TypeError:
-                # Don't care if it's already unicode.
-                pass
 
     def json_info(self):
         # Unpack the replacement info.
@@ -152,12 +135,12 @@ class Session(object):
         character['quirk_suffix'] = form['quirk_suffix'][:1500]
 
         # Validate case
-        if form['case'] in CASE_OPTIONS.keys():
+        if form['case'] in list(CASE_OPTIONS.keys()):
             character['case'] = form['case']
         else:
             raise ValueError("case")
 
-        replacements = zip(form.getlist('quirk_from'), form.getlist('quirk_to'))
+        replacements = list(zip(form.getlist('quirk_from'), form.getlist('quirk_to')))
         # Strip out any rows where from is blank or the same as to.
         replacements = [_ for _ in replacements if _[0] != '' and _[0] != _[1]]
         # And encode as JSON.
@@ -205,7 +188,6 @@ class Session(object):
                 lambda: self.character
             )
             self.character = fill_in_data(character)
-            self.unicodify()
 
     def set_group(self, group):
         self.meta['group'] = group

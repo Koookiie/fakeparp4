@@ -10,7 +10,7 @@ sql = sm()
 bans = r.zrange("ip-bans", 0, -1, withscores=True)
 ban_reasons = r.hgetall("ban-reasons")
 
-print "%s bans in Redis. %s ban reasons in Redis." % (len(bans), len(ban_reasons))
+print("%s bans in Redis. %s ban reasons in Redis." % (len(bans), len(ban_reasons)))
 
 for ban, expiry in bans:
     date = datetime.datetime.fromtimestamp(int(expiry))
@@ -24,6 +24,6 @@ for ban, expiry in bans:
         expires=date
     ))
     sql.commit()
-    print "Ban for %s in chat %s imported." % (ip, chat)
+    print("Ban for %s in chat %s imported." % (ip, chat))
 
-print "Import complete."
+print("Import complete.")

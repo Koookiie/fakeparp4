@@ -9,6 +9,8 @@ from erigam.lib.characters import CHARACTER_DETAILS
 from erigam.lib.model import sm, Log
 from erigam.lib.request_methods import redis_pool
 
+cache = {}
+
 if __name__ == '__main__':
 
     db = sm()
@@ -30,7 +32,12 @@ if __name__ == '__main__':
 
         for dead in redis.zrangebyscore('chats-alive', 0, get_time()):
             chat, session = dead.split('/', 1)
-            log = db.query(Log).filter(Log.url == chat).scalar()
+
+            if chat not in cache:
+                log = db.query(Log).filter(Log.url == chat).scalar()
+                cache[chat] = log
+            else:
+                log = cache[chat]
 
             if redis.hget('session.'+session+'.meta.'+chat, 'group') == 'silent':
                 disconnect_message = None
@@ -38,16 +45,16 @@ if __name__ == '__main__':
                 session_name = redis.hget('session.'+session+'.chat.'+chat, 'name')
                 if session_name is None:
                     session_name = CHARACTER_DETAILS[redis.hget('session.'+session+'.chat.'+chat, 'character')]['name']
-                disconnect_message = u'{name}\'s connection timed out. Please don\'t quit straight away; they could be back.'.format(
-                    name=session_name.decode("utf8")
+                disconnect_message = '{name}\'s connection timed out. Please don\'t quit straight away; they could be back.'.format(
+                    name=session_name
                 )
 
             if log:
                 disconnect(db, redis, log, session, disconnect_message)
-            print 'dead', dead
+            print('dead', dead)
 
         for dead in redis.zrangebyscore('searchers', 0, get_time()):
-            print 'reaping searcher', dead
+            print('reaping searcher', dead)
             redis.zrem('searchers', dead)
 
         time.sleep(1)

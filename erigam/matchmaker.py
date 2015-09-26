@@ -16,10 +16,10 @@ if 'DEBUG' in os.environ:
     logger.setLevel("DEBUG")
 
 OPTION_LABELS = {
-    'para0': u'script style',
-    'para1': u'paragraph style',
-    'nsfw0': u'safe for work',
-    'nsfw1': u'not safe for work',
+    'para0': 'script style',
+    'para1': 'paragraph style',
+    'nsfw0': 'safe for work',
+    'nsfw1': 'not safe for work',
 }
 
 def check_compatibility(first, second):
@@ -71,12 +71,12 @@ if __name__ == '__main__':
 
                 # Send options message if options are present.
                 if len(selected_options) > 0:
-                    option_text = u', '.join(OPTION_LABELS[_] for _ in selected_options)
+                    option_text = ', '.join(OPTION_LABELS[_] for _ in selected_options)
                     send_message(db, redis, Message(
                         log_id=log.id,
-                        type=u"message",
+                        type="message",
                         counter=-1,
-                        text=u"This is a {option} chat.".format(option=option_text)
+                        text="This is a {option} chat.".format(option=option_text)
                     ))
 
                 matchdata = {

@@ -44,10 +44,6 @@ def chat(chat_url=None):
         # Check if chat exists
         chat_meta = g.redis.hgetall('chat.'+chat_url+'.meta')
 
-        # Convert topic to unicode.
-        if 'topic' in chat_meta.keys():
-            chat_meta['topic'] = unicode(chat_meta['topic'], encoding='utf8')
-
         # Try to load the chat from sql if it doesn't exist in redis.
         if len(chat_meta) == 0 or g.redis.exists("chat."+chat_url+".regen"):
             chat_meta = chatapi.load_chat(g.sql, g.redis, chat_url)
@@ -123,7 +119,7 @@ def manageMods(chat):
         show = ('globalmod', 'mod', 'mod2', 'mod3', 'user')
     else:
         show = ('globalmod', 'mod', 'mod2', 'mod3')
-    for counter, session_id in counters.items():
+    for counter, session_id in list(counters.items()):
         group = g.redis.hget("session."+session_id+".meta."+chat, 'group')
         if group in show:
             data = g.redis.hgetall("session."+session_id+".chat."+chat)

@@ -47,9 +47,9 @@ def archive_chat(redis, sql, chat_url):
     redis_sessions = {}
 
     # Remove duplicate sessions from the list of counters
-    for key, value in redis.hgetall('chat.'+chat_url+'.counters').iteritems():
-        if value in redis_sessions.values():
-            print "Duplicate session found, ignoring"
+    for key, value in redis.hgetall('chat.'+chat_url+'.counters').items():
+        if value in list(redis_sessions.values()):
+            print("Duplicate session found, ignoring")
             continue
         redis_sessions[key] = value
 
@@ -83,13 +83,13 @@ def archive_chat(redis, sql, chat_url):
             try:
                 del redis_sessions[str(sql_session.counter)]
             except KeyError:
-                print "=== SQL session %s does not exist in redis counters list ===" % (sql_session.counter)
+                print("=== SQL session %s does not exist in redis counters list ===" % (sql_session.counter))
     except (UnicodeDecodeError, TypeError, KeyError):
-        print "=== Error encountered. Not updating this existing session."
-        print traceback.print_exc()
-        print "=========================================================="
+        print("=== Error encountered. Not updating this existing session.")
+        print(traceback.print_exc())
+        print("==========================================================")
     # And create the ones which aren't.
-    for counter, session_id in redis_sessions.items():
+    for counter, session_id in list(redis_sessions.items()):
         try:
             redis_session = redis.hgetall('session.'+session_id+'.chat.'+chat_url)
             redis_session_meta = redis.hgetall('session.'+session_id+'.meta.'+chat_url)
@@ -121,22 +121,22 @@ def archive_chat(redis, sql, chat_url):
                 sql.flush()
             except (IntegrityError, FlushError) as e:
                 reason = e.message
-                print "=== Error inside loop: ", reason
+                print("=== Error inside loop: ", reason)
                 sql.rollback()
             except DataError as e:
-                print "=== Unicode error. Removing session %s in chat %s" % (session_id, chat_url)
+                print("=== Unicode error. Removing session %s in chat %s" % (session_id, chat_url))
                 sql.rollback()
                 delete_chat_session(redis, chat_url, session_id)
         except (TypeError, KeyError, UnicodeDecodeError):
-            print "=== Error encountered. Skipping this key."
-            print '-'*60
+            print("=== Error encountered. Skipping this key.")
+            print('-'*60)
             traceback.print_exc(file=sys.stdout)
-            print '-'*60
+            print('-'*60)
         try:
             sql.flush()
         except (IntegrityError, FlushError) as e:
             reason = e.message
-            print "=== Error: ", reason
+            print("=== Error: ", reason)
             sql.rollback()
 
     return log.id

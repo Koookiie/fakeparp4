@@ -39,7 +39,14 @@ $(document).ready(function() {
 	var ORIGINAL_TITLE = document.title;
 	var conversation = $('#conversation');
 
-	var globals = [];
+	// User list
+	var user_data = [];
+	var userlist_online = $('#online');
+	var userlist_idle = $('#idle');
+	var user_list_template = Handlebars.compile($("#user_list_template").html());
+	Handlebars.registerHelper("is_you", function() { return this.meta.counter == user.meta.counter; });
+	Handlebars.registerHelper("admin", function() { return user.meta.group == "admin"; });
+	Handlebars.registerHelper("user_group", function() { return GROUP_DESCRIPTIONS[this.meta.group].shorthand; });
 
 	// Settings
 	var sysnot = 0;
@@ -287,7 +294,10 @@ $(document).ready(function() {
 			msgClass = 'user'+msg.counter;
 		}
 
-		var globalmod = ($.inArray(msg.counter, globals) !== -1 || msg.counter == -2);
+		var globalmod = (
+			(user_data && user_data[msg.counter] && user_data[msg.counter].meta.group == "globalmod") ||
+			msg.counter == -2
+		);
 
 		if (msg.acronym) msg.text = msg.acronym + ": " + msg.text;
 
@@ -337,19 +347,49 @@ $(document).ready(function() {
 			highlightUser = data.highlight;
 			highlightPosts(highlightUser);
 		}
-		if (typeof data.online!=="undefined") {
+		if (typeof data.online !== "undefined") {
 			// Reload user lists.
-			$("#online > li, #idle > li").appendTo(holdingList);
-			generateUserlist(data.online, $('#online')[0]);
-			generateUserlist(data.idle, $('#idle')[0]);
+			generateUserlist(data.online, userlist_online);
+			generateUserlist(data.idle, userlist_idle);
 
 			// Render user actions list
 			if (actionListUser !== null) {
-				var counter = $(actionListUser).data().meta.counter;
+				var counter = $(actionListUser).attr("id").substr(4);
 				var user_li = $("#user"+counter);
+				actionListUser = null;
 				if (user_li.length !== 0) {
-					actionListUser = null;
 					user_li.click();
+				}
+			}
+
+			// Concat both user lists or use the online list if idle undefined.
+			var users = data.idle ? data.online.concat(data.idle) : data.online;
+
+			// Update user data array for actions list.
+			for (var x = 0; x < users.length; x++) {
+				var currentUser = users[x];
+				user_data[currentUser.meta.counter] = currentUser;
+
+				if (currentUser.meta.counter === user.meta.counter) {
+					// Set self-related things here.
+					if (currentUser.meta.group=='silent') {
+						// Just been made silent.
+						$('#textInput, #controls button[type="submit"]').attr('disabled', 'disabled');
+					} else if (user.meta.group=='silent' && currentUser.meta.group!='silent') {
+						// No longer silent.
+						$('input, select, button').removeAttr('disabled');
+					}
+					user.meta.group = currentUser.meta.group;
+					if ($.inArray(user.meta.group, MOD_GROUPS)==-1) {
+						$(document.body).removeClass('modPowers');
+					} else {
+						$(document.body).addClass('modPowers');
+					}
+					if (GROUP_RANKS[user.meta.group] >= GROUP_RANKS.mod) {
+						$(document.body).addClass('pwbPowers');
+					} else {
+						$(document.body).removeClass('pwbPowers');
+					}
 				}
 			}
 		}
@@ -497,65 +537,22 @@ $(document).ready(function() {
 	}
 
 	// User list
-	var holdingList = $("<ul />");
-
 	function generateUserlist(users, listElement) {
-		for (var i=0; i<users.length; i++) {
-			var currentUser = users[i];
-			// Get or create a list item.
-			var listItem = $(holdingList).find('#user'+currentUser.meta.counter);
-			if (listItem.length === 0) {
-				listItem = $('<li />').attr('id', 'user'+currentUser.meta.counter);
-				listItem.click(showActionList);
-			}
-			// Name is a reserved word; this may or may not break stuff but whatever.
-			listItem.css('color', '#'+currentUser.character.color).text(currentUser.character.name);
-			listItem.removeClass().addClass(currentUser.meta.group);
-			if (currentUser.meta.group == 'globalmod'){
-				if ($.inArray(currentUser.meta.counter, globals) === -1 ) {
-					globals.push(currentUser.meta.counter);
-				}
-			}
-			var currentGroup = GROUP_DESCRIPTIONS[currentUser.meta.group];
-			var userTitle = currentGroup.title;
-			if (currentGroup.description !== '') {
-				userTitle += ' - '+GROUP_DESCRIPTIONS[currentUser.meta.group].description;
-			}
-			listItem.attr('title', userTitle);
-			if (currentUser.meta.counter==user.meta.counter) {
-				// Set self-related things here.
-				if (currentUser.meta.group=='silent') {
-					// Just been made silent.
-					$('#textInput, #controls button[type="submit"]').attr('disabled', 'disabled');
-				} else if (user.meta.group=='silent' && currentUser.meta.group!='silent') {
-					// No longer silent.
-					$('input, select, button').removeAttr('disabled');
-				}
-				user.meta.group = currentUser.meta.group;
-				if ($.inArray(user.meta.group, MOD_GROUPS)==-1) {
-					$(document.body).removeClass('modPowers');
-				} else {
-					$(document.body).addClass('modPowers');
-				}
-				if (GROUP_RANKS[user.meta.group] >= GROUP_RANKS.mod) {
-					$(document.body).addClass('pwbPowers');
-				} else {
-					$(document.body).removeClass('pwbPowers');
-				}
-				listItem.addClass('self').append(' (you)');
-			}
-			var userspan = $("<span/>").addClass("userID").text(GROUP_DESCRIPTIONS[currentUser.meta.group].shorthand + " - user" + currentUser.meta.counter);
-			listItem.append(userspan); 
-			listItem.removeData().data(currentUser).appendTo(listElement);
-		}
+		listElement.empty();
+		listElement.append(user_list_template(users));
 	}
+
+	$("#online").on("click", "li.entry", showActionList);
+	$("#idle").on("click", "li.entry", showActionList);
 
 	function showActionList() {
 		$('#actionList').remove();
+
+		var userData = user_data[this.id.substr(4)];
+
 		// Hide if already shown.
 		if (this!=actionListUser) {
 			var actionList = $('<ul />').attr('id', 'actionList');
-			var userData = $(this).data();
 			if (userData.meta.counter==highlightUser) {
 				$('<li />').text('Clear highlight').appendTo(actionList).click(function() { highlightPosts(null); });
 			} else {
@@ -567,7 +564,7 @@ $(document).ready(function() {
 					if (userData.meta.group!=MOD_GROUPS[i] && GROUP_RANKS[user.meta.group]>=GROUP_RANKS[MOD_GROUPS[i]]) {
 						var command = $('<li />').text('Make '+GROUP_DESCRIPTIONS[MOD_GROUPS[i]].title);
 						command.appendTo(actionList);
-						command.data({ group: MOD_GROUPS[i] });
+						command.data({group: MOD_GROUPS[i], counter: userData.meta.counter});
 						command.click(setUserGroup);
 					}
 				}
@@ -594,15 +591,15 @@ $(document).ready(function() {
 	}
 
 	function setUserGroup() {
-		var counter = $(this).parent().parent().data().meta.counter;
+		var counter = $(this).parent().parent().attr('id').substr(4);
 		var group = $(this).data().group;
-		if (counter!=user.meta.counter || confirm('You are about to unmod yourself. Are you sure you want to do this?')) {
+		if (counter != user.meta.counter || confirm('You are about to unmod yourself. Are you sure you want to do this?')) {
 			$.post(POST_URL,{'chat': chat, 'set_group': group, 'counter': counter});
 		}
 	}
 
 	function userAction() {
-		var counter = $(this).parent().parent().data().meta.counter;
+		var counter = $(this).parent().parent().attr('id').substr(4);
 		var action = $(this).data().action;
 		var actionData = {'chat': chat, 'user_action': action, 'counter': counter};
 		if (action=='ip_ban') {

@@ -23,7 +23,7 @@ while True:
                 continue
             change = len(sessions)-len(chat_history[0][chat])
             if change != 0:
-                print chat, change
+                print(chat, change)
             if change >= 8:
                 # Silence all sessions which have entered recently.
                 for session in sessions-chat_history[0][chat]:
@@ -41,7 +41,7 @@ while True:
                     '000000',
                     '',
                 )
-                print 'Spam detected in', chat
-        print
+                print('Spam detected in', chat)
+        print()
         del chat_history[0]
     time.sleep(1)

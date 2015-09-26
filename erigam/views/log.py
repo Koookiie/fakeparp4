@@ -11,7 +11,7 @@ from flask import (
     render_template
 )
 
-from webhelpers import paginate
+import paginate
 from sqlalchemy import and_, func
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -91,7 +91,7 @@ def view_log(chat=None, page=None):
         page=page,
         items_per_page=messages_per_page,
         item_count=message_count,
-        url=lambda page: url_for("log.view_log", chat=chat, page=page)
+        url_maker=lambda page: url_for("log.view_log", chat=chat, page=page)
     )
 
     return render_template('log.html',

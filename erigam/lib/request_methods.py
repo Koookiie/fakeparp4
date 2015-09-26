@@ -13,7 +13,8 @@ from functools import wraps
 redis_pool = ConnectionPool(
     host=os.environ.get('REDIS_PORT_6379_TCP_ADDR', os.environ.get('REDIS_HOST', '127.0.0.1')),
     port=int(os.environ.get('REDIS_PORT_6379_TCP_PORT', os.environ.get('REDIS_PORT', 6379))),
-    db=int(os.environ.get('REDIS_DB', 0))
+    db=int(os.environ.get('REDIS_DB', 0)),
+    decode_responses=True
 )
 
 # Application start
@@ -22,7 +23,7 @@ def populate_all_chars():
     redis = Redis(connection_pool=redis_pool)
     pipe = redis.pipeline()
     pipe.delete('all-chars')
-    pipe.sadd('all-chars', *CHARACTER_DETAILS.keys())
+    pipe.sadd('all-chars', *list(CHARACTER_DETAILS.keys()))
     pipe.execute()
     del pipe
     del redis

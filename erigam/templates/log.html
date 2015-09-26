@@ -6,7 +6,7 @@
 {% block pager %}
 {% if paginator.page_count!=1 %}
 <div class="pager">
-{{paginator.pager(format='~20~')}}
+{{paginator.pager(format='~20~')|safe}}
 </div>
 {% endif %}
 {% endblock %}

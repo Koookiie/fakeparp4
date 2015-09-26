@@ -11,10 +11,10 @@ from sqlalchemy.orm.exc import NoResultFound
 r = redis.Redis(connection_pool=redis_pool)
 sql = sm()
 
-print "%s LogPages in database. %s logs in database." % (
+print("%s LogPages in database. %s logs in database." % (
     sql.query(func.count('*')).select_from(LogPage).scalar(),
     sql.query(func.count('*')).select_from(Log).scalar()
-)
+))
 
 logs = sql.query(Log).order_by(Log.id)
 
@@ -60,25 +60,25 @@ def parse_line(log, line):
 conn = engine.connect()
 
 for log in logs:
-    for number in xrange(log.page_count):
+    for number in range(log.page_count):
         number = number + 1
-        print "[{chat}] Converting page {page}/{total}".format(
+        print("[{chat}] Converting page {page}/{total}".format(
             chat=log.url,
             page=number,
             total=log.page_count
-        )
+        ))
 
         try:
             page = sql.query(LogPage).filter(LogPage.log_id == log.id).filter(LogPage.number == number).one()
         except NoResultFound:
-            print "Page could not be found for page {page} of {chat}".format(
+            print("Page could not be found for page {page} of {chat}".format(
                 page=number,
                 chat=log.url
-            )
+            ))
             continue
 
         if not page.content.strip():
-            print "Chat {chat} is empty.".format(chat=log.url)
+            print("Chat {chat} is empty.".format(chat=log.url))
             continue
 
         try:
@@ -87,16 +87,16 @@ for log in logs:
                 [parse_line(log, line) for line in page.content.split("\n")[0:-1]]
             )
         except IntegrityError as e:
-            print "Encountered exception for chat {chat}: {exception}".format(
+            print("Encountered exception for chat {chat}: {exception}".format(
                 chat=log.url,
                 exception=e
-            )
+            ))
 
-    print "Completed!"
-    print "-"*60
+    print("Completed!")
+    print("-"*60)
 
 
-print "Converting redis based lines"
+print("Converting redis based lines")
 chats = set()
 
 for key in r.keys("chat.*"):
@@ -108,7 +108,7 @@ for x in chats:
     try:
         log = sql.query(Log).filter(Log.url == url).one()
     except NoResultFound:
-        print "Log could not be found for chat {chat}".format(chat=url)
+        print("Log could not be found for chat {chat}".format(chat=url))
         continue
 
     lines = r.lrange("chat."+url, 0, -1)
@@ -117,4 +117,4 @@ for x in chats:
         Message.__table__.insert(),
         [parse_line(log, line) for line in lines]
     )
-    print "Redis lines for chat {chat} converted.".format(chat=url)
+    print("Redis lines for chat {chat} converted.".format(chat=url))

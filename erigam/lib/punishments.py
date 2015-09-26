@@ -203,10 +203,10 @@ def punish(redis, cookie, chat, line):
 
     # Replacements.
     for replacement in replacements:
-        line = line.replace(replacement[0].decode('utf-8', 'ignore'), replacement[1].decode('utf-8', 'ignore'))
+        line = line.replace(replacement[0], replacement[1])
 
     # Prefix
-    line = "[font=Comic Sans MS] [color=#%s] k1nqp4ndA: ◖(◕ω◕)◗ < %s".decode('utf-8', 'ignore') % (color, line)
+    line = "[font=Comic Sans MS] [color=#%s] k1nqp4ndA: ◖(◕ω◕)◗ < %s" % (color, line)
 
     # Redis stuffs.
     datakey = 'session.%s.chat.%s' % (cookie, chat)

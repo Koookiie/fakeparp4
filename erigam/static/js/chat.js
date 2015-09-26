@@ -1,5 +1,4 @@
 $(document).ready(function() {
-
 	var SEARCH_PERIOD = 1;
 	var PING_PERIOD = 10;
 
@@ -73,15 +72,10 @@ $(document).ready(function() {
 			localStorage.setItem(chat+"bgset", 0);
 		}
 
-		if (!localStorage.getItem(chat+"highlightall")) {
-			localStorage.setItem(chat+"highlightall", 0);
-		}
-
 		sysnot = localStorage.getItem(chat+"sysnot");
 		bbset = localStorage.getItem(chat+"bbset");
 		audioset = localStorage.getItem(chat+"audioset");
 		bgset = localStorage.getItem(chat+"bgset");
-		highlightall = localStorage.getItem(chat+"highlightall");
 	} else {
 		$('.system').show();
 		$('.globalann').show();
@@ -187,22 +181,6 @@ $(document).ready(function() {
 		}
 	});
 
-	$('.highlightall').click(function() {
-		if (this.checked) {
-			if (Modernizr.localstorage) {
-				localStorage.setItem(chat+"highlightall", 1);
-			}
-			highlightall = 1;
-			$(".message").css('background-color', "rgba(0, 0, 0, 0.75)");
-		} else {
-			if (Modernizr.localstorage) {
-				localStorage.setItem(chat+"highlightall", 0);
-			}
-			highlightall = 0;
-			$(".message").css('background-color', "");
-		}
-	});
-
 	$('#conversation p').each(function() {
 		var line;
 
@@ -217,9 +195,6 @@ $(document).ready(function() {
 			}
 			$(this).html(line);
 		}
-		if (highlightall == 1) {
-			$(this).css('background-color', "rgba(0, 0, 0, 0.75)");
-		} 
 	});
 
 	if ($('#topic').length !== 0) {
@@ -284,7 +259,7 @@ $(document).ready(function() {
 		conversation.scrollTop(conversation[0].scrollHeight);
 	}
 
-	function addLine(msg){
+	function addLine(msg) {
 		var msgClass;
 		var at_bottom = is_at_bottom();
 
@@ -305,17 +280,11 @@ $(document).ready(function() {
 
 		var mp = $('<p>').addClass(msgClass).addClass("message").attr('title', msgClass).css('color', '#'+msg.color).html(message); //.appendTo('#conversation');
 
-		if (highlightall == 1) {
-			mp.css('background-color', "rgba(0, 0, 0, 0.75)");
-		}
+		// Highlighting
+		if (highlightUser == msg.counter) mp.addClass('highlight');
 
-		if (highlightUser==msg.counter) {
-			mp.addClass('highlight');
-		}
-
-		if (sysnot == 1 && msgClass == 'system') {
-			$('.system').hide();
-		}
+		// Hide system
+		if (sysnot == 1 && msgClass == 'system') $('.system').hide();
 
 		mp.appendTo('#conversation');
 
@@ -441,15 +410,6 @@ $(document).ready(function() {
 				}
 			} else {
 				$("#backgroundAudio").attr('src', '');
-			}
-			
-			// Mod passwords
-			if (user.meta.group == 'mod' || user.meta.group == 'globalmod') {
-				$('#inPass').hide();
-				$('#editPass').show();
-			} else {
-				$('#editPass').hide();
-				$('#inPass').show();
 			}
 		}
 		if (messages.length>0 && typeof hidden!=="undefined" && document[hidden] === true) {
@@ -862,7 +822,7 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#conversation').scrollTop($('#conversation')[0].scrollHeight);
+	conversation.scrollTop(conversation[0].scrollHeight);
 	$("#textInput").focus();
 
 	$(document).on('click', '.spoiler', function() {

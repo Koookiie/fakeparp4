@@ -15,7 +15,7 @@ blueprint = Blueprint('main', __name__)
 # Helper functions
 
 def show_homepage(error):
-    sessions = []
+    public_chats = []
 
     for chat in g.redis.smembers("public-chats"):
         metadata = g.redis.hgetall('chat.'+chat+'.meta')
@@ -37,10 +37,10 @@ def show_homepage(error):
 
         metadata.update(data)
 
-        sessions.append(metadata)
+        public_chats.append(metadata)
 
-    sessions = sorted(sessions, key=lambda k: k['total_online'])
-    sessions = sessions[::-1]
+    public_chats = sorted(public_chats, key=lambda k: k['total_online'])
+    public_chats = public_chats[::-1]
 
     return render_template('frontpage.html',
         error=error,
@@ -52,7 +52,7 @@ def show_homepage(error):
         characters=CHARACTERS,
         users_searching=g.redis.zcard('searchers'),
         users_chatting=g.redis.scard('sessions-chatting'),
-        active_pub=sessions,
+        active_pub=public_chats,
         message=g.redis.get('front_message') or "Blame Nepeat",
     )
 

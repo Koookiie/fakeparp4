@@ -6,6 +6,11 @@ define("erigam", [], function() {
 			require(["erigam/views/chat"], function(app) {
 				app.init(userinfo);
 			});
+		},
+		logpage: function(url) {
+			require(["erigam/views/log"], function(app) {
+				app.init(url);
+			});
 		}
 	};
 });

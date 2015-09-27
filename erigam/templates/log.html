@@ -1,8 +1,9 @@
 {% extends "base.html" %}
-{% block title%}{% endblock %}
+
 {% block header %}
 <link rel="stylesheet" href="/static/css/chat.css?fs">
 {% endblock %}
+
 {% block pager %}
 {% if paginator.page_count!=1 %}
 <div class="pager">
@@ -10,6 +11,7 @@
 </div>
 {% endif %}
 {% endblock %}
+
 {% block content %}
 
 {{ self.pager() }}
@@ -24,27 +26,23 @@
     <h1>{{current_date.strftime("%A %d %B %Y")}}</h1>
 {% set last_date = current_date %}
 {% endif %}
-	{{render_message(message)}}
+	{{macros.render_message(message)}}
 {% endfor %}
 {% else %}
 	<p>There isn't a log for this chat - either it hasn't existed long enough to be archived or I've screwed up the archiving system yet again. Chats are archived after about half an hour, so if you're still seeing this message after that then please send a series of <em>very angry</em> asks to eggyeggegg.tumblr.com.</p>
 {% endif %}
 	<p><a href="/chat/{{chat}}">Continue this chat</a></p>
 </div>
-<script>
-line = bbEncode(linkify($('#archiveConversation').html()));
-$('#archiveConversation').html(line);
-
-$(document).on('click', '.spoiler', function() {
-    if ($(this).css('opacity') == '0') {
-        $(this).css('opacity','1');
-    } else {
-        $(this).css('opacity','0');
-    }
-});
-
-</script>
 
 {{ self.pager() }}
 
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+	require(['erigam'], function(erigam) {
+		erigam.logpage({{chat|tojson|safe}});
+	});
+</script>
 {% endblock %}

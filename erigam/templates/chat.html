@@ -9,7 +9,7 @@
 	<p><a href="/chat/{{chat}}/log" target="_blank">View earlier messages</a></p>
 {% endif %}
 {% for message in messages %}
-	{{render_message(message)}}
+	{{macros.render_message(message)}}
 {% endfor %}
 </div>
 

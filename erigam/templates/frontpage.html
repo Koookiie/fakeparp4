@@ -2,7 +2,6 @@
 {% block header %}
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="/static/css/home.css">
-<script src="/static/js/characters.js?8"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 
 {% if error=="chaturl_taken" or error=="chaturl_invalid" %}
@@ -15,7 +14,6 @@
 </script>
 {% endif %}
 
-<script src="/static/js/home.js?9"></script>
 {% endblock %}
 {% block content %}
 <form id="frontform" method="post" action="{{url_for('main.save')}}" role="form">
@@ -215,4 +213,12 @@
     </div>
 </div>
 </form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+require(['erigam'], function(app) {
+    app.home();
+});
+</script>
 {% endblock %}

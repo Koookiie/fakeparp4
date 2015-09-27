@@ -6,16 +6,17 @@
     body {
         padding-top: 60px;
     }
-</style>
 
-<script>
-    $(document).ready(function(){
-        if (screen.width <= 699) {
-            $("td").css('font-size', '14px');
-            $(".btn").css("padding", "5px");
+    @media (max-width: 700px) {
+        td {
+            font-size: 14px;
         }
-    });
-</script>
+
+        .btn {
+            padding: 5px;
+        }
+    }
+</style>
 
 <div class="container">
     <div class="row">

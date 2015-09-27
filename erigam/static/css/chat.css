@@ -271,16 +271,23 @@ body.mobile.withSidebar #conversation, body.mobile.withSidebar #controls {
 	border-radius: 5px;
 }
 
-.spoil {
-	border: dashed;
-	border-width: 1px;
-	padding-left: 2px;
-	padding-right: 2px;
+.spoiler {
+	position: relative;
+	padding: 0 2px;
+	border: 1px dashed #ccc;
+	cursor: pointer;
 }
 
-.spoiler{
-	opacity: 0;
-	cursor: pointer;
+.spoiler input {
+	display: none;
+}
+
+.spoiler input + span + span, .spoiler input:checked + span {
+	display: none;
+}
+
+.spoiler input:checked + span + span {
+	display: inline;
 }
 
 .userID {

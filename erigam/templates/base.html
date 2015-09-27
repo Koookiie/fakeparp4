@@ -1,14 +1,3 @@
-{% macro render_message(message) -%}
-    {% if message.counter== -1 %}
-        {% set class = "system" %}
-    {% elif message.counter== -2 %}
-        {% set class = "system_important" %}
-    {% else %}
-        {% set class = "user" ~ message.counter %}
-    {% endif %}
-
-    <p class="{{class}} message" title="{{class}}" style="color: #{{message.color}}">{% if message.acronym %}{{message.acronym}}: {% endif %}{{message.text}}</p>
-{%- endmacro %}
 <!DOCTYPE html>
 <html>
     <head>
@@ -60,3 +49,15 @@
         {% block scripts %}{% endblock %}
     </body>
 </html>
+
+{% macro render_message(message) -%}
+    {% if message.counter== -1 %}
+        {% set class = "system" %}
+    {% elif message.counter== -2 %}
+        {% set class = "system_important" %}
+    {% else %}
+        {% set class = "user" ~ message.counter %}
+    {% endif %}
+
+    <p class="{{class}} message" title="{{class}}" style="color: #{{message.color}}">{% if message.acronym %}{{message.acronym}}: {% endif %}{{message.text}}</p>
+{%- endmacro %}

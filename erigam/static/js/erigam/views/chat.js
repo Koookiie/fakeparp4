@@ -1,4 +1,15 @@
-define("erigam/views/chat", ['jquery', 'erigam/helpers', 'erigam/quirks', 'erigam/bbcode', 'erigam/characters', 'erigam/tts'], function($, helpers, quirks, bbcode) {
+define("erigam/views/chat", [
+		'jquery',
+		'erigam/helpers',
+		'erigam/quirks',
+		'erigam/bbcode',
+		'erigam/characters',
+		'erigam/tts'
+	], function(
+		$,
+		helpers,
+		quirks,
+		bbcode) {
 	"use strict";
 
 	var user, chat, chat_meta, latestNum, log_id;
@@ -41,17 +52,6 @@ define("erigam/views/chat", ['jquery', 'erigam/helpers', 'erigam/quirks', 'eriga
 
 	var ORIGINAL_TITLE = document.title;
 	var conversation = $('#conversation');
-
-	// User list
-	var user_data = [];
-	var userlist_online = $('#online');
-	var userlist_idle = $('#idle');
-	var user_list_template;
-	require(['handlebars'], function(Handlebars) {
-		Handlebars.registerHelper("is_you", function() { return this.meta.counter == user.meta.counter; });
-		Handlebars.registerHelper("admin", function() { return user.meta.group == "admin"; });
-		Handlebars.registerHelper("user_group", function() { return GROUP_DESCRIPTIONS[this.meta.group].shorthand; });
-	});
 
 	// Settings
 	var sysnot = 0;
@@ -184,11 +184,11 @@ define("erigam/views/chat", ['jquery', 'erigam/helpers', 'erigam/quirks', 'eriga
 		$('#conversation p').each(function() {
 			var line;
 			if (bbcodeon == 1) {
-				line = bbcode.encode($(this).html());
+				line = bbcode.raw_encode($(this).html());
 				$(this).html(line);
 			} else {
 				line = bbcode.remove($(this).html());
-				$(this).text(line);
+				$(this).html(line);
 			}
 		});
 
@@ -196,11 +196,11 @@ define("erigam/views/chat", ['jquery', 'erigam/helpers', 'erigam/quirks', 'eriga
 			var text;
 
 			if (bbcodeon == 1) {
-				text = bbcode.encode(helpers.html_encode($('#topic').html()));
+				text = bbcode.encode($('#topic').html());
 				$('#topic').html(text);
 			} else {
 				text = bbcode.remove($('#topic').html());
-				$('#topic').text(text);
+				$('#topic').html(text);
 			}
 		}
 	}
@@ -294,7 +294,7 @@ define("erigam/views/chat", ['jquery', 'erigam/helpers', 'erigam/quirks', 'eriga
 		if (msg.acronym) msg.text = msg.acronym + ": " + msg.text;
 
 		if (bbcodeon == 1 || globalmod) {
-			message = bbcode.encode(helpers.html_encode(msg.text), globalmod);
+			message = bbcode.encode(msg.text, globalmod);
 		} else {
 			message = bbcode.remove(msg.text);
 		}
@@ -414,7 +414,7 @@ define("erigam/views/chat", ['jquery', 'erigam/helpers', 'erigam/quirks', 'eriga
 
 			// Topic
 			if (typeof data.meta.topic!=='undefined') {
-				$('#topic').html(bbcode.encode(helpers.html_encode(data.meta.topic)));
+				$('#topic').html(bbcode.encode(data.meta.topic));
 			} else {
 				$('#topic').text('');
 			}
@@ -504,6 +504,17 @@ define("erigam/views/chat", ['jquery', 'erigam/helpers', 'erigam/quirks', 'eriga
 	}
 
 	// User list
+	var user_data = [];
+	var userlist_online = $('#online');
+	var userlist_idle = $('#idle');
+	var user_list_template;
+
+	require(['handlebars'], function(Handlebars) {
+		Handlebars.registerHelper("is_you", function() { return this.meta.counter == user.meta.counter; });
+		Handlebars.registerHelper("admin", function() { return user.meta.group == "admin"; });
+		Handlebars.registerHelper("user_group", function() { return GROUP_DESCRIPTIONS[this.meta.group].shorthand; });
+	});
+
 	function generateUserlist(users, listElement) {
 		listElement.empty();
 		require(['handlebars'], function(Handlebars) {

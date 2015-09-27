@@ -1,10 +1,13 @@
-define("erigam/bbcode", ['jquery'], function($) {
+define("erigam/bbcode", ['jquery', 'erigam/helpers'], function($, helpers) {
 	"use strict";
 
 	var tag_properties = {bgcolor: "background-color", color: "color", font: "font-family", bshadow: "box-shadow", tshadow: "text-shadow"};
 
 	return {
 		encode: function(text, admin) {
+			return this.raw_encode(helpers.html_encode(text), admin);
+		},
+		raw_encode: function(text, admin) {
 			var self = this;
 
 			text = text.replace(/(\[br\])+/g, "<br>");

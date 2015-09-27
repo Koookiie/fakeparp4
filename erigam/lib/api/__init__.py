@@ -8,8 +8,8 @@ def join(sql, redis, log, session):
     if sql.query(Ban).filter(Ban.url == log.url).filter(Ban.ip == session.ip).scalar() is not None:
         abort(403)
 
-    # Otherwise make sure it's in the archive queue.
-    elif redis.zscore('archive-queue', log.url) is None:
+    # Make sure it's in the archive queue.
+    if redis.zscore('archive-queue', log.url) is None:
         redis.zadd('archive-queue', log.url, get_time(ARCHIVE_PERIOD))
 
     # Set user state.

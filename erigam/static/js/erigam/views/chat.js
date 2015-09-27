@@ -1,4 +1,4 @@
-define("erigam/chat", ['jquery', 'erigam/helpers', 'erigam/quirks', 'erigam/bbcode', 'erigam/characters', 'erigam/tts'], function($, helpers, quirks, bbcode) {
+define("erigam/views/chat", ['jquery', 'erigam/helpers', 'erigam/quirks', 'erigam/bbcode', 'erigam/characters', 'erigam/tts'], function($, helpers, quirks, bbcode) {
 	"use strict";
 
 	var user, chat, chat_meta, latestNum, log_id;

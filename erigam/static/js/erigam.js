@@ -3,7 +3,7 @@ define("erigam", [], function() {
 
 	return {
 		chat: function(userinfo) {
-			require(["erigam/chat"], function(app) {
+			require(["erigam/views/chat"], function(app) {
 				app.init(userinfo);
 			});
 		}

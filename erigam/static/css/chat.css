@@ -5,7 +5,14 @@ body {
 	background-color: #cccccc;
 	background-attachment: fixed;
 	word-wrap: break-word;
+    background-image: none;
+    /*main one: http://i.imgur.com/1gA5miD.jpg*/
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    word-wrap: break-word;
 }
+
 
 body, button, input, select, optgroup, option {
 	font-family: "Courier", monospace;

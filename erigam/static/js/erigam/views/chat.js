@@ -301,6 +301,10 @@ define("erigam/views/chat", ['jquery', 'erigam/helpers', 'erigam/quirks', 'eriga
 
 		var mp = $('<p>').addClass(msgClass).addClass("message").attr('title', msgClass).css('color', '#'+msg.color).html(message); //.appendTo('#conversation');
 
+		// Timestamp
+		var date = new Date(msg.timestamp * 1000)
+		$("<span>").addClass("timestamp").text(date.toLocaleTimeString()).appendTo(mp);
+
 		// Highlighting
 		if (highlightUser == msg.counter) mp.addClass('highlight');
 

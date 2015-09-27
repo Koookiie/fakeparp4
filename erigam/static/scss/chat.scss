@@ -1,3 +1,5 @@
+@import 'fonts';
+
 /* General */
 
 body {
@@ -5,12 +7,12 @@ body {
 	background-color: #cccccc;
 	background-attachment: fixed;
 	word-wrap: break-word;
-    background-image: none;
-    /*main one: http://i.imgur.com/1gA5miD.jpg*/
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    word-wrap: break-word;
+	background-image: none;
+	/*main one: http://i.imgur.com/1gA5miD.jpg*/
+	background-size: 100% 100%;
+	background-repeat: no-repeat;
+	background-position: center;
+	word-wrap: break-word;
 }
 
 body, button, input, select, optgroup, option {
@@ -20,14 +22,20 @@ body, button, input, select, optgroup, option {
 }
 
 a {
-    text-decoration: none;
+	text-decoration: none;
+
+	&:link, &:visited, &:active {
+		text-decoration: none;
+	}
+
+	&:hover {
+		text-decoration: underline;
+	}
 }
 
-a:hover, a:link, a:visited, a:active, {text-decoration: none}
-a:hover {text-decoration: underline}
 
 h1 {
-	font-size: 14pt;
+	font-size: 1.25rem;
 	word-wrap: break-word;
 }
 
@@ -75,11 +83,11 @@ input {
 optgroup {
 	color: #666666;
 	font-style: normal;
-}
 
-optgroup option {
-	color: #000000;
-	padding: 0 10px;
+	option {
+		color: #000000;
+		padding: 0 10px;
+	}
 }
 
 input:focus, input:hover, select:focus, select:hover, button:hover, .aButton:hover {
@@ -104,16 +112,16 @@ button:hover, .aButton:hover {
 	left: 5px;
 	overflow: auto;
 	padding: 2px 0;
-}
 
-#conversation.search {
-	background-image: url('/static/img/throbber-big.gif');
-	background-repeat: no-repeat;
-	background-position: center;
-}
+	&.search {
+		background-image: url('/static/img/throbber-big.gif');
+		background-repeat: no-repeat;
+		background-position: center;
+	}
 
-body.withSidebar #conversation {
-	right: 230px;
+	body.withSidebar & {
+		right: 230px;
+	}
 }
 
 .sidebar {
@@ -124,24 +132,32 @@ body.withSidebar #conversation {
 	bottom: 5px;
 	width: 218px;
 	overflow: auto;
-}
 
-.sidebar .close {
-	display: none;
+	.close {
+		display: none;
+	}
+
+	ul {
+		margin: 0;
+		padding: 0 0 0 2em;
+	}
+
+	ul ul {
+		color: #000;
+	}
+
+	ul li {
+		padding: 2px 0;
+	}
 }
 
 #topic {
 	padding: 0 5px 5px;
 	word-wrap: break-word;
-}
 
-#topic:empty {
-	display: none;
-}
-
-.sidebar ul {
-	margin: 0;
-	padding: 0 0 0 2em;
+	&:empty {
+		display: none;
+	}
 }
 
 #online:empty:after, #idle:empty:after {
@@ -152,16 +168,8 @@ body.withSidebar #conversation {
 	font-style: italic;
 }
 
-.sidebar ul li {
-	padding: 2px 0;
-}
-
 #online li, #idle li {
 	cursor: pointer;
-}
-
-.sidebar ul ul {
-	color: #000;
 }
 
 #controls {
@@ -248,40 +256,6 @@ label {
 #metaOptions input {
 	vertical-align: middle;
 	margin: 0 0 0 2px;
-}
-
-
-/* Mobile */
-
-body.mobile .sidebar {
-	left: 5px;
-	width: auto;
-}
-
-body.mobile .sidebar .close {
-	display: block;
-	margin: 5px;
-	float: right;
-}
-
-body.mobile #conversation {
-	right: 5px !important;
-}
-
-body.mobile #controls {
-	right: 8px !important;
-}
-
-body.mobile #userListButton {
-	display: inline;
-}
-
-body.mobile.withSidebar #conversation, body.mobile.withSidebar #controls {
-	display: none;
-}
-
-body.mobile #conversation, body.mobile #userList, body.mobile #settings {
-    -webkit-overflow-scrolling: touch;
 }
 
 /* BBCode */
@@ -397,10 +371,10 @@ body.mobile #conversation, body.mobile #userList, body.mobile #settings {
 #archiveConversation {
 	margin: 5px 0;
 	padding: 2px 0;
-}
 
-#archiveConversation h1 {
-	margin: 5px;
+	h1 {
+		margin: 5px;
+	}
 }
 
 .pager {
@@ -409,10 +383,53 @@ body.mobile #conversation, body.mobile #userList, body.mobile #settings {
 
 .timestamp {
 	display: none;
+
+	p:hover > & {
+		display: block;
+		float: right;
+		color: #666;
+	}
 }
 
-p:hover .timestamp {
-	display: block;
-	float: right;
-	color: #666;
+/* Mobile */
+
+body.mobile {
+	body, button, input, select, optgroup, option {
+		font-size: 6px;
+	}
+
+	.sidebar {
+		left: 5px;
+		width: auto;
+	}
+
+	.sidebar .close {
+		display: block;
+		margin: 5px;
+		float: right;
+	}
+
+	#conversation {
+		right: 5px !important;
+	}
+
+	#controls {
+		right: 8px !important;
+	}
+
+	#userListButton {
+		display: inline;
+	}
+
+	.withSidebar #conversation, .withSidebar #controls {
+		display: none;
+	}
+
+	#conversation, #userList, #settings {
+		-webkit-overflow-scrolling: touch;
+	}
+
+	#userList, #settings {
+		background-color: rgba(238, 238, 238, 1);
+	}
 }

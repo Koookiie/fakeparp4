@@ -1,3 +1,5 @@
+import json
+
 from flask import (
     Blueprint,
     request,
@@ -67,19 +69,26 @@ def chat(chat_url=None):
 
         latest_num = messages[-1].id if len(messages) > 0 else 0
 
+    user_info = {
+        "user": g.user.json_info(),
+        "chat": chat_url,
+        "chat_meta": chat_meta,
+        "latest_num": latest_num,
+        "log_id": log.id or None
+    }
+
     return render_template(
         'chat.html',
         user=g.user,
-        character_dict=g.user.json_info(),
         case_options=CASE_OPTIONS,
         groups=CHARACTER_GROUPS,
         characters=CHARACTERS,
         chat=chat_url,
         chat_meta=chat_meta,
         messages=messages,
-        latest_num=latest_num,
-        legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat_url),
-        log=log
+        character_dict=g.user.json_info(),
+        user_info=json.dumps(user_info),
+        legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat_url)
     )
 
 @blueprint.route('/<chat>/unban', methods=['GET', 'POST'])

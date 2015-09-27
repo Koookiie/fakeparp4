@@ -22,13 +22,6 @@
         <link rel="stylesheet" href="/static/css/mobile.css" media="only screen and (max-height : 400px)" type="text/css"/>
         <link rel="stylesheet" href="/static/css/font.css?2" type="text/css"/>
         <script src="/static/js/jquery.min.js?1"></script>
-        {% if legacy_bbcode %}
-        <script src="/static/js/legacy_bbcode.js?1"></script>
-        {% else %}
-        <script src="/static/js/bbcode.js?1"></script>
-        {% endif %}
-        <script src="/static/js/modernizr.localstorage.js?1"></script>
-        <script src="/static/js/quirks.js?3"></script>
         <script src="/static/js/rptc.js?2"></script>
 
         <script>
@@ -49,6 +42,23 @@
     </head>
 
     <body>
-        {%block content%}{% endblock %}
+        {% block content %}{% endblock %}
+
+        <!-- Scripts -->
+        {% if legacy_bbcode %}
+        <script>window.legacy_bbcode = true;</script>
+        {% endif %}
+        {% if config.DEBUG %}
+        <!-- Debug mode is active. -->
+        <script src="/static/vendor/requirejs/require.js?1"></script>
+        <script src="/static/js/config.js?1"></script>
+        <script>
+                require.config({urlArgs: "debug=" + (new Date()).getTime()});
+                window.debug = true;
+        </script>
+        {% else %}
+        <script src="/static/js/app.min.js?1"></script>
+        {% endif %}
+        {% block scripts %}{% endblock %}
     </body>
 </html>

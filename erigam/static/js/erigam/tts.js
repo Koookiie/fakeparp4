@@ -1,4 +1,4 @@
-$(document).ready(function() {
+define("erigam/tts", ['jquery', 'erigam/helpers'], function($, helpers) {
 	if('speechSynthesis' in window) {
 		var speechUtteranceChunker = function (utt, settings, callback) {
 			settings = settings || {};
@@ -47,7 +47,7 @@ $(document).ready(function() {
 
 	$('#conversation').bind('DOMNodeInserted DOMNodeRemoved DOMSubTreeModified', function(event) {
 		// Disable TTS if there is no localstorage
-		if (!Modernizr.localstorage) return;
+		if (!helpers.check_localstorage()) return;
 
 		if (localStorage.getItem("tts") == 'undefined' || localStorage.getItem("tts") === null) {
 			localStorage.setItem("tts", 0);

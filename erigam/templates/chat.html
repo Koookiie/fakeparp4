@@ -2,7 +2,6 @@
 {% block title%}{% endblock %}
 {% block header %}
 <link rel="stylesheet" href="/static/css/chat.css?3">
-<link rel="stylesheet" media="screen" type="text/css" href="/static/colorpicker/css/colorpicker.css"/>
 {% endblock %}
 {% block content %}
 <div id="conversation">
@@ -86,12 +85,12 @@
 	<br />
 	<h1>Options</h1>
 	<div class="stoptions">
-		<label><input type="checkbox" class="ttsset" name="ttsset" checked><span class="labeling ttsset"> Enable Moonbase Alpha Mode</span></label>
-		<label><input type="checkbox" class="sysnot" name="sysnot"><span class="labeling sysnota"> Hide System Notifications</span></label>
-		<label><input type="checkbox" class="bbset" name="bbset"><span class="labeling bbseta"> Disable BBCode (refresh required)</span></label>
-		<label><input type="checkbox" class="audioset" name="audioset"><span class="labeling audioseta"> Enable Audio</span></label>
-		<label><input type="checkbox" class="bgset" name="bgset"><span class="labeling bgseta"> Enable Backgrounds</span></label>
-		<label><input type="checkbox" class="highlightall" name="highlightall"><span class="labeling highlightalla"> Highlight All</span></label>
+		<label><input type="checkbox" class="ttsset" name="ttsset" checked><span> Enable Moonbase Alpha Mode</span></label>
+		<label><input type="checkbox" class="sysnot" name="sysnot"><span> Hide System Notifications</span></label>
+		<label><input type="checkbox" class="bbcodeon" name="bbcodeon"><span> Enable BBCode (refresh required)</span></label>
+		<label><input type="checkbox" class="audioset" name="audioset"><span> Enable Audio</span></label>
+		<label><input type="checkbox" class="bgset" name="bgset"><span> Enable Backgrounds</span></label>
+		<label><input type="checkbox" class="highlightall" name="highlightall"><span> Highlight All</span></label>
 			</div>
 		</div>
 	</div>
@@ -126,18 +125,12 @@
 </script>
 {% endraw %}
 
-<script type="text/javascript">
-	var user = {{character_dict|tojson|safe}};
-	var chat = {{(chat)|tojson|safe}};
-	var chat_meta = {{chat_meta|tojson|safe}};
-	var latestNum = {{latest_num}};
-	var log_id = {% if log %}{{log.id}}{% else %}null{% endif %};
+{% endblock %}
+
+{% block scripts %}
+<script>
+	require(['erigam'], function(erigam) {
+		erigam.chat({{user_info|safe}});
+	});
 </script>
-
-<script src="/static/js/handlebars-v4.0.2.js?1"></script>
-<script type="text/javascript" src="/static/colorpicker/js/colorpicker.js"></script>
-<script src="/static/js/characters.js?2"></script>
-<script src="/static/js/chat.js?18"></script>
-<script src="/static/js/tts.js?2"></script>
-
 {% endblock %}

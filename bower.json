@@ -1,0 +1,19 @@
+{
+  "name": "erigam",
+  "version": "0.0.0",
+  "homepage": "https://github.com/nepeat/erigam",
+  "authors": [
+    "nepeat <nepeat@users.noreply.github.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "requirejs": "~2.1.20",
+    "almond": "~0.3.1",
+    "handlebars": "~4.0.3"
+  }
+}

@@ -35,7 +35,8 @@ module.exports = function(grunt) {
 		sass: {
 			dist: {
 				files: {
-					'build/home.css': 'erigam/static/scss/home.scss'
+					'build/home.css': 'erigam/static/scss/home.scss',
+					'build/chat.css': 'erigam/static/scss/chat.scss'
 				}
 			}
 		},
@@ -45,6 +46,9 @@ module.exports = function(grunt) {
 					'erigam/static/css/home.min.css': [
 						'erigam/static/vendor/bootstrap/dist/css/bootstrap.min.css',
 						'build/home.css'
+					],
+					'erigam/static/css/chat.min.css': [
+						'build/chat.css'
 					]
 				}
 			}

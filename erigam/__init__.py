@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 
 from erigam.lib.request_methods import (
@@ -38,6 +40,9 @@ app.jinja_env.lstrip_blocks = True
 
 # Throw tracebacks to console
 app.config['PROPAGATE_EXCEPTIONS'] = True
+
+if 'DEBUG' in os.environ:
+    app.config['DEBUG'] = True
 
 # Register Blueprints
 app.register_blueprint(main.blueprint)

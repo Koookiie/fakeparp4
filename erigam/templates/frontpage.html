@@ -1,23 +1,9 @@
 {% extends "base.html" %}
+
 {% block header %}
-
-{% if config['DEBUG'] %}
-<!-- Debug mode active. -->
-<link rel="stylesheet" href="/static/vendor/bootstrap/dist/css/bootstrap.min.css">
-<link rel="stylesheet" href="/static/css/home.css">
-{% endif %}
-
-{% if error=="chaturl_taken" or error=="chaturl_invalid" %}
-<script>
-    group_chat_error = 1;
-</script>
-{% else %}
-<script>
-    group_chat_error = 0;
-</script>
-{% endif %}
-
+<link rel="stylesheet" href="/static/css/home.min.css">
 {% endblock %}
+
 {% block content %}
 <form id="frontform" method="post" action="{{url_for('main.save')}}" role="form">
 <noscript>
@@ -94,8 +80,8 @@
                     <!-- Color -->
                     <div class="form-group">
                         <label>Color: </label>
-                        <input id="color_input" type="color" size="7" maxlength="6" value="#{{g.user.character['color']}}"/>
-                        <input class="form-control" id="color_input_hex" type="text" size="7" maxlength="6" name="color" value="{{g.user.character['color']}}"/>
+                        <input type="color" id="color_input" size="7" maxlength="6" value="#{{g.user.character['color']}}"/>
+                        <input type="text" id="color_input_hex" class="form-control" size="7" maxlength="6" name="color" value="{{g.user.character['color']}}"/>
                     </div>
 
                     <!-- Quirks -->
@@ -220,6 +206,16 @@
 {% endblock %}
 
 {% block scripts %}
+{% if error=="chaturl_taken" or error=="chaturl_invalid" %}
+<script>
+    group_chat_error = 1;
+</script>
+{% else %}
+<script>
+    group_chat_error = 0;
+</script>
+{% endif %}
+
 <script>
 require(['erigam'], function(erigam) {
     erigam.home();

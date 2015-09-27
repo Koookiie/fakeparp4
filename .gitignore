@@ -16,3 +16,4 @@ env3/
 *.bak
 vendor/
 node_modules/
+.sass-cache/

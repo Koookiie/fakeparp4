@@ -21,17 +21,40 @@ module.exports = function(grunt) {
 					'!erigam/static/js/app.min.js'
 				],
 				tasks: ['requirejs']
+			},
+			css: {
+				files: ['erigam/static/scss/**/*.scss'],
+				tasks: ['sass', 'cssmin']
 			}
 		},
 		requirejs: {
 			compile: {
 				options: rjsconfig
 			}
+		},
+		sass: {
+			dist: {
+				files: {
+					'build/home.css': 'erigam/static/scss/home.scss'
+				}
+			}
+		},
+		cssmin: {
+			target: {
+				files: {
+					'erigam/static/css/home.min.css': [
+						'erigam/static/vendor/bootstrap/dist/css/bootstrap.min.css',
+						'build/home.css'
+					]
+				}
+			}
 		}
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-sass');
+	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-requirejs');
 
-	grunt.registerTask('default', ['requirejs']);
+	grunt.registerTask('default', ['requirejs', 'sass', 'cssmin']);
 };

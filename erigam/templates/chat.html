@@ -132,7 +132,7 @@
 {% block scripts %}
 <script>
 	require(['erigam'], function(erigam) {
-		erigam.chat({{user_info|safe}});
+		erigam.chat({{user_info|tojson|safe}});
 	});
 </script>
 {% endblock %}

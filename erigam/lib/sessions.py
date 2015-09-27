@@ -44,35 +44,19 @@ class Session(object):
 
         self.redis = redis
         self.session_id = session_id or str(uuid4())
-        self.chat = chat
         self.globalmod = redis.sismember('global-mods', self.session_id)
         self.ip = request.headers.get('X-Forwarded-For', request.remote_addr)
 
-        original_prefix = 'session.'+self.session_id
-        original_meta_prefix = original_prefix+'.meta'
+        self.original_prefix = 'session.'+self.session_id
+        self.original_meta_prefix = self.original_prefix+'.meta'
 
         # Load metadata and character data.
         if chat is not None:
-            self.prefix = original_prefix+'.chat.'+chat
-            self.meta_prefix = original_meta_prefix+'.'+chat
-            self.meta = get_or_create(
-                redis,
-                self.meta_prefix,
-                lambda: new_chat_metadata(redis, chat, session_id)
-            )
-            self.character = get_or_create(
-                redis,
-                self.prefix,
-                lambda: get_or_create(
-                    redis,
-                    original_prefix,
-                    lambda: CHARACTER_DEFAULTS
-                )
-            )
+            self.set_chat(chat)
         else:
-            self.prefix = original_prefix
-            self.meta_prefix = original_meta_prefix
-            self.meta = get_or_create(redis, original_meta_prefix, lambda: META_DEFAULTS)
+            self.prefix = self.original_prefix
+            self.meta_prefix = self.original_meta_prefix
+            self.meta = get_or_create(redis, self.original_meta_prefix, lambda: META_DEFAULTS)
             self.character = get_or_create(
                 redis,
                 self.prefix,
@@ -125,8 +109,7 @@ class Session(object):
             raise ValueError("color")
 
         # Validate character
-        # XXX Get all-chars from CHARACTER_DEFAULTS.keys()?
-        if form['character'] in self.redis.smembers('all-chars'):
+        if form['character'].lower() in CHARACTER_DETAILS.keys():
             character['character'] = form['character']
         else:
             raise ValueError("character")
@@ -175,19 +158,19 @@ class Session(object):
         if self.chat is None:
             # XXX This is pretty much just cut and pasted from __init__().
             self.chat = chat
-            self.prefix = self.prefix+'.chat.'+chat
-            self.meta_prefix = self.meta_prefix+'.'+chat
+            self.prefix = self.original_prefix+'.chat.'+chat
+            self.meta_prefix = self.original_meta_prefix+'.'+chat
             self.meta = get_or_create(
                 self.redis,
                 self.meta_prefix,
                 lambda: new_chat_metadata(self.redis, chat, self.session_id)
             )
-            character = get_or_create(
+            self.character = get_or_create(
                 self.redis,
-                self.prefix,
-                lambda: self.character
+                self.original_prefix,
+                lambda: CHARACTER_DEFAULTS
             )
-            self.character = fill_in_data(character)
+            self.character = fill_in_data(self.character)
 
     def set_group(self, group):
         self.meta['group'] = group

@@ -4,7 +4,6 @@ from redis import ConnectionPool, Redis
 
 from erigam.lib import validate_chat_url, session_validator
 from erigam.lib.archive import get_or_create_log
-from erigam.lib.characters import CHARACTER_DETAILS
 from erigam.lib.model import sm
 from erigam.lib.sessions import Session
 from functools import wraps
@@ -16,17 +15,6 @@ redis_pool = ConnectionPool(
     db=int(os.environ.get('REDIS_DB', 0)),
     decode_responses=True
 )
-
-# Application start
-
-def populate_all_chars():
-    redis = Redis(connection_pool=redis_pool)
-    pipe = redis.pipeline()
-    pipe.delete('all-chars')
-    pipe.sadd('all-chars', *list(CHARACTER_DETAILS.keys()))
-    pipe.execute()
-    del pipe
-    del redis
 
 # Before request
 

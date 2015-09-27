@@ -1,4 +1,6 @@
 define("erigam/tts", ['jquery', 'erigam/helpers'], function($, helpers) {
+	"use strict";
+
 	if('speechSynthesis' in window) {
 		var speechUtteranceChunker = function (utt, settings, callback) {
 			settings = settings || {};

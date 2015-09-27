@@ -1,4 +1,6 @@
 define("erigam/bbcode", ['jquery'], function($) {
+	"use strict";
+
 	var tag_properties = {bgcolor: "background-color", color: "color", font: "font-family", bshadow: "box-shadow", tshadow: "text-shadow"};
 
 	return {

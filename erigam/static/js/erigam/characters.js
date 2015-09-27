@@ -1,4 +1,6 @@
 define("erigam/characters", ['jquery'], function($) {
+	"use strict";
+
 	var characterKeys = ['acronym', 'name', 'color', 'quirk_suffix', 'quirk_prefix', 'case'];
 
 	var characters = {

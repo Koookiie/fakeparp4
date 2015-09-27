@@ -347,8 +347,9 @@ define("erigam/views/chat", ['jquery', 'erigam/helpers', 'erigam/quirks', 'eriga
 		}
 
 		if (typeof data.highlight !== "undefined") {
-			highlightPosts(highlightUser);
+			highlightPosts(data.highlight);
 		}
+
 		if (typeof data.online !== "undefined") {
 			// Reload user lists.
 			generateUserlist(data.online, userlist_online);
@@ -813,14 +814,6 @@ define("erigam/views/chat", ['jquery', 'erigam/helpers', 'erigam/quirks', 'eriga
 	$(window).unload(function() {
 		if (chatState=='chat') {
 			$.ajax(QUIT_URL, {'type': 'POST', data: {'chat': chat}, 'async': false});
-		}
-	});
-
-	$(document).on('click', '.spoiler', function() {
-		if ($(this).css('opacity') == '0') {
-			$(this).css('opacity','1');
-		} else {
-			$(this).css('opacity','0');
 		}
 	});
 

@@ -1,15 +1,11 @@
-function getURLParameter(name) {
-	return decodeURI(
-		(RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
-	);
-}
+define("erigam/views/home", ['jquery', 'erigam/characters', 'bootstrap'], function($, characters) {
+	function getURLParameter(name) {
+		return decodeURI(
+			(RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+		);
+	}
 
-$(document).ready(function() {
-
-	// jQuery :focus selector? 
-	jQuery.expr[':'].focus = function( elem ) {
-		return elem === document.activeElement && ( elem.type || elem.href );
-	};
+	var text_preview_container = $('#color-preview');
 
 	// You need cookies to use this site.
 	if (document.cookie === "") {
@@ -25,12 +21,13 @@ $(document).ready(function() {
 
 	// Supposed to update the bottom preview box
 	function updatePreview() {
-		// Color + Acronym
-		$('#color-preview').css('color', '#'+config.find('input[name="color"]').val());
+		// Acronym
+
 		var acronym = config.find('input[name="acronym"]').val();
 		$('#color-preview #acronym').text(acronym+(acronym.length>0?': ':''));
 
 		// Text
+
 		var name = $("select.character-select").val();
 		config.find('#color-preview #quote').text(characters[name].quote);
 		if (name=="kankri") {
@@ -38,10 +35,12 @@ $(document).ready(function() {
 				config.find('#color-preview #quote').text(reply);
 			});
 		}
+
+		// Color
+		update_color(color_hex_input.val());
 	}
 
 	config.find('input').change(updatePreview).keyup(updatePreview);
-	updatePreview();
 
 	$('.menuopt').click(function(e) {
 		e.preventDefault();
@@ -78,4 +77,26 @@ $(document).ready(function() {
 		$('#'+getURLParameter('m')).click();
 	}
 
+	// Color and color_hex
+	var color_input = $("#color_input").change(function() {
+		update_color(this.value.substr(1));
+	});
+
+	var color_hex_input = $("#color_input_hex").keyup(function() {
+		if (this.value.length == 6) {
+			update_color(this.value);
+		}
+	});
+
+	function update_color(color) {
+		color_input.val("#" + color);
+		color_hex_input.val(color);
+		text_preview_container.css("color", "#" + color);
+	}
+
+	return {
+		init: function() {
+			updatePreview();
+		}
+	};
 });

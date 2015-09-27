@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 {% block header %}
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+{% if config['DEBUG'] %}
+<!-- Debug mode active. -->
+<link rel="stylesheet" href="/static/vendor/bootstrap/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="/static/css/home.css">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+{% endif %}
 
 {% if error=="chaturl_taken" or error=="chaturl_invalid" %}
 <script>
@@ -91,7 +94,8 @@
                     <!-- Color -->
                     <div class="form-group">
                         <label>Color: </label>
-                        <input class="form-control" id="coln" type="text" size="7" maxlength="6" name="color" value="{{g.user.character['color']}}"/>
+                        <input id="color_input" type="color" size="7" maxlength="6" value="#{{g.user.character['color']}}"/>
+                        <input class="form-control" id="color_input_hex" type="text" size="7" maxlength="6" name="color" value="{{g.user.character['color']}}"/>
                     </div>
 
                     <!-- Quirks -->
@@ -217,8 +221,8 @@
 
 {% block scripts %}
 <script>
-require(['erigam'], function(app) {
-    app.home();
+require(['erigam'], function(erigam) {
+    erigam.home();
 });
 </script>
 {% endblock %}

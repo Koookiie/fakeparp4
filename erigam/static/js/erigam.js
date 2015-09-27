@@ -11,6 +11,11 @@ define("erigam", [], function() {
 			require(["erigam/views/log"], function(app) {
 				app.init(url);
 			});
+		},
+		home: function() {
+			require(["erigam/views/home"], function(app) {
+				app.init();
+			})
 		}
 	};
 });

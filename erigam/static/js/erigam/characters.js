@@ -825,7 +825,7 @@ define("erigam/characters", ['jquery'], function($) {
 	}
 
 	function addReplacement(e, from, to) {
-		newItem = $('<li><input class="form-control quirks" type="text" name="quirk_from" size="4"> to <input class="form-control quirks" type="text" name="quirk_to" size="4"> <a href="#" class="btn btn-danger deleteReplacement">Remove</a></li>');
+		var newItem = $('<li><input class="form-control quirks" type="text" name="quirk_from" size="4"> to <input class="form-control quirks" type="text" name="quirk_to" size="4"> <a href="#" class="btn btn-danger deleteReplacement">Remove</a></li>');
 		if (from && to) {
 			var inputs = $(newItem).find('input');
 			inputs[0].value = from;
@@ -848,12 +848,12 @@ define("erigam/characters", ['jquery'], function($) {
 	$('select[name="character"]').change(function() {
 		if (characters[this.value]) {
 			var newCharacter = characters[this.value];
-			for (i=0; i<characterKeys.length; i++) {
+			for (var i=0; i<characterKeys.length; i++) {
 				$('input[name="'+characterKeys[i]+'"], select[name="'+characterKeys[i]+'"]').val(newCharacter[characterKeys[i]]);
 			}
 			clearReplacements(null);
 			if (newCharacter.replacements.length>0) {
-				for (i=0; i<newCharacter.replacements.length; i++) {
+				for (var i=0; i<newCharacter.replacements.length; i++) {
 					addReplacement(null, newCharacter.replacements[i][0], newCharacter.replacements[i][1]);
 				}
 			} else {
@@ -861,4 +861,6 @@ define("erigam/characters", ['jquery'], function($) {
 			}
 		}
 	});
+
+	return characters;
 });

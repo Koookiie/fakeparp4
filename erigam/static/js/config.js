@@ -3,6 +3,11 @@ requirejs.config({
 	paths: {
 		'jquery': '../vendor/jquery/dist/jquery.min',
 		'handlebars': '../vendor/handlebars/handlebars.amd',
+		'bootstrap': '../vendor/bootstrap/dist/js/bootstrap.min'
 	},
-	shim: {}
+	shim: {
+		bootstrap: {
+			deps: ['jquery']
+		}
+	}
 });

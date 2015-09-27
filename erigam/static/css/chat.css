@@ -13,6 +13,10 @@ body, button, input, select, optgroup, option {
 	font-weight: bold;
 }
 
+a {
+    text-decoration: none;
+}
+
 a:hover, a:link, a:visited, a:active, {text-decoration: none}
 a:hover {text-decoration: underline}
 
@@ -210,6 +214,11 @@ body.settings #settings, body.userList #userList {
 	display: block;
 }
 
+label {
+	display: block;
+	margin: 5px 0;
+}
+
 /* User groups */
 
 .globalmod {
@@ -265,7 +274,12 @@ body.mobile.withSidebar #conversation, body.mobile.withSidebar #controls {
 	display: none;
 }
 
+body.mobile #conversation, body.mobile #userList, body.mobile #settings {
+    -webkit-overflow-scrolling: touch;
+}
+
 /* BBCode */
+
 .padded {
 	padding: 5px;
 	border-radius: 5px;
@@ -303,7 +317,6 @@ body.mobile.withSidebar #conversation, body.mobile.withSidebar #controls {
 /* Online / Idle Status  */
 
 .sidebar h1 {
-	padding: 0 0.5em;
 	margin: 5px;
 }
 

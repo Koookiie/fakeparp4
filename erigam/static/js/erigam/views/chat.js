@@ -3,15 +3,13 @@ define("erigam/views/chat", [
 		'erigam/helpers',
 		'erigam/quirks',
 		'erigam/bbcode',
-		'erigam/search',
 		'erigam/characters',
 		'erigam/tts'
 	], function(
 		$,
 		helpers,
 		quirks,
-		bbcode,
-		search
+		bbcode
 	) {
 	"use strict";
 
@@ -823,10 +821,12 @@ define("erigam/views/chat", [
 			log_id = userinfo.log_id;
 
 			if (chat === null) {
-				search.start(function(searchinfo) {
-					chat = searchinfo.chat;
-					log_id = searchinfo.log_id;
-					startChat();
+				require(['erigam/search'], function(search) {
+					search.start(function(searchinfo) {
+						chat = searchinfo.chat;
+						log_id = searchinfo.log_id;
+						startChat();
+					});
 				});
 			} else {
 				startChat();

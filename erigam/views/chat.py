@@ -74,7 +74,7 @@ def chat(chat_url=None):
         "chat": chat_url,
         "chat_meta": chat_meta,
         "latest_num": latest_num,
-        "log_id": log.id or None
+        "log_id": log.id if log else None
     }
 
     return render_template(

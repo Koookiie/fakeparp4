@@ -43,6 +43,7 @@ class Session(object):
     def __init__(self, redis, session_id=None, chat=None):
 
         self.redis = redis
+        self.chat = None
         self.session_id = session_id or str(uuid4())
         self.globalmod = redis.sismember('global-mods', self.session_id)
         self.ip = request.headers.get('X-Forwarded-For', request.remote_addr)
@@ -155,22 +156,20 @@ class Session(object):
                 self.redis.hdel(option_key, option)
 
     def set_chat(self, chat):
-        if self.chat is None:
-            # XXX This is pretty much just cut and pasted from __init__().
-            self.chat = chat
-            self.prefix = self.original_prefix+'.chat.'+chat
-            self.meta_prefix = self.original_meta_prefix+'.'+chat
-            self.meta = get_or_create(
-                self.redis,
-                self.meta_prefix,
-                lambda: new_chat_metadata(self.redis, chat, self.session_id)
-            )
-            self.character = get_or_create(
-                self.redis,
-                self.original_prefix,
-                lambda: CHARACTER_DEFAULTS
-            )
-            self.character = fill_in_data(self.character)
+        self.chat = chat
+        self.prefix = self.original_prefix+'.chat.'+chat
+        self.meta_prefix = self.original_meta_prefix+'.'+chat
+        self.meta = get_or_create(
+            self.redis,
+            self.meta_prefix,
+            lambda: new_chat_metadata(self.redis, chat, self.session_id)
+        )
+        self.character = get_or_create(
+            self.redis,
+            self.original_prefix,
+            lambda: CHARACTER_DEFAULTS
+        )
+        self.character = fill_in_data(self.character)
 
     def set_group(self, group):
         self.meta['group'] = group

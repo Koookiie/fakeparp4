@@ -225,7 +225,10 @@ define("erigam/views/chat", [
 		}
 	}
 
-	function startChat() {
+	function startChat(data) {
+		chat = data.chat;
+		log_id = data.log_id;
+
 		chatState = 'chat';
 		document.title = 'Chat - '+ORIGINAL_TITLE;
 		$('#preview').css('color', '#'+user.character.color);
@@ -815,21 +818,15 @@ define("erigam/views/chat", [
 	return {
 		init: function(userinfo) {
 			user = userinfo.user;
-			chat = userinfo.chat;
 			chat_meta = userinfo.chat_meta;
 			latestNum = userinfo.latest_num;
-			log_id = userinfo.log_id;
 
-			if (chat === null) {
+			if (userinfo.chat === null) {
 				require(['erigam/search'], function(search) {
-					search.start(function(searchinfo) {
-						chat = searchinfo.chat;
-						log_id = searchinfo.log_id;
-						startChat();
-					});
+					search.start(startChat);
 				});
 			} else {
-				startChat();
+				startChat(userinfo);
 			}
 
 			$('#textInput').change(updateChatPreview).keyup(updateChatPreview).change();

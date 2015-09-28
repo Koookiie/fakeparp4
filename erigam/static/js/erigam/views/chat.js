@@ -811,6 +811,8 @@ define("erigam/views/chat", [
 		}
 	});
 
+	// ;)
+
 	if (Math.floor(Math.random()*413) === 0) {
 		$("body > *").css("transform", "rotate(180deg)");
 	}

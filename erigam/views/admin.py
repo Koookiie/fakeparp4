@@ -103,7 +103,7 @@ def admin_allbans():
 
 @blueprint.route('/allchats')
 @require_admin
-def show_allchats():
+def all_chats():
     pipe = g.redis.pipeline()
     sessions = []
     chats = set()

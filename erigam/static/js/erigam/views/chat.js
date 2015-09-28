@@ -3,22 +3,22 @@ define("erigam/views/chat", [
 		'erigam/helpers',
 		'erigam/quirks',
 		'erigam/bbcode',
+		'erigam/search',
 		'erigam/characters',
 		'erigam/tts'
 	], function(
 		$,
 		helpers,
 		quirks,
-		bbcode) {
+		bbcode,
+		search
+	) {
 	"use strict";
 
 	var user, chat, chat_meta, latestNum, log_id;
 
-	var SEARCH_PERIOD = 1;
 	var PING_PERIOD = 10;
 
-	var SEARCH_URL = "/search";
-	var SEARCH_QUIT_URL = "/stop_search";
 	var POST_URL = "/chat_ajax/post";
 	var FLAG_URL = "/chat_ajax/flag";
 	var PING_URL = "/chat_ajax/ping";
@@ -225,34 +225,6 @@ define("erigam/views/chat", [
 		} else {
 			$("#backgroundAudio").attr('src', '');
 		}
-	}
-
-	// Search
-
-	var searching;
-
-	function runSearch() {
-		document.title = 'Searching - '+ORIGINAL_TITLE;
-		conversation.addClass('search');
-		searching = true;
-
-		$.post(SEARCH_URL, {}, function(data) {
-			chat = data.chat;
-			log_id = data.log;
-			searching = false;
-			if (typeof window.history.replaceState != "undefined") {
-				window.history.replaceState('', '', '/chat/'+chat);
-				startChat();
-			} else {
-				window.location.replace(chaturl);
-			}
-		}).always(function() {
-			if (searching === true) {
-				window.setTimeout(runSearch, 1000);
-			} else {
-				conversation.removeClass('search');
-			}
-		});
 	}
 
 	function startChat() {
@@ -851,9 +823,10 @@ define("erigam/views/chat", [
 			log_id = userinfo.log_id;
 
 			if (chat === null) {
-				runSearch();
-				$(window).unload(function() {
-					if (searching) $.ajax(SEARCH_QUIT_URL, { "type": "POST", "async": false });
+				search.start(function(searchinfo) {
+					chat = searchinfo.chat;
+					log_id = searchinfo.log_id;
+					startChat();
 				});
 			} else {
 				startChat();

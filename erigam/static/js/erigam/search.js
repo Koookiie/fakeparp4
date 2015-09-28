@@ -1,4 +1,6 @@
 define("erigam/search", ['jquery'], function($) {
+	"use strict";
+
 	var ORIGINAL_TITLE = document.title;
 	var SEARCH_URL = "/search";
 	var SEARCH_QUIT_URL = "/stop_search";

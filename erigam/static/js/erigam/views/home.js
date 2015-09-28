@@ -1,4 +1,6 @@
 define("erigam/views/home", ['jquery', 'erigam/characters', 'bootstrap'], function($, characters) {
+	"use strict";
+
 	function getURLParameter(name) {
 		return decodeURI(
 			(RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]

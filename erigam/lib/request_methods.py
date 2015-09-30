@@ -1,5 +1,5 @@
 import os
-from flask import g, request, abort
+from flask import g, request, abort, current_app
 from redis import ConnectionPool, Redis
 
 from erigam.lib import validate_chat_url, session_validator
@@ -124,3 +124,27 @@ def disconnect_redis(response=None):
 
     del g.redis
     return response
+
+file_hashes = {}
+
+def cache_breaker(endpoint, values):
+    if 'static' == endpoint or endpoint.endswith('.static'):
+        filename = values.get('filename')
+        if filename:
+            if '.' in endpoint:  # has higher priority
+                blueprint = endpoint.rsplit('.', 1)[0]
+            else:
+                blueprint = request.blueprint  # can be None too
+
+            if blueprint:
+                static_folder = current_app.blueprints[blueprint].static_folder or current_app.static_folder
+            else:
+                static_folder = current_app.static_folder
+
+            values['q'] = static_file_hash(os.path.join(static_folder, filename))
+
+def static_file_hash(filename):
+    if filename not in file_hashes:
+        file_hashes[filename] = int(os.stat(filename).st_mtime)
+
+    return file_hashes[filename]

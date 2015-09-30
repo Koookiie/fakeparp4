@@ -44,7 +44,7 @@ if __name__ == '__main__':
             else:
                 session_name = redis.hget('session.'+session+'.chat.'+chat, 'name')
                 if session_name is None:
-                    session_name = CHARACTER_DETAILS[redis.hget('session.'+session+'.chat.'+chat, 'character')]['name']
+                    session_name = CHARACTER_DETAILS[redis.hget('session.'+session+'.chat.'+chat, 'character') or 'anonymous/other']['name']
                 disconnect_message = '{name}\'s connection timed out. Please don\'t quit straight away; they could be back.'.format(
                     name=session_name
                 )

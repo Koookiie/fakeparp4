@@ -166,7 +166,7 @@ class Session(object):
         )
         self.character = get_or_create(
             self.redis,
-            self.original_prefix,
+            self.prefix,
             lambda: CHARACTER_DEFAULTS
         )
         self.character = fill_in_data(self.character)
@@ -201,7 +201,8 @@ def fill_in_data(character_data):
         character_data['character'] = 'anonymous/other'
 
     if len(character_data) < len(CHARACTER_DETAILS[character_data['character']])+1:
-        new_character_data = dict(CHARACTER_DETAILS[character_data['character']])
+        new_character_data = CHARACTER_DETAILS[character_data['character']]
         new_character_data.update(character_data)
         return new_character_data
+
     return character_data

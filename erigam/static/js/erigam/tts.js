@@ -1,4 +1,4 @@
-define("erigam/tts", ['jquery', 'erigam/helpers'], function($, helpers) {
+define("erigam/tts", ['jquery', 'erigam/helpers', 'erigam/settings'], function($, helpers, settings) {
 	"use strict";
 
 	if('speechSynthesis' in window) {
@@ -48,21 +48,16 @@ define("erigam/tts", ['jquery', 'erigam/helpers'], function($, helpers) {
 	}
 
 	$('#conversation').bind('DOMNodeInserted DOMNodeRemoved DOMSubTreeModified', function(event) {
-		// Disable TTS if there is no localstorage
+		// Disable TTS if there is no localstorage or is unchecked.
 		if (!helpers.check_localstorage()) return;
-
-		if (localStorage.getItem("tts") == 'undefined' || localStorage.getItem("tts") === null) {
-			localStorage.setItem("tts", 0);
-		}
-
-		if (localStorage.getItem("tts") === "0") return;
+		if (!settings.get("tts")) return;
 
 		if (event.target.nodeName != "P") {
 			console.log($('#conversation > p:last-child').text());
 			return;
 		}
 
-		var text = $('#conversation > p:last-child').text();
+		var text = $(event.target).find('.text').text();
 		text = text.substring(text.indexOf(":") + 1);
 
 		var utterance = new SpeechSynthesisUtterance(text);
@@ -77,16 +72,7 @@ define("erigam/tts", ['jquery', 'erigam/helpers'], function($, helpers) {
 
 	});
 
-	$(".ttsset").click(function(){
-		if (this.checked) {
-			localStorage.setItem("tts", 1);
-		} else {
-			localStorage.setItem("tts", 0);
-		}
+	$(".ttsset").click(function() {
+		var x = this.checked ? settings.set("tts", 1) : settings.set("tts", 0);
 	});
-
-	var init = function() {
-		var state = localStorage.getItem("tts") == "1" ? true : false;
-		$("input.ttsset").prop("checked", state);
-	}();
 });

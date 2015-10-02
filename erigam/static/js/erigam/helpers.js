@@ -43,6 +43,34 @@ define("erigam/helpers", ['jquery'], function($) {
 		},
 		get_visibilitychange: function() {
 			return visibility_change;
+		},
+		update_meta: function() {
+			var self = this;
+
+			require(['erigam/settings'], function(settings) {
+				var background = settings.get("background", true);
+				var audio = settings.get("audio", true);
+
+				if (settings.get('bgset') && background) {
+					$("#conversation, #userList, #settings").css("background-color", "rgba(238, 238, 238, 0.5)");
+					$("body").css('background-image', 'url("' + background + '")' );
+				} else {
+					$("#conversation, #userList, #settings").css("background-color", "rgb(238, 238, 238)");
+					$("body").css('background-image', 'none');
+				}
+
+				if (settings.get('audioset') && audio) {
+					// Only update the element if the URL has changed, otherwise it restarts it.
+					if (audio != $("#backgroundAudio").attr('src')) {
+						$("#backgroundAudio").attr('src', audio);
+					}
+					if (self.get_hidden()) {
+						$("#backgroundAudio")[0].pause();
+					}
+				} else {
+					$("#backgroundAudio").attr('src', '');
+				}
+			});
 		}
 	};
 });

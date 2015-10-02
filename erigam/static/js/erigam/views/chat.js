@@ -3,13 +3,17 @@ define("erigam/views/chat", [
 		'erigam/helpers',
 		'erigam/quirks',
 		'erigam/bbcode',
+		'erigam/messages',
+		'erigam/settings',
 		'erigam/characters',
 		'erigam/tts'
 	], function(
 		$,
 		helpers,
 		quirks,
-		bbcode
+		bbcode,
+		messages,
+		settings
 	) {
 	"use strict";
 
@@ -18,12 +22,10 @@ define("erigam/views/chat", [
 	var PING_PERIOD = 10;
 
 	var POST_URL = "/chat_ajax/post";
-	var FLAG_URL = "/chat_ajax/flag";
 	var PING_URL = "/chat_ajax/ping";
 	var MESSAGES_URL = "/chat_ajax/messages";
 	var SAVE_URL = "/chat_ajax/save";
 	var QUIT_URL = "/chat_ajax/quit";
-	var STATE_URL = "/chat_ajax/state";
 
 	var CHAT_FLAGS = ['autosilence', 'public', 'nsfw'];
 
@@ -40,190 +42,13 @@ define("erigam/views/chat", [
 
 	var pingInterval;
 	var chatState;
-	var userState = 'online';
 	var newState;
 	var currentSidebar;
-	var previewHidden = false;
 
 	var actionListUser = null;
-	var highlightUser;
 
 	var ORIGINAL_TITLE = document.title;
 	var conversation = $('#conversation');
-
-	// Settings
-	var sysnot = 0;
-	var audioset, bgset, highlightall = 0;
-	var bbcodeon = 1;
-	var audio, background;
-
-	function load_settings() {
-		if (helpers.check_localstorage()) {
-			$(".stoptions").show();
-
-			if (!localStorage.getItem(chat+"sysnot")) {
-				localStorage.setItem(chat+"sysnot", sysnot);
-			}
-
-			if (!localStorage.getItem(chat+"bbcodeon")) {
-				localStorage.setItem(chat+"bbcodeon", bbcodeon);
-			}
-
-			if (!localStorage.getItem(chat+"audioset")) {
-				localStorage.setItem(chat+"audioset", audioset);
-			}
-
-			if (!localStorage.getItem(chat+"bgset")) {
-				localStorage.setItem(chat+"bgset", bgset);
-			}
-
-			sysnot = localStorage.getItem(chat+"sysnot");
-			bbcodeon = localStorage.getItem(chat+"bbcodeon");
-			audioset = localStorage.getItem(chat+"audioset");
-			bgset = localStorage.getItem(chat+"bgset");
-		} else {
-			$('.system').show();
-			$('.globalann').show();
-		}
-
-		if (sysnot == 1) {
-			$('.sysnot').attr('checked','checked');
-			$('.system').hide();
-			$('.globalann').hide();
-		}
-
-		if (bbcodeon == 1) {
-			$('.bbcodeon').attr('checked','checked');
-		} else {
-			$('.bbcodeon').removeAttr('checked');
-		}
-
-		if (audioset == 1) {
-			$('.audioset').attr('checked','checked');
-		} else {
-			$('.audioset').removeAttr('checked');
-		}
-
-		if (bgset == 1) {
-			$('.bgset').attr('checked','checked');
-		} else {
-			$('.bgset').removeAttr('checked');
-		}
-
-		if (highlightall == 1) {
-			$('.highlightall').attr('checked','checked');
-		} else {
-			$('.highlightall').removeAttr('checked');
-		}
-
-		// Toggles
-		$('.sysnot').click(function() {
-			if (this.checked) {
-				if (helpers.check_localstorage()) {
-					localStorage.setItem(chat+"sysnot",1);
-				}
-				sysnot = 1;
-				$('.system').hide();
-				$('.globalann').hide();
-			} else {
-				if (helpers.check_localstorage()) {
-					localStorage.setItem(chat+"sysnot",0);
-				}
-				sysnot = 0;
-				$('.system').show();
-				$('.globalann').show();
-				conversation.scrollTop(conversation[0].scrollHeight);
-			}
-		});
-
-		$('.bbcodeon').click(function() {
-			if (this.checked) {
-				if (helpers.check_localstorage()) {
-					localStorage.setItem(chat+"bbcodeon",1);
-				}
-				bbcodeon = 1;
-			} else {
-				if (helpers.check_localstorage()) {
-					localStorage.setItem(chat+"bbcodeon",0);
-				}
-				bbcodeon = 0;
-			}
-		});
-
-		$('.audioset').click(function() {
-			if (this.checked) {
-				if (helpers.check_localstorage()) {
-					localStorage.setItem(chat+"audioset",1);
-				}
-				audioset = 1;
-				$("#backgroundAudio").attr('src', audio);
-			} else {
-				if (helpers.check_localstorage()) {
-					localStorage.setItem(chat+"audioset",0);
-				}
-				audioset = 0;
-				$("#backgroundAudio").attr('src', '');
-			}
-		});
-
-		$('.bgset').click(function() {
-			if (this.checked) {
-				if (helpers.check_localstorage()) localStorage.setItem(chat+"bgset", 1);
-				bgset = 1;
-				update_meta();
-			} else {
-				if (helpers.check_localstorage()) localStorage.setItem(chat+"bgset",0);
-				bgset = 0;
-				update_meta();
-			}
-		});
-	
-
-		$('#conversation p').each(function() {
-			var line;
-			if (bbcodeon == 1) {
-				line = bbcode.raw_encode($(this).html());
-				$(this).html(line);
-			} else {
-				line = bbcode.remove($(this).html());
-				$(this).html(line);
-			}
-		});
-
-		if ($('#topic').length !== 0) {
-			var text;
-
-			if (bbcodeon == 1) {
-				text = bbcode.encode($('#topic').html());
-				$('#topic').html(text);
-			} else {
-				text = bbcode.remove($('#topic').html());
-				$('#topic').html(text);
-			}
-		}
-	}
-
-	function update_meta() {
-		if (bgset == 1 && background) {
-			$("#conversation, #userList, #settings").css("background-color", "rgba(238, 238, 238, 0.5)");
-			$("body").css('background-image', 'url("' + background + '")' );
-		} else {
-			$("#conversation, #userList, #settings").css("background-color", "rgb(238, 238, 238)");
-			$("body").css('background-image', 'none');
-		}
-
-		if (audioset == 1 && audio) {
-			// Only update the element if the URL has changed, otherwise it restarts it.
-			if (audio != $("#backgroundAudio").attr('src')) {
-				$("#backgroundAudio").attr('src', audio);
-			}
-			if (helpers.get_hidden()) {
-				$("#backgroundAudio")[0].pause();
-			}
-		} else {
-			$("#backgroundAudio").attr('src', '');
-		}
-	}
 
 	function startChat(data) {
 		chat = data.chat;
@@ -234,69 +59,21 @@ define("erigam/views/chat", [
 		$('#preview').css('color', '#'+user.character.color);
 		closeSettings();
 		getMessages(true);
-		load_settings();
+		settings.load(chat, function() {
+			require(['erigam/buttons'], function(buttons) {
+				buttons.init_chat();
+			});
+		});
 		pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
-		scroll_to_bottom();
-	}
-
-	function is_at_bottom() {
-		var current_scroll = conversation.scrollTop() + conversation.height();
-		var max_scroll = conversation[0].scrollHeight;
-		return max_scroll - current_scroll < 30;
-	}
-
-	function scroll_to_bottom() {
-		conversation.scrollTop(conversation[0].scrollHeight);
-	}
-
-	function addLine(msg) {
-		var msgClass;
-		var message;
-		var at_bottom = is_at_bottom();
-		var globalmod = (
-			(user_data && user_data[msg.counter] && user_data[msg.counter].meta.group == "globalmod") ||
-			msg.counter == -2
-		);
-
-		if (msg.counter == -1) {
-			msgClass = 'system';
-		} else {
-			msgClass = 'user'+msg.counter;
-		}
-
-		if (msg.acronym) msg.text = msg.acronym + ": " + msg.text;
-
-		if (bbcodeon == 1 || globalmod) {
-			message = bbcode.encode(msg.text, globalmod);
-		} else {
-			message = bbcode.remove(msg.text);
-		}
-
-		var mp = $('<p>').addClass(msgClass).addClass("message").attr('title', msgClass).css('color', '#'+msg.color).html(message); //.appendTo('#conversation');
-
-		// Timestamp
-		var date = new Date(msg.timestamp * 1000)
-		$("<span>").addClass("timestamp").text(date.toLocaleTimeString()).appendTo(mp);
-
-		// Highlighting
-		if (highlightUser == msg.counter) mp.addClass('highlight');
-
-		// Hide system
-		if (sysnot == 1 && msgClass == 'system') $('.system').hide();
-
-		mp.appendTo('#conversation');
-
-		if (at_bottom) scroll_to_bottom();
-
-		return mp;
+		messages.scroll_bottom();
 	}
 
 	function handleMessages(data) {
 		if (typeof data.exit!=='undefined') {
 			if (data.exit=='kick') {
 				clearChat();
-				addLine({ counter: -1, color: '000000', text: 'You have been kicked from this chat. Please think long and hard about your behaviour before rejoining.' });
-				scroll_to_bottom();
+				messages.add({ counter: -1, color: '000000', text: 'You have been kicked from this chat. Please think long and hard about your behaviour before rejoining.' });
+				messages.scroll_bottom();
 			} else if (data.exit=='ban') {
 				window.location.replace(document.location.origin + "/chat/theoubliette");
 			}
@@ -306,7 +83,7 @@ define("erigam/views/chat", [
 		// Messagse
 		if (typeof data.messages !== "undefined") {
 			for (var i=0; i<data.messages.length; i++) {
-				addLine(data.messages[i]);
+				messages.add(data.messages[i]);
 				latestNum = Math.max(latestNum, data.messages[i].id);
 			}
 
@@ -393,9 +170,9 @@ define("erigam/views/chat", [
 			}
 
 			// Background / Audio meta
-			background = data.meta.background;
-			audio = data.meta.audio;
-			update_meta();
+			settings.set("background", data.meta.background);
+			settings.set("audio", data.meta.audio);
+			helpers.update_meta();
 		}
 
 		if (typeof data.lol!=="undefined") {
@@ -412,7 +189,7 @@ define("erigam/views/chat", [
 				getMessages();
 			} else {
 				$('#save').appendTo(conversation);
-				scroll_to_bottom();
+				messages.scroll_bottom();
 			}
 		}).fail(function() {
 			if (chatState=='chat') window.setTimeout(getMessages, 2000);
@@ -510,7 +287,7 @@ define("erigam/views/chat", [
 		// Hide if already shown.
 		if (this != actionListUser) {
 			var actionList = $('<ul />').attr('id', 'actionList');
-			if (userData.meta.counter==highlightUser) {
+			if (userData.meta.counter == settings.get("highlight", true)) {
 				$('<li />').text('Clear highlight').appendTo(actionList).click(function() { highlightPosts(null); });
 			} else {
 				$('<li />').text('Highlight posts').appendTo(actionList).click(function() { highlightPosts(userData.meta.counter); });
@@ -575,12 +352,12 @@ define("erigam/views/chat", [
 	function ipLookup() {
 		var counter = $(this).parent().parent().data().meta.counter;
 		$.post("/chat_ajax/ip_lookup", { 'chat': chat, 'counter': counter, }, function(ip) {
-			addLine({counter: "-1", color: "000000", text: "[SYSTEM] user" +counter+ "'s IP: " + ip});
+			messages.add({counter: "-1", color: "000000", text: "[SYSTEM] user" +counter+ "'s IP: " + ip});
 		});
 	}
 
 	function highlightPosts(counter) {
-		if (counter != highlightUser) {
+		if (counter != settings.get("highlight", true)) {
 			$.post("/chat_ajax/highlight", {chat: chat, counter: counter});
 		}
 
@@ -588,7 +365,7 @@ define("erigam/views/chat", [
 		if (counter !== null) {
 			$('.user'+counter).addClass('highlight');
 		}
-		highlightUser = counter;
+		settings.set("highlight", counter);
 	}
 
 	// Event listeners
@@ -618,15 +395,15 @@ define("erigam/views/chat", [
 	}
 
 	$('#hidePreview').click(function() {
-		if (previewHidden) {
-			$('#preview').show();
+		var preview = $("#preview");
+		if (!preview.is(":visible")) {
+			preview.show();
 			$(this).text("[hide]");
 		} else {
-			$('#preview').hide();
+			preview.hide();
 			$(this).text("[show]");
 		}
 		$('#conversation').css('bottom',($('#controls').height()+10)+'px');
-		previewHidden = !previewHidden;
 		return false;
 	});
 
@@ -652,7 +429,7 @@ define("erigam/views/chat", [
 
 	function sendMessage(line, callback) {
 		$.post(POST_URL, {'chat': chat, 'line': line}).fail(function() {
-			addLine({counter: -1, color: 'ff0000', text: 'Message has failed to send. Retrying in three seconds.' });
+			messages.add({counter: -1, color: 'ff0000', text: 'Message has failed to send. Retrying in three seconds.' });
 			// Retry after a second if message send fails
 			setTimeout(function() {
 				sendMessage(line, callback);
@@ -674,17 +451,6 @@ define("erigam/views/chat", [
 			updateChatPreview();
 		}
 		return false;
-	});
-
-	$('#idleButton').click(function() {
-		if (userState=='idle') {
-			newState = 'online';
-		} else {
-			newState = 'idle';
-		}
-		$.post(STATE_URL, {'chat': chat, 'state': newState}, function(data) {
-			userState = newState;
-		});
 	});
 
 	$('#settingsButton').click(function() {
@@ -728,22 +494,6 @@ define("erigam/views/chat", [
 
 	$('#settingsCancelButton').click(function() {
 		closeSettings();
-	});
-
-	/* Autosilence, NSFW, Publicity buttons */
-
-	$('.metatog').click(function() {
-		var data = {'chat': chat};
-		// Convert to integer then string.
-		if ($(this).hasClass("active")) {
-			data[this.id] = '0';
-			$(this).removeClass('active');
-		} else {
-			data[this.id] = '1';
-			$(this).addClass('active');
-		}
-
-		$.post(FLAG_URL, data);
 	});
 
 	/* Meta buttons */

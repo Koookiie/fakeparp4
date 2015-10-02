@@ -7,7 +7,7 @@ chardet==2.3.0
 Flask==0.10.1
 gevent==1.1b5
 greenlet==0.4.9
--e git+https://github.com/benoitc/gunicorn.git
+-e git+https://github.com/benoitc/gunicorn.git#egg=gunicorn
 hiredis==0.2.0
 itsdangerous==0.24
 Jinja2==2.8

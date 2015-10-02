@@ -1,4 +1,6 @@
 define("erigam/buttons", ['jquery', 'erigam/settings', 'erigam/bbcode'], function($, settings, bbcode) {
+	"use strict";
+
 	var STATE_URL = "/chat_ajax/state";
 	var FLAG_URL = "/chat_ajax/flag";
 

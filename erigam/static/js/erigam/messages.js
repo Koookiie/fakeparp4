@@ -1,4 +1,6 @@
 define("erigam/messages", ['jquery', 'erigam/settings', 'erigam/bbcode'], function($, settings, bbcode) {
+	"use strict";
+
 	var conversation = $('#conversation');
 
 	return {

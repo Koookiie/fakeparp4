@@ -6,5 +6,8 @@
 	{% else %}
 		{% set class = "user" ~ message.counter %}
 	{% endif %}
-	<p class="{{class}} message" title="{{class}}" style="color: #{{message.color}}">{% if message.acronym %}{{message.acronym}}: {% endif %}{{message.text}} <span class="timestamp">{{message.timestamp.strftime('%X')}}</span></p>
+	<p class="{{class}} {{"admin" if message.admin}} message" title="{{class}}" style="color: #{{message.color}}">
+		<span class="text">{% if message.acronym %}{{message.acronym}}: {% endif %}{{message.text}}</span>
+		<span class="timestamp">{{message.timestamp.strftime('%X')}}</span>
+	</p>
 {%- endmacro %}

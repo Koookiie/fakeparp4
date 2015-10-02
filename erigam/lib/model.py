@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import backref, relation, scoped_session, sessionmaker
 from sqlalchemy.schema import Index
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, ForeignKey, Integer, String, Unicode, UnicodeText, DateTime, Enum
+from sqlalchemy import Column, ForeignKey, Integer, String, Unicode, UnicodeText, DateTime, Enum, Boolean
 
 import datetime
 import os
@@ -83,6 +83,7 @@ class Message(Base):
 
     id = Column(Integer, primary_key=True)
     log_id = Column(Integer, ForeignKey('logs.id'), nullable=False)
+    admin = Column(Boolean, default=False)
 
     timestamp = Column(DateTime(), nullable=False, default=now)
 
@@ -109,6 +110,7 @@ class Message(Base):
     def to_dict(self, include_user=False):
         md = {
             "id": self.id,
+            "admin": self.admin,
             "counter": self.counter,
             "timestamp": time.mktime(self.timestamp.timetuple()),
             "type": self.type,

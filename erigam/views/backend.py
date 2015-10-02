@@ -56,6 +56,7 @@ def postMessage():
             line = punish(g.redis, g.user.session_id, chat, line)
 
         send_message(g.sql, g.redis, Message(
+            admin=g.user.globalmod,
             log_id=g.log.id,
             type="message",
             counter=g.user.meta['counter'],

@@ -3,7 +3,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/home.min.css')}}">
     <style>
     body {
         background-color: #eeeeee;
@@ -11,52 +11,11 @@
         padding-bottom: 30px;
     }
 
-    thead {
-        background-color: #535353;
-    }
-
     #usertable {
         table-layout: fixed;
         word-wrap: break-word;
         text-align: center;
-        border: 1.5px solid #999999;
     }
-
-    .navbar {
-        background-color: #535353;
-    }
-
-    .navbar-default .navbar-nav>li>a, .navbar-default .navbar-brand, #usertable th {
-        color: #eeeeee;
-    }
-
-    .navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus {
-        color: #eeeeee;
-        background-color: #6f6f6f;
-    }
-
-    .unban {
-        background-image: none;
-        background-color: #eeeeee;
-        color: #535353;
-        border-radius: 5px;
-        border: 1.5px solid #999999;
-    }
-
-    .unban:hover {
-        background-image: none;
-        background-color: #eeeeee;
-        color: #535353;
-        border-radius: 5px;
-        border: 1.5px solid #999999;
-    }
-
-    .alert-info {
-        color: #535353;
-        background-color: #cccccc;
-        border: 1.5px solid #999999;
-    }
-
     </style>
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
@@ -64,7 +23,7 @@
 
 <body>
     <!-- Fixed navbar -->
-    <div class="navbar navbar-default navbar-fixed-top" role="navigation" id="topbar">
+    <div class="navbar navbar-erigam navbar-fixed-top" role="navigation" id="topbar">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">

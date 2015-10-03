@@ -179,7 +179,6 @@
             </div>
             <div class="group_container">
                 <h1>Public Groups</h1>
-                <br /><br />
                 <div class="active_container">
                     {% for chat in active_pub %}
                         <div id="chat_{{chat['url']}}">
@@ -207,19 +206,14 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
 {% if error=="chaturl_taken" or error=="chaturl_invalid" %}
-<script>
-    group_chat_error = 1;
-</script>
+    var err = true;
 {% else %}
-<script>
-    group_chat_error = 0;
-</script>
+    var err = false;
 {% endif %}
-
-<script>
 require(['erigam'], function(erigam) {
-    erigam.home();
+    erigam.home(err);
 });
 </script>
 {% endblock %}

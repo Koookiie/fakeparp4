@@ -14,11 +14,6 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'bootstrap'], functi
 		$('<p class="error">').text("It seems you have cookies disabled. Unfortunately cookies are essential for MSPARP to work, so you'll need to either enable them or add an exception in order to use MSPARP.").appendTo(document.body);
 	}
 
-	// Skip directly to the errors
-	if (group_chat_error == 1) {
-		$('#group_chat').click();
-	}
-
 	var config = $('#character-config');
 
 	// Supposed to update the bottom preview box
@@ -97,7 +92,10 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'bootstrap'], functi
 	}
 
 	return {
-		init: function() {
+		init: function(err) {
+			// Open groups page if error.
+			if (err) $('#group_chat').click();
+
 			updatePreview();
 		}
 	};

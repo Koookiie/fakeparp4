@@ -12,9 +12,9 @@ define("erigam", [], function() {
 				app.init(url);
 			});
 		},
-		home: function() {
+		home: function(err) {
 			require(["erigam/views/home"], function(app) {
-				app.init();
+				app.init(err);
 			})
 		}
 	};

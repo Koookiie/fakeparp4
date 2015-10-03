@@ -11,7 +11,7 @@
 
 
     <div class="container">
-        <h1> Mods for chat <br> <small>{{chat}}</small> </h1>
+        <h1> Mods </h1>
         <table class="table table-striped table-bordered" id="usertable">
             <thead>
                 <tr>
@@ -30,7 +30,7 @@
                 <tr>
                     <td>{{x[0]}}</td>
                     <td>{{x[1]}}</td>
-                    <td>{{x[2]}} [{{x[3}}] {% if x[4] == True %} (you!) {% endif %}</td>
+                    <td>{{x[2]}} [{{x[3]}}] {% if x[4] == True %} (you!) {% endif %}</td>
             		<td> <button user="{{x[0]}}" class="mod{{x[0]}} btn btn-primary" {% if x[1] == "globalmod" or x[4] == True %} disabled {% endif %} value="user"> Demod </button> </td>
             		<td> <button user="{{x[0]}}" class="mod{{x[0]}} btn btn-primary" {% if x[1] == "globalmod" or x[4] == True %} disabled {% endif %} value="mod"> Pro Wet Blanket </button>
             		<td> <button user="{{x[0]}}" class="mod{{x[0]}} btn btn-primary" {% if x[1] == "globalmod" or x[4] == True %} disabled {% endif %} value="mod2"> Bum Rusher </button> </td>

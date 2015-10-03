@@ -43,9 +43,9 @@
     </div>
 
     <script>
-    $(".setGroup").click(function(){
-        $.post("/chat_ajax/post", {"chat": "{{chat}}", "set_group": $(this).attr("value"), "counter": $(this).attr("user")}
-    )});
+    $(".setGroup").click(function() {
+        $.post("/chat_ajax/post", {"chat": "{{chat}}", "set_group": $(this).attr("value"), "counter": $(this).attr("user")});
+    });
     </script>
 
 {% endblock %}

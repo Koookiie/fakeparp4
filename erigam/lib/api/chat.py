@@ -5,7 +5,7 @@ from erigam.lib.archive import get_or_create_log
 from erigam.lib.model import Log, Chat, ChatSession
 from sqlalchemy.orm.exc import NoResultFound
 
-def create_chat(sql, redis, url, chattype="group"):
+def create(sql, redis, url, chattype="group"):
     if sql.query(Log).filter(Log.url == url).scalar():
         raise ValueError('chaturl_taken')
 
@@ -26,7 +26,7 @@ def create_chat(sql, redis, url, chattype="group"):
 
     return log
 
-def load_chat(sql, redis, chat):
+def load(sql, redis, chat):
     try:
         sql_log = sql.query(Log).filter(Log.url == chat).one()
         sql_chat = sql.query(Chat).filter(Chat.log_id == sql_log.id).one()

@@ -48,7 +48,7 @@ def chat(chat_url=None):
 
         # Try to load the chat from sql if it doesn't exist in redis.
         if len(chat_meta) == 0 or g.redis.exists("chat."+chat_url+".regen"):
-            chat_meta = api.chat.load_chat(g.sql, g.redis, chat_url)
+            chat_meta = api.chat.load(g.sql, g.redis, chat_url)
             g.redis.delete("chat."+chat_url+".regen")
 
         # Make sure it's in the archive queue.

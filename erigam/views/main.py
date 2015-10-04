@@ -88,7 +88,7 @@ def save():
         if 'para' in request.form or 'nsfw' in request.form:
             g.user.save_pickiness(request.form)
         if 'create' in request.form:
-            log = api.chat.create_chat(g.sql, g.redis, request.form['chaturl'], 'group')
+            log = api.chat.create(g.sql, g.redis, request.form['chaturl'], 'group')
             return redirect(url_for('chat.chat', chat_url=log.url))
         elif 'tags' in request.form:
             g.user.save_pickiness(request.form)

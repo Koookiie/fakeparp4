@@ -39,6 +39,9 @@ def ban(sql, redis, chat, ip, user=None, reason=None, message=None):
 def unban(sql, chat=None, banid=None):
     query = sql.query(Ban)
 
+    if not chat and not banid:
+        return
+
     if chat:
         query = query.filter(Ban.url == chat)
 

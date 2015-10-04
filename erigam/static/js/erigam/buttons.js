@@ -73,7 +73,7 @@ define("erigam/buttons", ['jquery', 'erigam/settings', 'erigam/bbcode'], functio
 			});
 
 			if ($('#topic').length !== 0) {
-				var text = settings.get("bbcodeon") ? bbcode.encode($('#topic').html()) : bbcode.remove($('#topic').html());
+				var text = settings.get("bbcodeon") ? bbcode.raw_encode($('#topic').html()) : bbcode.remove($('#topic').html());
 
 				$('#topic').html(text);
 			}

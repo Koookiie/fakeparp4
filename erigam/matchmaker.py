@@ -5,7 +5,7 @@ import time
 import logging
 import os
 
-from erigam.lib.api import chatapi
+from erigam.lib import api
 from erigam.lib.model import sm, Message
 from erigam.lib.messages import send_message
 from erigam.lib.request_methods import redis_pool
@@ -67,7 +67,7 @@ if __name__ == '__main__':
                 logging.debug('Match found, sending to %s.' % chat)
                 logging.debug('%s: options %s' % (searcher1['id'], searcher1['options']))
                 logging.debug('%s: options %s' % (searcher2['id'], searcher2['options']))
-                log = chatapi.create_chat(db, redis, chat, 'saved')
+                log = api.chat.create_chat(db, redis, chat, 'saved')
 
                 # Send options message if options are present.
                 if len(selected_options) > 0:

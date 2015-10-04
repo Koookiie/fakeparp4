@@ -4,7 +4,7 @@ from redis import Redis
 import time
 
 from erigam.lib import get_time, LONGPOLL_TIMEOUT_PERIOD
-from erigam.lib.api import disconnect
+from erigam.lib import api
 from erigam.lib.characters import CHARACTER_DETAILS
 from erigam.lib.model import sm, Log
 from erigam.lib.request_methods import redis_pool
@@ -50,7 +50,7 @@ if __name__ == '__main__':
                 )
 
             if log:
-                disconnect(db, redis, log, session, disconnect_message)
+                api.state.disconnect(db, redis, log, session, disconnect_message)
             print('dead', dead)
 
         for dead in redis.zrangebyscore('searchers', 0, get_time()):

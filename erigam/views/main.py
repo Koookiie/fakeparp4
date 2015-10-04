@@ -5,7 +5,7 @@ except:
 from flask import Blueprint, g, request, render_template, redirect, url_for, jsonify, abort
 
 from erigam.lib import SEARCH_PERIOD, get_time
-from erigam.lib.api import chatapi
+from erigam.lib import api
 from erigam.lib.characters import CHARACTER_GROUPS, CHARACTERS
 from erigam.lib.sessions import CASE_OPTIONS
 from erigam.lib.request_methods import use_db
@@ -88,7 +88,7 @@ def save():
         if 'para' in request.form or 'nsfw' in request.form:
             g.user.save_pickiness(request.form)
         if 'create' in request.form:
-            log = chatapi.create_chat(g.sql, g.redis, request.form['chaturl'], 'group')
+            log = api.chat.create_chat(g.sql, g.redis, request.form['chaturl'], 'group')
             return redirect(url_for('chat.chat', chat_url=log.url))
         elif 'tags' in request.form:
             g.user.save_pickiness(request.form)

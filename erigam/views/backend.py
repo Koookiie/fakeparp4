@@ -11,7 +11,7 @@ from erigam.lib import (
     CHAT_FLAGS
 )
 
-from erigam.lib.api import disconnect, get_online_state
+from erigam.lib import api
 
 from erigam.lib.groups import (
     MOD_GROUPS,
@@ -135,7 +135,7 @@ def postMessage():
 
             if request.form['user_action'] == 'kick':
                 g.redis.publish('channel.'+chat+'.'+their_session_id, '{"exit":"kick"}')
-                disconnect(g.sql, g.redis, g.log, their_session_id, "%s [%s] kicked %s [%s] from the chat." % (
+                api.state.disconnect(g.sql, g.redis, g.log, their_session_id, "%s [%s] kicked %s [%s] from the chat." % (
                     g.user.character['name'],
                     g.user.character['acronym'],
                     their_session_name,
@@ -171,7 +171,7 @@ def postMessage():
                     ban_message = ban_message + " Reason: %s" % (request.form['reason'][:1500])
 
                 if g.redis.sismember('chat.'+chat+'.online', their_session_id) or g.redis.sismember('chat.'+chat+'.idle', their_session_id):
-                    disconnect(g.sql, g.redis, g.log, their_session_id, ban_message)
+                    api.state.disconnect(g.sql, g.redis, g.log, their_session_id, ban_message)
                 else:
                     send_message(g.sql, g.redis, Message(
                         log_id=g.log.id,
@@ -345,7 +345,7 @@ def getMessages():
 @use_db_chat
 def quitChatting():
     disconnect_message = '%s [%s] disconnected.' % (g.user.character['name'], g.user.character['acronym']) if g.user.meta['group'] != 'silent' else None
-    disconnect(g.sql, g.redis, g.log, g.user.session_id, disconnect_message)
+    api.state.disconnect(g.sql, g.redis, g.log, g.user.session_id, disconnect_message)
     return 'ok'
 
 @blueprint.route('/save', methods=['POST'])
@@ -375,7 +375,7 @@ def change_state():
     if state not in ['idle', 'online']:
         abort(500)
 
-    current_state = get_online_state(g.redis, g.log.url, g.user.session_id)
+    current_state = api.state.get_online_state(g.redis, g.log.url, g.user.session_id)
 
     if state != current_state:
         g.redis.smove('chat.'+g.log.url+'.'+current_state, 'chat.'+g.log.url+'.'+state, g.user.session_id)

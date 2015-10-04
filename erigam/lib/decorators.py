@@ -1,7 +1,7 @@
 from flask import g, render_template, abort
 from functools import wraps
 from erigam.lib import get_time, PING_PERIOD
-from erigam.lib.api import join, get_online_state
+from erigam.lib import api
 from erigam.lib.request_methods import db_connect, get_log
 
 def require_admin(f):
@@ -18,10 +18,10 @@ def mark_alive(f):
         if hasattr(g.user, "chat") and g.user.chat is None:
             abort(400)
 
-        if get_online_state(g.redis, g.user.chat, g.user.session_id) == "offline":
+        if api.state.get_online_state(g.redis, g.user.chat, g.user.session_id) == "offline":
             db_connect()
             get_log()
-            g.joining = join(g.sql, g.redis, g.log, g.user)
+            g.joining = api.state.join(g.sql, g.redis, g.log, g.user)
         else:
             g.redis.zadd('chats-alive', g.user.chat+'/'+g.user.session_id, get_time(PING_PERIOD*2))
             g.joining = False

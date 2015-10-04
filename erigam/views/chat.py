@@ -100,11 +100,8 @@ def unban(chat=None):
         return render_template('admin_denied.html')
 
     if "banid" in request.form:
-        # Exequte ban delete
-        ban = g.sql.query(Ban).filter(Ban.url == chat).filter(Ban.id == request.form['banid']).scalar()
-        if ban:
-            g.sql.delete(ban)
-            return redirect(url_for("chat.unbanPage", chat=chat))
+        api.bans.unban(g.sql, chat, request.form['banid'])
+        return redirect(url_for("chat.unban", chat=chat))
 
     bans = g.sql.query(Ban).filter(Ban.url == chat).order_by(Ban.id).all()
 

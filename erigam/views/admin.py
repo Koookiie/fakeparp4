@@ -8,6 +8,7 @@ from flask import (
     url_for
 )
 
+from erigam.lib import api
 from erigam.lib.decorators import require_admin
 from erigam.lib.model import Ban
 from erigam.lib.request_methods import use_db
@@ -80,10 +81,8 @@ def admin_allbans():
 
     if "banid" in request.form:
         # Exequte ban delete
-        ban = g.sql.query(Ban).filter(Ban.id == request.form['banid']).scalar()
-        if ban:
-            g.sql.delete(ban)
-            return redirect(url_for("admin.admin_allbans"))
+        api.bans.unban(g.sql, banid=request.form['banid'])
+        return redirect(url_for("admin.admin_allbans"))
 
     sorts = {
         "chat": Ban.url,

@@ -83,10 +83,7 @@ def chat(chat_url=None):
         case_options=CASE_OPTIONS,
         groups=CHARACTER_GROUPS,
         characters=CHARACTERS,
-        chat=chat_url,
-        chat_meta=chat_meta,
         messages=messages,
-        character_dict=g.user.json_info(),
         user_info=user_info,
         legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat_url)
     )

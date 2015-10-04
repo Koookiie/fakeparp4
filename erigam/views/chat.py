@@ -69,7 +69,7 @@ def chat(chat_url=None):
 
         latest_num = messages[-1].id if len(messages) > 0 else 0
 
-    user_info = {
+    meta = {
         "user": g.user.json_info(),
         "chat": chat_url,
         "chat_meta": chat_meta,
@@ -84,7 +84,7 @@ def chat(chat_url=None):
         groups=CHARACTER_GROUPS,
         characters=CHARACTERS,
         messages=messages,
-        user_info=user_info,
+        meta=meta,
         legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat_url)
     )
 

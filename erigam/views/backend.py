@@ -144,22 +144,6 @@ def postMessage():
 
             # Don't ban people from the oubliette because that'll just put us in an infinite loop.
             elif request.form['user_action'] == 'ip_ban' and chat != 'theoubliette':
-                their_ip_address = g.redis.hget('session.'+their_session_id+'.meta', 'last_ip')
-
-                if their_ip_address is None:
-                    return jsonify({"error": "baduser"}), 500
-
-                g.sql.add(Ban(
-                    url=chat,
-                    ip=their_ip_address,
-                    name=their_session_name,
-                    counter=request.form['counter'],
-                    expires=datetime.datetime.utcnow() + datetime.timedelta(weeks=3),
-                    reason=request.form.get('reason', "")[:1500]
-                ))
-
-                g.redis.publish('channel.'+chat+'.'+their_session_id, '{"exit":"ban"}')
-
                 ban_message = "%s [%s] IP banned %s [%s]. " % (
                               g.user.character['name'],
                               g.user.character['acronym'],
@@ -170,15 +154,19 @@ def postMessage():
                 if 'reason' in request.form:
                     ban_message = ban_message + " Reason: %s" % (request.form['reason'][:1500])
 
-                if g.redis.sismember('chat.'+chat+'.online', their_session_id) or g.redis.sismember('chat.'+chat+'.idle', their_session_id):
-                    api.state.disconnect(g.sql, g.redis, g.log, their_session_id, ban_message)
-                else:
-                    send_message(g.sql, g.redis, Message(
-                        log_id=g.log.id,
-                        type="user_change",
-                        counter=-1,
-                        text=ban_message
-                    ))
+                api.bans.ban(
+                    g.sql,
+                    g.redis,
+                    chat,
+                    g.redis.hget('session.'+their_session_id+'.meta', 'last_ip'),
+                    user={
+                        "session": their_session_id,
+                        "name": their_session_name,
+                        "counter": request.form['counter'],
+                    },
+                    reason=request.form.get('reason', "")[:1500],
+                    message=ban_message
+                )
 
         if 'topic' in request.form:
             if request.form['topic'] != '':

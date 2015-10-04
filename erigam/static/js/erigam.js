@@ -15,7 +15,7 @@ define("erigam", [], function() {
 		home: function(err) {
 			require(["erigam/views/home"], function(app) {
 				app.init(err);
-			})
+			});
 		}
 	};
 });

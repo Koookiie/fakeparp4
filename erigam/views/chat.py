@@ -93,7 +93,7 @@ def chat(chat_url=None):
 
 @blueprint.route('/<chat>/unban', methods=['GET', 'POST'])
 @use_db
-def unbanPage(chat=None):
+def unban(chat=None):
     if chat is None or not g.redis.hgetall("chat."+chat+".meta"):
         abort(403)
 

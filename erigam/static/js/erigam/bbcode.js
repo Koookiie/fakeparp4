@@ -27,13 +27,13 @@ define("erigam/bbcode", ['jquery', 'erigam/helpers'], function($, helpers) {
 						case "bgcolor":
 						case "color":
 						case "font":
-							return $("<span>").css(tag_properties[tag], attribute).html(self.encode(content, admin))[0].outerHTML;
+							return $("<span>").css(tag_properties[tag], attribute).html(self.raw_encode(content, admin))[0].outerHTML;
 						case "bshadow":
 						case "tshadow":
-							return $("<span>").css(tag_properties[tag], attribute).html(self.encode(content, admin))[0].outerHTML;
+							return $("<span>").css(tag_properties[tag], attribute).html(self.raw_encode(content, admin))[0].outerHTML;
 						case "url":
 							if (attribute.substr(0, 7) == "http://" || attribute.substr(0, 8) == "https://") {
-								return $("<a>").attr({href: attribute, target: "_blank"}).html(self.encode(content, admin))[0].outerHTML;
+								return $("<a>").attr({href: attribute, target: "_blank"}).html(self.raw_encode(content, admin))[0].outerHTML;
 							}
 							break;
 					}
@@ -46,19 +46,19 @@ define("erigam/bbcode", ['jquery', 'erigam/helpers'], function($, helpers) {
 						case "sup":
 						case "u":
 						case "s":
-							return "<" + tag + ">" + self.encode(content, admin) + "</" + tag + ">";
+							return "<" + tag + ">" + self.raw_encode(content, admin) + "</" + tag + ">";
 						case "spoiler":
-							return "<label class=\"spoiler\"><input type=\"checkbox\"><span>SPOILER</span> <span>" + self.encode(content, admin) + "</span></label>";
+							return "<label class=\"spoiler\"><input type=\"checkbox\"><span>SPOILER</span> <span>" + self.raw_encode(content, admin) + "</span></label>";
 						case "raw":
 							return content;
 						case "audio":
 							// _autoplay_ must be replaced because of how creating the string puts the element in the DOM.
-							return window.legacy_bbcode || admin ? $("<audio>").attr("src", content).attr("_autoplay_", "autoplay").attr("controls", "controls").attr("preload", "none")[0].outerHTML.replace("_autoplay_", "autoplay") : self.encode(content, admin);
+							return window.legacy_bbcode || admin ? $("<audio>").attr("src", content).attr("_autoplay_", "autoplay").attr("controls", "controls").attr("preload", "none")[0].outerHTML.replace("_autoplay_", "autoplay") : self.raw_encode(content, admin);
 						case "img":
-							return window.legacy_bbcode || admin ? $("<img>").attr("src", content).attr("width", 300).css("max-width", "100%")[0].outerHTML : self.encode(content, admin);
+							return window.legacy_bbcode || admin ? $("<img>").attr("src", content).attr("width", 300).css("max-width", "100%")[0].outerHTML : self.raw_encode(content, admin);
 					}
 				}
-				return "[" + tag + (attribute ? "=" + attribute : "") + "]" + self.encode(content, admin) + "[/" + tag + "]";
+				return "[" + tag + (attribute ? "=" + attribute : "") + "]" + self.raw_encode(content, admin) + "[/" + tag + "]";
 			});
 		},
 		remove: function(text) {

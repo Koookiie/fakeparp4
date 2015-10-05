@@ -4,11 +4,10 @@ import re
 import random
 import json
 
+word_regex = re.compile("[^a-zA-Z\s]+")
 bbcode_regex = re.compile("\[.+?\]")
 
 def punish(redis, cookie, chat, line):
-    word_regex = re.compile("[^a-zA-Z\s]+")
-    bbcode_regex = re.compile("\[.+?\]")
     replacements = [
         ["nigglet", "^o^ frienddsss"],
         ["jew", "panda"],
@@ -203,7 +202,10 @@ def punish(redis, cookie, chat, line):
 
     # Replacements.
     for replacement in replacements:
-        line = line.replace(replacement[0], replacement[1])
+        try:
+            line = re.sub(re.escape(replacement[0]), replacement[1], line)
+        except re.error:
+            pass
 
     # Prefix
     line = "[font=Comic Sans MS] [color=#%s] k1nqp4ndA: ◖(◕ω◕)◗ < %s [/color][/font]" % (color, line)

@@ -105,13 +105,13 @@
 	<button type="button" id="idleButton">Idle</button>
 	<button type="button" id="userListButton">Users</button>
 	<button type="button" id="settingsButton">Settings</button>
-	<a id="logLink" class="aButton" target="_blank" href="{{url_for("log.view_log", chat=meta['chat'])}}">Log</a>
+	{% if meta['chat'] %}<a id="logLink" class="aButton" target="_blank" href="{{url_for("log.view_log", chat=meta['chat'])}}">Log</a>{% endif %}
 	<button type="submit">Send</button>
 </form>
 
 <div id="save">
 	<p>Did you enjoy that chat? If so, remember to save the log - the chat will be deleted from this URL in 7 days.</p>
-	<p> <a href="{{url_for("log.view_log", chat=meta['chat'])}}">View log</a> </p>
+	{% if meta['chat'] %}<p> <a href="{{url_for("log.view_log", chat=meta['chat'])}}">View log</a> </p>{% endif %}
 </div>
 
 {% raw %}

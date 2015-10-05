@@ -350,8 +350,8 @@ define("erigam/views/chat", [
 	}
 
 	function ipLookup() {
-		var counter = $(this).parent().parent().data().meta.counter;
-		$.post("/chat_ajax/ip_lookup", { 'chat': chat, 'counter': counter, }, function(ip) {
+		var counter = $(this).parent().parent().attr("id").substr(4);
+		$.post("/chat_ajax/ip_lookup", { 'chat': chat, 'counter': counter }, function(ip) {
 			messages.add({counter: "-1", color: "000000", text: "[SYSTEM] user" +counter+ "'s IP: " + ip});
 		});
 	}

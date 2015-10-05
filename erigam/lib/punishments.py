@@ -206,7 +206,7 @@ def punish(redis, cookie, chat, line):
         line = line.replace(replacement[0], replacement[1])
 
     # Prefix
-    line = "[font=Comic Sans MS] [color=#%s] k1nqp4ndA: ◖(◕ω◕)◗ < %s" % (color, line)
+    line = "[font=Comic Sans MS] [color=#%s] k1nqp4ndA: ◖(◕ω◕)◗ < %s [/color][/font]" % (color, line)
 
     # Redis stuffs.
     datakey = 'session.%s.chat.%s' % (cookie, chat)

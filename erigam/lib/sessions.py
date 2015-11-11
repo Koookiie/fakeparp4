@@ -167,7 +167,11 @@ class Session(object):
         self.character = get_or_create(
             self.redis,
             self.prefix,
-            lambda: CHARACTER_DEFAULTS
+            lambda: get_or_create(
+                self.redis,
+                self.original_prefix,
+                lambda: CHARACTER_DETAILS
+            )
         )
         self.character = fill_in_data(self.character)
 

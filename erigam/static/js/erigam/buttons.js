@@ -1,4 +1,4 @@
-define("erigam/buttons", ['jquery', 'erigam/settings', 'erigam/bbcode'], function($, settings, bbcode) {
+define("erigam/buttons", ['jquery', 'erigam/settings', 'erigam/bbcode', 'erigam/helpers'], function($, settings, bbcode, helpers) {
 	"use strict";
 
 	var STATE_URL = "/chat_ajax/state";

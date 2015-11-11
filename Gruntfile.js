@@ -61,4 +61,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-requirejs');
 
 	grunt.registerTask('default', ['requirejs', 'sass', 'cssmin']);
+	grunt.registerTask('js', ['requirejs']);
+	grunt.registerTask('css', ['sass', 'cssmin']);
 };

@@ -62,7 +62,9 @@
 		{% endfor %}
 		</select></p>
 		<p><input id="usingname" type="text" name="name" value="{{user.character['name']}}" maxlength="50"></p>
-		<p><input id="ailin" type="text" size="15" name="acronym" value="{{user.character['acronym']}}" maxlength="15"> <input id="coln" type="text" size="7" maxlength="6" name="color" value="{{user.character['color']}}"></p>
+		<p><input id="ailin" type="text" size="15" name="acronym" value="{{user.character['acronym']}}" maxlength="15"></p>
+		<p><input id="color_input_hex" type="text" size="7" maxlength="6" name="color" value="{{user.character['color']}}"></p>
+		<p><input id="color_input" type="color" size="7" maxlength="6" value="#{{user.character['color']}}"></p>
 	</div>
 	<p><label>Prefix: <input id="prei" type="text" size="8" name="quirk_prefix" value="{{user.character['quirk_prefix']}}" /></label></p>
 	<p><label>Suffix: <input id="sufi" type="text" size="8" name="quirk_suffix" value="{{user.character['quirk_suffix']}}" /></label></p>

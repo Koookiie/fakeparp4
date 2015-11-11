@@ -465,13 +465,13 @@ define("erigam/views/chat", [
 		}
 		if ($('input[name="name"]').val() === "") {
 			alert("You can't chat with a blank name!");
-		} else if ($('input[name="color"]').val().match(/^[0-9a-fA-F]{6}$/) === null) {
+		} else if (color_hex_input.val().match(/^[0-9a-fA-F]{6}$/) === null) {
 			alert("You entered an invalid hex code. Try using the color picker.");
 		} else {
 			var formData = $(this).serializeArray();
 			formData.push({ name: 'chat', value: chat });
 			$.post(SAVE_URL, formData, function(data) {
-				$('#preview').css('color', '#'+$('input[name="color"]').val());
+				$('#preview').css('color', '#'+color_hex_input.val());
 				var formInputs = $('#settings').find('input, select');
 				for (var i=0; i<formInputs.length; i++) {
 					if (formInputs[i].name!="quirk_from" && formInputs[i].name!="quirk_to") {
@@ -565,6 +565,22 @@ define("erigam/views/chat", [
 
 	if (Math.floor(Math.random()*413) === 0) {
 		$("body > *").css("transform", "rotate(180deg)");
+	}
+
+	/* Color inputs */
+	var color_input = $("#color_input").change(function() {
+		update_color(this.value.substr(1));
+	});
+
+	var color_hex_input = $("#color_input_hex").keyup(function() {
+		if (this.value.length == 6) {
+			update_color(this.value);
+		}
+	});
+
+	function update_color(color) {
+		color_input.val("#" + color);
+		color_hex_input.val(color);
 	}
 
 	return {

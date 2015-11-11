@@ -66,6 +66,7 @@
 		<p><input id="color_input_hex" type="text" size="7" maxlength="6" name="color" value="{{user.character['color']}}"></p>
 		<p><input id="color_input" type="color" size="7" maxlength="6" value="#{{user.character['color']}}"></p>
 	</div>
+
 	<p><label>Prefix: <input id="prei" type="text" size="8" name="quirk_prefix" value="{{user.character['quirk_prefix']}}" /></label></p>
 	<p><label>Suffix: <input id="sufi" type="text" size="8" name="quirk_suffix" value="{{user.character['quirk_suffix']}}" /></label></p>
 	<p><label>Case: <select id="casing" name="case">
@@ -93,8 +94,7 @@
 		<label><input type="checkbox" class="bbcodeon" name="bbcodeon"><span> Enable BBCode (refresh required)</span></label>
 		<label><input type="checkbox" class="audioset" name="audioset"><span> Enable Audio</span></label>
 		<label><input type="checkbox" class="bgset" name="bgset"><span> Enable Backgrounds</span></label>
-			</div>
-		</div>
+		<label><input type="checkbox" class="timestamps" name="timestamps"><span> Enable Timestamps</span></label>
 	</div>
 	<p><audio id="backgroundAudio" src="" autoplay loop controls></audio></p>
 </form>

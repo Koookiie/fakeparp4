@@ -72,6 +72,16 @@ define("erigam/buttons", ['jquery', 'erigam/settings', 'erigam/bbcode', 'erigam/
 				$(this).html(line);
 			});
 
+			$(".timestamps").click(function() {
+				if (this.checked) {
+					settings.set("timestamps", 1);
+					$(".timestamp").css("display", "");
+				} else {
+					settings.set("timestamps", 0);
+					$(".timestamp").css("display", "none");
+				}
+			});
+
 			if ($('#topic').length !== 0) {
 				var text = settings.get("bbcodeon") ? bbcode.raw_encode($('#topic').html()) : bbcode.remove($('#topic').html());
 

@@ -7,7 +7,8 @@ define("erigam/settings", ['jquery', 'erigam/helpers', 'erigam/bbcode'], functio
 		bbcodeon: 1,
 		audioset: 0,
 		bgset: 0,
-		tts: 0
+		tts: 0,
+		timestamps: 0
 	};
 	var temp_storage = {};
 
@@ -41,12 +42,17 @@ define("erigam/settings", ['jquery', 'erigam/helpers', 'erigam/bbcode'], functio
 				$('.system').hide();
 				$('.globalann').hide();
 			}
+
 			if (self.get("bbcodeon")) $('.bbcodeon').attr('checked', 'checked');
 			if (self.get("audioset")) $('.audioset').attr('checked', 'checked');
 			if (self.get("bgset")) $('.bgset').attr('checked', 'checked');
+			if (!self.get("timestamps")) {
+				$(".timestamp").css("display", "none");
+			}
 
 			if (callback && typeof callback === "function") callback();
 		},
+
 		set: function(key, value) {
 			if (settings[key]) {
 				if (helpers.check_localstorage()) localStorage.setItem(settings.chat + key, value);
@@ -55,6 +61,7 @@ define("erigam/settings", ['jquery', 'erigam/helpers', 'erigam/bbcode'], functio
 				temp_storage[key] = value;
 			}
 		},
+
 		get: function(key, raw) {
 			var value;
 			if (window.debug) this.debug();

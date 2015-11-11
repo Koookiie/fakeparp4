@@ -36,7 +36,8 @@ define("erigam/messages", ['jquery', 'erigam/settings', 'erigam/bbcode'], functi
 
 			// Timestamp
 			var date = new Date(msg.timestamp * 1000);
-			$("<span>").addClass("timestamp").text(date.toLocaleTimeString()).appendTo(mp);
+			var timestamp = $("<span>").addClass("timestamp").text(date.toLocaleTimeString()).appendTo(mp);
+			if (!settings.get('timestamp')) timestamp.css("display", "none");
 
 			// Highlighting
 			if (settings.get("highlight", true) == msg.counter) mp.addClass('highlight');

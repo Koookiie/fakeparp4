@@ -1,0 +1,21 @@
+---
+
+- hosts: builder
+  sudo: yes
+  roles:
+    -build
+
+- hosts: erigam
+  serial: 1
+  sudo: yes
+
+  vars_files:
+  - vars/erigam_docker_env.yml
+
+  roles:
+    - deploy
+
+  handlers:
+  - name: reload nginx
+    service: name=nginx state=reloaded
+    delegate_to: erigam

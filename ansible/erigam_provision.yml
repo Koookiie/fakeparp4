@@ -1,0 +1,11 @@
+--- 
+
+# Honestly, who would be setting up a server using this playbook.
+# Not me. #ducttapelife
+
+- hosts: bootstrap
+  serial: 1
+  sudo: yes
+
+  roles:
+  - provision

@@ -1,0 +1,42 @@
+---
+
+- name: "Docker - Start Redis"
+  docker:
+    image: redis
+    name: "redis_main"
+    restart_policy: "on-failure"
+    volumes:
+      - /var/lib/redis:/data
+    ports:
+      - 127.0.0.1:6379:6379
+    command: "redis-server --appendonly yes"
+    state: started
+
+- name: "Docker - Start web process"
+  docker:
+    image: erigam
+    name: "erigam_web"
+    links:
+    - "redis_main:redis"
+    restart_policy: "on-failure"
+    restart_policy_retry: 5
+    command: "gunicorn -b 0.0.0.0:5000 -k gevent -w 4 erigam:app"
+    env: "{{docker_env}}"
+    state: reloaded
+  notify: reload nginx
+
+- name: "Docker - Start background processes"
+  docker:
+    image: erigam
+    name: "erigam_{{item}}"
+    links:
+    - "redis_main:redis"
+    restart_policy: "on-failure"
+    restart_policy_retry: 5
+    command: "python3 erigam/{{item}}.py"
+    env: "{{docker_env}}"
+    state: reloaded
+  with_items:
+    - archiver
+    - reaper
+    - matchmaker

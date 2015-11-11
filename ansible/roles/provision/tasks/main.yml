@@ -1,0 +1,13 @@
+---
+
+# XXX finish server setup
+
+- name: System - Install Python
+  apt: name={{item}} state=installed
+  with_items:
+    - python
+    - python-pip
+    - python-dev
+
+- name: System - Install docker-py
+  pip: name=docker-py 

@@ -179,10 +179,6 @@ button:hover, .aButton:hover {
 	left: 8px;
 }
 
-body.withSidebar #controls {
-	right: 233px;
-}
-
 #controls input[type="submit"], #controls button, .aButton {
 	margin: 5px 0 0 0;
 }
@@ -394,10 +390,6 @@ label {
 /* Mobile */
 
 body.mobile {
-	body, button, input, select, optgroup, option {
-		font-size: 6px;
-	}
-
 	.sidebar {
 		left: 5px;
 		width: auto;

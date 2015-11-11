@@ -390,6 +390,7 @@ define("erigam/views/chat", [
 			$('#preview').html('&nbsp;');
 		}
 		$('#conversation').css('bottom',($('#controls').height()+10)+'px');
+		$('.sidebar').css('bottom',($('#controls').height()+10)+'px');
 
 		return textPreview.length !== 0;
 	}
@@ -404,6 +405,7 @@ define("erigam/views/chat", [
 			$(this).text("[show]");
 		}
 		$('#conversation').css('bottom',($('#controls').height()+10)+'px');
+		$('.sidebar').css('bottom',($('#controls').height()+10)+'px');
 		return false;
 	});
 

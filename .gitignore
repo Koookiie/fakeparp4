@@ -17,3 +17,4 @@ env3/
 vendor/
 node_modules/
 .sass-cache/
+*env.yml

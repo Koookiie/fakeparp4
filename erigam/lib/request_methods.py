@@ -19,10 +19,17 @@ redis_pool = ConnectionPool(
 # Before request
 
 def connect_redis():
+    if request.endpoint == "static":
+        g.redis = None
+        return
+
     # Connect to Redis
     g.redis = Redis(connection_pool=redis_pool)
 
 def create_session():
+    if request.endpoint == "static":
+        return
+
     # Do not bother allowing the user in if they are globalbanned.
     if g.redis.sismember("globalbans", request.headers.get('X-Forwarded-For', request.remote_addr)):
         abort(403)
@@ -115,6 +122,7 @@ def disconnect_sql(response=None):
     if hasattr(g, "sql"):
         g.sql.close()
         del g.sql
+
     return response
 
 def disconnect_redis(response=None):
@@ -122,7 +130,9 @@ def disconnect_redis(response=None):
         g.pubsub.close()
         del g.pubsub
 
-    del g.redis
+    if hasattr(g, "redis"):
+        del g.redis
+
     return response
 
 file_hashes = {}

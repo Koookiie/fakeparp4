@@ -1,0 +1,11 @@
+{% extends 'errors/base.html' %}
+
+{% block title: %}Internal Server Error - {% endblock %}
+
+{% block error %}
+	<p>Something broke on our end and this request could not be completed. Please try again and your request might work again. You should probarly complain to <a href="http://blog.skeleton.army/ask">nepeat</a> for this one.</p>
+	{% if traceback %}
+	<label>This will help the admins. Please include this as a pastebin paste in your report for a gold star.</label>
+	<pre class="debug">{{traceback}}</pre>
+	{% endif %}
+{% endblock %}

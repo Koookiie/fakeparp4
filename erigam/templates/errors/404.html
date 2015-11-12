@@ -1,0 +1,8 @@
+{% extends 'errors/base.html' %}
+
+{% block title: %}Not Found - {% endblock %}
+
+{% block error %}
+	<p>The URL "{{request.url}}" does not exist.</p>
+	<p>If you entered the URL manually please check your spelling and try again.</p>
+{% endblock %}

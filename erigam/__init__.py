@@ -1,6 +1,7 @@
 import os
+import traceback
 
-from flask import Flask
+from flask import Flask, request, render_template
 
 from erigam.lib.request_methods import (
     connect_redis,
@@ -52,3 +53,19 @@ app.register_blueprint(backend.blueprint, url_prefix='/chat_ajax')
 app.register_blueprint(chat.blueprint, url_prefix='/chat')
 app.register_blueprint(admin.blueprint, url_prefix='/admin')
 app.register_blueprint(log.blueprint)
+
+# Error handlers
+@app.errorhandler(404)
+def notfound_error(e):
+    return render_template("errors/404.html"), 404
+
+if not app.config['DEBUG']:
+    @app.errorhandler(Exception)
+    def production_error(e):
+        if request.is_xhr:
+            if 'debug' not in request.args and 'debug' not in request.form:
+                raise
+
+        return render_template("errors/exception.html",
+            traceback=traceback.format_exc()
+        ), 500

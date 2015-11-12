@@ -180,7 +180,7 @@
             <div class="group_container">
                 <h1>Public Groups</h1>
                 <div class="active_container">
-                    {% for chat in active_pub %}
+                    {% for chat in active_pub if chat['total_online'] != 0 %}
                         <div id="chat_{{chat['url']}}">
                             <h3 class="url"><a href="/chat/{{chat['url']}}">{{chat['url']}}</a></h3>
                             <p class="topic">{% if 'topic' in chat %} {{chat['topic']}} {% endif %}</p>

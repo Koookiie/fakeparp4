@@ -28,6 +28,7 @@ if __name__ == '__main__':
 
             # Expire IP bans.
             db.query(Ban).filter(Ban.expires < datetime.datetime.utcnow()).delete()
+            db.commit()
 
             # Archive chats.
             for chat in redis.zrangebyscore('archive-queue', 0, get_time()):

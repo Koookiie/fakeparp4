@@ -373,7 +373,9 @@ define("erigam/views/chat", [
 	function updateChatPreview() {
 		var textPreview = $('#textInput').val();
 
-		if (textPreview.substr(0,1)=='/' && textPreview.substr(0,4)!=='/ooc') {
+		if (textPreview.match(/https?:\/\//)) {
+			textPreview = jQuery.trim(textPreview);
+		} else if (textPreview.substr(0,1)=='/' && textPreview.substr(0,4)!=='/ooc') {
 			textPreview = jQuery.trim(textPreview.substr(1));
 		} else {
 			textPreview = quirks.apply(jQuery.trim(textPreview), user.character);

@@ -42,7 +42,7 @@ def show_homepage(error):
     public_chats = sorted(public_chats, key=lambda k: k['total_online'])
     public_chats = public_chats[::-1]
 
-    return render_template('frontpage.html',
+    return render_template('front/frontpage.html',
         error=error,
         replacements=json.loads(g.user.character['replacements']),
         tag_text=g.redis.get(g.user.prefix+'.tag-text') or "",

@@ -17,7 +17,7 @@ blueprint = Blueprint('admin', __name__)
 
 @blueprint.route("/changemessages", methods=['GET', 'POST'])
 @require_admin
-def change_messages():
+def messages():
     if 'front_message' in request.form:
         front_message = request.form['front_message']
         g.redis.set('front_message', front_message)
@@ -25,13 +25,12 @@ def change_messages():
         front_message = g.redis.get('front_message')
 
     return render_template('admin/changemsg.html',
-        front_message=front_message,
-        page="changemsg",
+        front_message=front_message
     )
 
 @blueprint.route("/broadcast", methods=['GET', 'POST'])
 @require_admin
-def global_broadcast():
+def broadcast():
     if 'line' in request.form:
         color = request.form.get('color', "000000")
         line = request.form.get('line', None)
@@ -76,13 +75,13 @@ def global_broadcast():
 @blueprint.route('/allbans', methods=['GET', 'POST'])
 @require_admin
 @use_db
-def admin_allbans():
+def all_bans():
     sort = request.args.get('sort', "id")
 
     if "banid" in request.form:
         # Exequte ban delete
         api.bans.unban(g.sql, banid=request.form['banid'])
-        return redirect(url_for("admin.admin_allbans"))
+        return redirect(url_for("admin.all_bans"))
 
     sorts = {
         "chat": Ban.url,
@@ -132,13 +131,12 @@ def all_chats():
     sessions = sessions[::-1]
 
     return render_template('admin/allchats.html',
-        chats=sessions,
-        page="allchats",
+        chats=sessions
     )
 
 @blueprint.route('/panda', methods=['GET', 'POST'])
 @require_admin
-def admin_panda():
+def panda():
     result = None
 
     try:
@@ -167,6 +165,5 @@ def admin_panda():
     return render_template('admin/panda.html',
         lines=pandas,
         result=result,
-        extrapunishments=extrapunishments,
-        page="panda"
+        extrapunishments=extrapunishments
     )

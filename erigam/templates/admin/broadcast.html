@@ -1,4 +1,4 @@
-{% extends 'admin/base.html' %}
+{% extends "front/base.html" %}
 
 {% set page = "broadcast" %}
 
@@ -10,11 +10,11 @@
     <form role="form" action="/admin/broadcast" method="post">
   		<div class="form-group">
     		<label for="inputColor">Color</label>
-    		<input type="text" class="form-control" id="color" value="000000" name="color" maxlength="6">
+    		<input type="text" class="form-control fullwidth" id="color" value="000000" name="color" maxlength="6">
   		</div>
   		<div class="form-group">
     		<label for="inputColor">Announcement</label>
-    		<input type="text" class="form-control" id="announcement" placeholder="[GLOBAL] global announcement goes here" name="line">
+    		<input type="text" class="form-control fullwidth" id="announcement" placeholder="[GLOBAL] global announcement goes here" name="line">
   		</div>
   		<div class="form-group">
     		<label for="inputColor">Confirm?</label>

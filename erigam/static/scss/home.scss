@@ -1,10 +1,16 @@
 body {
-	padding-top: 20px;
+	padding-top: 40px;
 	padding-bottom: 20px;
 }
 
 body, .navbar-default .navbar-nav>li>a {
     color: #2b0057;
+}
+
+table {
+	table-layout: fixed;
+	word-wrap: break-word;
+	text-align: center;
 }
 
 .quirks {
@@ -39,7 +45,10 @@ body, .navbar-default .navbar-nav>li>a {
 .navbar-erigam .navbar-nav>.active>a:hover,
 .navbar-erigam .navbar-nav>.active>a:focus,
 .nav>li>a:focus,
-.nav>li>a:hover {
+.nav>li>a:hover,
+.nav .open>a,
+.nav .open>a:focus,
+.nav .open>a:hover {
 	background-color: #440a7f;
 }
 
@@ -81,6 +90,10 @@ body, .navbar-default .navbar-nav>li>a {
 .btn-danger:hover {
 	background-color: #F350F7;
 	border: none;
+}
+
+.fullwidth {
+	width: 100%;
 }
 
 /* Color input */

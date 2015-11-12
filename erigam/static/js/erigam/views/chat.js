@@ -433,7 +433,7 @@ define("erigam/views/chat", [
 
 	function sendMessage(line, callback) {
 		$.post(POST_URL, {'chat': chat, 'line': line}).fail(function() {
-			messages.add({counter: -1, color: 'ff0000', text: 'Message has failed to send. Retrying in three seconds.' });
+			messages.add({counter: -1, color: 'ff0000', text: 'Message has failed to send. Retrying send in three seconds.' });
 			// Retry after a second if message send fails
 			setTimeout(function() {
 				sendMessage(line, callback);

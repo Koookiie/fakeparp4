@@ -112,7 +112,7 @@ def unban(chat=None):
     )
 
 @blueprint.route('/<chat>/mods')
-def manageMods(chat):
+def mods(chat):
     chat_session = g.redis.hgetall("session."+g.user.session_id+".meta."+chat)
     if not chat_session or chat_session['group'] != 'globalmod':
         return render_template('admin_denied.html')
@@ -135,6 +135,5 @@ def manageMods(chat):
     return render_template(
         'mod/mods.html',
         modstatus=mods,
-        chat=chat,
-        page='mods',
+        chat=chat
     )

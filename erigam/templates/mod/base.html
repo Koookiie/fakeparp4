@@ -4,19 +4,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="{{url_for('static', filename='css/home.min.css')}}">
-    <style>
-    body {
-        background-color: #eeeeee;
-        padding-top: 60px;
-        padding-bottom: 30px;
-    }
-
-    #usertable {
-        table-layout: fixed;
-        word-wrap: break-word;
-        text-align: center;
-    }
-    </style>
     <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
     <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 </head>
@@ -38,7 +25,8 @@
           <ul class="nav navbar-nav">
             <li><a href="/">Home</a></li>
             <li><a href="/chat/{{chat}}">{{chat}}</a></li>
-            <li {% if page == 'unban' %}class="active"{% endif %}><a href="/chat/{{chat}}/unban">Unban</a></li>
+            <li {% if page == 'mods' %}class="active"{% endif %}><a href="{{url_for("chat.mods", chat=chat)}}">Mods</a></li>
+            <li {% if page == 'unban' %}class="active"{% endif %}><a href="{{url_for("chat.unban", chat=chat)}}">Unban</a></li>
           </ul>
         </div><!--/.nav-collapse-->
       </div>

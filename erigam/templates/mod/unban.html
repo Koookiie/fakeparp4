@@ -3,15 +3,6 @@
 {% set page = 'unban' %}
 
 {% block content %}
-    <script>
-        $(document).ready(function(){
-            if (screen.width <= 699) {
-                $("td").css('font-size', '14px');
-                $(".btn").css("padding", "5px");
-            }
-        });
-    </script>
-
     <div class="container">
     	{% if result %}<div class="alert alert-info">{{result}}</div>{% endif %}
         <h1> Bans for chat: <small>{{chat}}</small> </h1>
@@ -19,7 +10,7 @@
             <thead>
                 <tr>
                     <th class="col-sm-2">Chat</th>
-                    <th class="col-sm-2">Expires</th>
+                    <th class="col-sm-2">Created</th>
                     <th class="col-sm-7">Reason</th>
                     <th class="col-sm-1">Unban</th>
                 </tr>
@@ -30,7 +21,7 @@
     				<input type="hidden" name="banid" value="{{ban.id}}"/>
                 <tr>
                     <td><a href="/chat/{{chat}}"> {{ban.url}} </a></td>
-                    <td>{{ban.expires}}</td>
+                    <td>{{ban.created.strftime("%B %d, %Y %H:%M:%S %Z")}}</td>
                     <td>{{ban.reason or "No reason specified"}}</td>
                     <td><button type="submit" class="btn btn-primary unban">Unban</button></td>
                 </tr>

@@ -76,6 +76,7 @@ class Ban(Base):
     name = Column(Unicode(100))
     counter = Column(Integer)
     reason = Column(UnicodeText)
+    created = Column(DateTime(), nullable=False, default=now)
     expires = Column(DateTime(), nullable=False)
 
 class Message(Base):

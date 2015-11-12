@@ -35,7 +35,8 @@
                 <th class="col-sm-2">Chat</th>
                 <th class="col-sm-1">IP</th>
                 <th class="col-sm-2">Name</th>
-                <th class="col-sm-6">Reason</th>
+                <th class="col-sm-2">Created</th>
+                <th class="col-sm-4">Reason</th>
                 <th class="col-sm-1">Unban</th>
             </tr>
         </thead>
@@ -47,6 +48,7 @@
                 <td><a href="/chat/{{ban.url}}"> {{ban.url}} </a></td>
                 <td>{{ban.ip}}</td>
                 <td>{{ban.name}} (user{{ban.counter}})</td>
+                <td>{{ban.created.strftime("%B %d, %Y %H:%M:%S %Z")}}</td>
                 <td>{{ban.reason or "No reason specified"}}</td>
                 <td><button type="submit" class="btn btn-primary">Unban</button></td>
             </tr>

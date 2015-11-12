@@ -72,7 +72,9 @@ define("erigam/settings", ['jquery', 'erigam/helpers', 'erigam/bbcode'], functio
 				value = temp_storage[key];
 			}
 
-			if (raw === true) return value;
+			// Return raw value if raw is specified or value is not 0 or 1.
+			if (raw || (value !== "0" && value !== "1")) return value;
+
 			return value == "1";
 		}
 	};

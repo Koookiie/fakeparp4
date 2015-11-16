@@ -1,7 +1,4 @@
-try:
-    import ujson as json
-except:
-    import json
+import json
 from flask import Blueprint, g, request, render_template, redirect, url_for, jsonify, abort
 
 from erigam.lib import SEARCH_PERIOD, get_time

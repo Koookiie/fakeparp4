@@ -1,7 +1,4 @@
-try:
-    import ujson as json
-except:
-    import json
+import json
 
 from erigam.lib import get_time, LONGPOLL_TIMEOUT_PERIOD
 from erigam.lib.characters import CHARACTER_DETAILS

@@ -1,7 +1,4 @@
-try:
-    import ujson as json
-except:
-    import json
+import json
 import re
 
 from flask import request

@@ -1,18 +1,13 @@
 ---
 
-- hosts: builder
-  sudo: yes
-  roles:
-    - build
-
 - hosts: erigam
-  serial: 1
-  sudo: yes
+  become: yes
 
   vars_files:
   - vars/erigam_docker_env.yml
 
   roles:
+    - build
     - deploy
 
   handlers:

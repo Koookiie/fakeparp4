@@ -1,3 +1,4 @@
+import logging
 import os
 import traceback
 
@@ -42,10 +43,25 @@ app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True
 
 # Throw tracebacks to console
+app.config["SENTRY_PRIVATE_DSN"] = os.environ.get("SENTRY_PRIVATE_DSN", None)
+app.config["SENTRY_PUBLIC_DSN"] = os.environ.get("SENTRY_PUBLIC_DSN", None)
 app.config['PROPAGATE_EXCEPTIONS'] = True
 
 if 'DEBUG' in os.environ:
     app.config['DEBUG'] = True
+
+# Sentry
+if app.config["SENTRY_PRIVATE_DSN"]:  # pragma: no cover
+    from raven.contrib.flask import Sentry
+    app.config["SENTRY_INCLUDE_PATHS"] = ["erigam"]
+    sentry = Sentry(app,
+        dsn=app.config["SENTRY_PRIVATE_DSN"],
+        logging=True,
+        level=logging.ERROR,
+    )
+    logging.getLogger("sentry.errors.uncaught").setLevel(logging.CRITICAL)
+else:
+    sentry = None
 
 # Register Blueprints
 app.register_blueprint(main.blueprint)

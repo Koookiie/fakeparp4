@@ -78,6 +78,9 @@ def get_sublist(redis, chat, sessions):
             new_session_character.update(session_character)
             session_character = new_session_character
         if session_character and session_meta:
+            if len(session_character) > 16:
+                session_character = dict(CHARACTER_DETAILS['anonymous/other'])
+
             sublist.append({
                 'character': session_character,
                 'meta': session_meta,

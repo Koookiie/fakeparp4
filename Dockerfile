@@ -8,8 +8,8 @@ WORKDIR /src
 
 # Add and install Python modules
 ADD requirements.txt /src/requirements.txt
-RUN sudo curl https://bootstrap.pypa.io/ez_setup.py -o - | sudo python3.5
-RUN easy_install pip
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN python3.5 get-pip.py
 RUN python3.5 -m pip install --upgrade setuptools
 RUN python3.5 -m pip install -r requirements.txt
 

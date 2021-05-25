@@ -11,6 +11,6 @@
     "grunt-sass": "^1.0.0"
   },
   "scripts": {
-    "postinstall": "node node_modules/.bin/bower cache clean && node node_modules/.bin/bower update"
+    "postinstall": "bash node_modules/.bin/bower cache clean && bash node_modules/.bin/bower update"
   }
 }

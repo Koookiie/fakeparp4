@@ -59,6 +59,7 @@ define("erigam/tts", ['jquery', 'erigam/helpers', 'erigam/settings'], function($
 
 		var text = $(event.target).find('.text').text();
 		text = text.substring(text.indexOf(":") + 1);
+		text = text.replace(/[^\x00-\x7F]/g, "");
 
 		var utterance = new SpeechSynthesisUtterance(text);
 		var voiceArr = speechSynthesis.getVoices();

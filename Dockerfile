@@ -8,13 +8,13 @@ WORKDIR /src
 
 # Add and install Python modules
 ADD requirements.txt /src/requirements.txt
-RUN py -m pip install -r requirements.txt
+RUN python3.8 -m pip install -r requirements.txt
 
 # Bundle app source
 ADD . /src
 
 # Install main module
-RUN py setup.py install
+RUN python3.8 setup.py install
 
 # Expose web port
 EXPOSE 5000

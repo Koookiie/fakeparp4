@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 
 # Update packages and install setup requirements.
-RUN DEBIAN_FRONTEND=noninteractive apt-get update -y && apt-get -y install python3.8 python3.8-dev libpq-dev libffi-dev git-core
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -y && apt-get -y install python3.8 python3.8-pip python3.8-dev libpq-dev libffi-dev git-core
 
 # Set WORKDIR to /src
 WORKDIR /src

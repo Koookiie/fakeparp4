@@ -61,7 +61,7 @@ define("erigam/tts", ['jquery', 'erigam/helpers', 'erigam/settings'], function($
 		text = text.substring(text.indexOf(":") + 1);
 		text = text.trim();
 		if (text.includes("◖(◕ω◕)◗ < ")) {
-			text.replace("◖(◕ω◕)◗ < ", "");
+			text = text.replace("◖(◕ω◕)◗ < ", "");
 		}
 		var utterance = new SpeechSynthesisUtterance(text);
 		var voiceArr = speechSynthesis.getVoices();

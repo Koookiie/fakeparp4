@@ -8,7 +8,7 @@ WORKDIR /src
 
 # Add and install Python modules
 ADD requirements.txt /src/requirements.txt
-RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN curl https://bootstrap.pypa.io/pip/3.5/get-pip.py -o get-pip.py
 RUN python3.5 get-pip.py
 RUN python3.5 -m pip install --upgrade setuptools
 RUN python3.5 -m pip install -r requirements.txt

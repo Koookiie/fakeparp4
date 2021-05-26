@@ -19,7 +19,7 @@
 <div id="archiveConversation">
 {% if messages|length!=0 %}
 {% set last_date = None %}
-{% set current_date = message[0]['timestamp'].date() %}
+{% set current_date = messages[0]['timestamp'].date() %}
 <h1>{{current_date.strftime("%A %d %B %Y")}}</h1>
 {% for message in messages %}
 	{{macros.render_message(message)}}

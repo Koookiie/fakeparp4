@@ -18,7 +18,7 @@
 
 <div id="archiveConversation">
 {% if messages|length!=0 %}
-{% set last_date = None %}
+{% set last_date = datetime.date(1, 1, 1) %}
 {% for message in messages %}
 {% set current_date = message['timestamp'].date() %}
 

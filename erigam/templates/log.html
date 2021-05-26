@@ -19,11 +19,11 @@
 <div id="archiveConversation">
 {% if messages|length!=0 %}
 {% import datetetime %}
-{% set last_date = datetime.date(1, 1, 1) %}
+{% set last_date = None %}
 {% for message in messages %}
 {% set current_date = message['timestamp'].date() %}
 
-{% if current_date.strftime("%A %d %B %Y")!=last_date.strftime("%A %d %B %Y") %}
+{% if last_date==None or (current_date.strftime("%A %d %B %Y") != last_date.strftime("%A %d %B %Y")) %}
     <h1>{{current_date.strftime("%A %d %B %Y")}}</h1>
 {% set last_date = current_date %}
 {% endif %}

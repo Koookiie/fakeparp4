@@ -18,7 +18,6 @@
 
 <div id="archiveConversation">
 {% if messages|length!=0 %}
-{% import datetetime %}
 {% set last_date = None %}
 {% for message in messages %}
 {% set current_date = message['timestamp'].date() %}

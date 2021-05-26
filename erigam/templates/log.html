@@ -18,10 +18,13 @@
 
 <div id="archiveConversation">
 {% if messages|length!=0 %}
-{% set last_date = None %}
-{% set current_date = messages[0]['timestamp'].date() %}
-<h1>{{current_date.strftime("%A %d %B %Y")}}</h1>
+{% set ns = namespace(last_date=None) %}
 {% for message in messages %}
+{% set current_date = message['timestamp'].date() %}
+{% if ns.last_date != none or (current_date.strftime("%A %d %B %Y")!=ns.last_date.strftime("%A %d %B %Y")) %}
+    <h1>{{current_date.strftime("%A %d %B %Y")}}</h1>
+{% set ns.last_date = current_date %}
+{% endif %}
 	{{macros.render_message(message)}}
 {% endfor %}
 {% else %}

@@ -21,7 +21,7 @@
 {% set ns = namespace(last_date=None) %}
 {% for message in messages %}
 {% set current_date = message['timestamp'].date() %}
-{% if ns.last_date != None and (current_date != ns.last_date) %}
+{% if current_date != ns.last_date %}
     <h1>{{current_date.strftime("%A %d %B %Y")}}</h1>
 {% set ns.last_date = current_date %}
 {% endif %}

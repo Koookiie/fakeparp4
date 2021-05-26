@@ -566,10 +566,11 @@ define("erigam/views/chat", [
 	});
 
 	// ;)
-
+	/*
 	if (Math.floor(Math.random()*413) === 0) {
 		$("body > *").css("transform", "rotate(180deg)");
 	}
+	*/
 
 	/* Color inputs */
 	var color_input = $("#color_input").change(function() {

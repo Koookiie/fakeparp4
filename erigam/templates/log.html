@@ -22,7 +22,6 @@
 {% for message in messages %}
 {% set current_date = message['timestamp'].date() %}
 
-{% endif %}
 	{{macros.render_message(message)}}
 {% endfor %}
 {% else %}

@@ -64,7 +64,7 @@ def set_cookie(response):
         response.set_cookie('session', g.user.session_id,
             httponly=True,
             max_age=365*24*60*60,
-            domain="." + os.environ.get("BASE_DOMAIN", "terminallycapricio.us")
+            domain="." + os.environ.get("BASE_DOMAIN", "dreambubble.xyz")
         )
 
         response.set_cookie('session', g.user.session_id,

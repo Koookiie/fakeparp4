@@ -387,7 +387,7 @@ define("erigam/views/chat", [
 		}
 
 		if (textPreview.length>0) {
-			$('#preview').text(textPreview);
+			$('#preview').text(bbcode.encode(textPreview, false));
 		} else {
 			$('#preview').html('&nbsp;');
 		}
@@ -522,7 +522,7 @@ define("erigam/views/chat", [
 
 	$('#audioButton').click(function() {
 		if ($.inArray(user.meta.group, MOD_GROUPS)!=-1) {
-			var new_audio = prompt('Please enter a audio URL for the chat:');
+			var new_audio = prompt('Please enter a audio URL for the chat (Mp3 or Wav):');
 			if (new_audio !== null) {
 				$.post(POST_URL,{'chat': chat, 'audio': new_audio});
 			} 

@@ -387,7 +387,8 @@ define("erigam/views/chat", [
 		}
 
 		if (textPreview.length>0) {
-			$('#preview').html(bbcode.encode(textPreview));
+			$('#preview').html(bbcode.encode(msg.text));
+			// $('#preview').text(textPreview);
 		} else {
 			$('#preview').html('&nbsp;');
 		}
@@ -446,7 +447,22 @@ define("erigam/views/chat", [
 			// Returns false if there is nothing in the text input box.
 			if (!$('#textInput').val().trim()) return false;
 
-			sendMessage($('#textInput').val(), function() {
+			var textPreview = $('#textInput').val();
+
+			if (textPreview.match(/https?:\/\//)) {
+				textPreview = jQuery.trim(textPreview);
+			} else if (textPreview.substr(0,1)=='/' && textPreview.substr(0,4)!=='/ooc') {
+				textPreview = jQuery.trim(textPreview.substr(1));
+			} else {
+				textPreview = quirks.apply(jQuery.trim(textPreview), user.character);
+			}
+
+			if (textPreview.substr(0,4)=='/ooc') {
+				textPreview = jQuery.trim(textPreview.substr(4));
+				textPreview = "(( "+textPreview+" ))";
+			}
+
+			sendMessage(textPreview, function() {
 				if (pingInterval) window.clearTimeout(pingInterval);
 				pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
 			});

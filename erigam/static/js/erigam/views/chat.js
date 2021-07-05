@@ -387,7 +387,7 @@ define("erigam/views/chat", [
 		}
 
 		if (textPreview.length>0) {
-			$('#preview').html(bbcode.encode(msg.text));
+			$('#preview').html(bbcode.encode(textPreview));
 			// $('#preview').text(textPreview);
 		} else {
 			$('#preview').html('&nbsp;');

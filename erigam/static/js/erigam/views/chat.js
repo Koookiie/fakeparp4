@@ -387,7 +387,9 @@ define("erigam/views/chat", [
 		}
 
 		if (textPreview.length>0) {
-			$('#preview').html(bbcode.encode(textPreview));
+			bbcode_result = bbcode.encode(textPreview);
+			console.log(bbcode_result);
+			$('#preview').html(bbcode_result);
 		} else {
 			$('#preview').html('&nbsp;');
 		}
@@ -446,7 +448,7 @@ define("erigam/views/chat", [
 			// Returns false if there is nothing in the text input box.
 			if (!$('#textInput').val().trim()) return false;
 
-			sendMessage($("#preview").text(), function() {
+			sendMessage($('#textInput').val(), function() {
 				if (pingInterval) window.clearTimeout(pingInterval);
 				pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
 			});

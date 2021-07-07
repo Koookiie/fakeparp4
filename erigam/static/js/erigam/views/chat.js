@@ -357,7 +357,12 @@ define("erigam/views/chat", [
 	}
 
 	function ipLookupNumber(num) {
-		$.post("/chat_ajax/ip_lookup", { 'chat': chat, 'counter': num }, function(ip) {
+		$.ajax(
+			{
+				type: 'POST',
+				url: '/chat_ajax/ip_lookup',
+				data: { 'chat': chat, 'counter': num }
+		}).done(function(ip) {
 			messages.add({counter: "-1", color: "000000", text: "[SYSTEM] user" +num+ "'s IP: " + ip});
 		});
 	}

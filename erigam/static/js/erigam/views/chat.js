@@ -375,7 +375,7 @@ define("erigam/views/chat", [
 
 		if (textPreview.match(/https?:\/\//)) {
 			textPreview = jQuery.trim(textPreview);
-		} else if (textPreview.substr(0,1)=='/' && textPreview.substr(0,4)!=='/ooc') {
+		} else if (textPreview.substr(0,1)=='/' && (textPreview.substr(0,4)!=='/ooc' || textPreview.substr(0,7)!=='/lookup')) {
 			textPreview = jQuery.trim(textPreview.substr(1));
 		} else {
 			textPreview = quirks.apply(jQuery.trim(textPreview), user.character);
@@ -384,6 +384,11 @@ define("erigam/views/chat", [
 		if (textPreview.substr(0,4)=='/ooc') {
 			textPreview = jQuery.trim(textPreview.substr(4));
 			textPreview = "(( "+textPreview+" ))";
+		}
+
+		if (textPreview.substr(0,7)=='/lookup') {
+			textPreview = jQuery.trim(textPreview.substr(7));
+			textPreview = "Look up user " + textPreview;
 		}
 
 		if (textPreview.length>0) {

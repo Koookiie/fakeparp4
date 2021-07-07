@@ -6,6 +6,9 @@ from erigam.lib.model import Log, Chat, ChatSession
 from sqlalchemy.orm.exc import NoResultFound
 
 def create(sql, redis, url, chattype="group"):
+    if redis.hexists('punish-scene', g.user.ip):
+        raise ValueError('pandamode')
+
     if sql.query(Log).filter(Log.url == url).scalar():
         raise ValueError('chaturl_taken')
 

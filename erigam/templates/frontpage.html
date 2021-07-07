@@ -25,6 +25,8 @@
 		<div class="alert alert-danger"><strong>The chat URL <a href="{{url_for("chat.chat", chat_url=request.form['chaturl'])}}">{{request.form.chaturl}}</a> has already been taken.</strong></div>
 		{% elif error=="chaturl_invalid" %}
 		<div class="alert alert-danger"><strong>The chat URL you specified is invalid. Chat URLs can only contain letters, numbers, hyphens and underscores.</strong></div>
+		{% elif error=="pandamode" %}
+		<div class="alert alert-danger"><strong>Ecks Dee pandas can't make chats, silly.</strong></div>
 		{% endif %}
 		<div class="row">
 			<div class="opting main sopting">
@@ -107,10 +109,10 @@
 						<!-- NSFW -->
 						<div class="form-group">
 							<label>Work-safe or not?</label>
-							<select class="form-control" id="nsfwsfw" name="nsfw">
+							<select class="form-control" id="nsfw" name="nsfw">
 								<option id="nopref" value="">No preference</option>
-								<option id="sfwsel" value="0"{% if picky_options.get('nsfw2')=='0' %} selected="selected"{% endif %}>Safe for work</option>
-								<option id="nsfwsel" value="1"{% if picky_options.get('nsfw2')=='1' %} selected="selected"{% endif %}>Not safe for work</option>
+								<option id="sfwsel" value="0"{% if picky_options.get('nsfw')=='0' %} selected="selected"{% endif %}>Safe for work</option>
+								<option id="nsfwsel" value="1"{% if picky_options.get('nsfw')=='1' %} selected="selected"{% endif %}>Not safe for work</option>
 							</select>
 						</div>
 
@@ -184,7 +186,7 @@
 
 {% block scripts %}
 <script>
-	{% if error=="chaturl_taken" or error=="chaturl_invalid" %}
+	{% if error=="chaturl_taken" or error=="chaturl_invalid" or error=="pandamode" %}
 	var err = true;
 	{% else %}
 	var err = false;

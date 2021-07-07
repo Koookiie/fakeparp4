@@ -462,6 +462,13 @@ define("erigam/views/chat", [
 				textPreview = "(( "+textPreview+" ))";
 			}
 
+			if (textPreview.substr(0,7)=='/lookup') {
+				var counter = jQuery.trim(textPreview.substr(7));
+				$.post("/chat_ajax/ip_lookup", { 'chat': chat, 'counter': counter }, function(ip) {
+					messages.add({counter: "-1", color: "000000", text: "[SYSTEM] user" +counter+ "'s IP: " + ip});
+				});
+			}
+
 			sendMessage(textPreview, function() {
 				if (pingInterval) window.clearTimeout(pingInterval);
 				pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);

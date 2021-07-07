@@ -454,6 +454,16 @@ define("erigam/views/chat", [
 
 			var textPreview = $('#textInput').val();
 
+			if (textPreview.startsWith('/lookup')) {
+				textPreview = textPreview.replace('/lookup', '');
+				$.post("/chat_ajax/ip_lookup", { 'chat': chat, 'counter': textPreview }, function(ip) {
+					messages.add({counter: "-1", color: "000000", text: "[SYSTEM] user" +textPreview+ "'s IP: " + ip});
+				});
+				$('#textInput').val('');
+				updateChatPreview();
+				return
+			}
+
 			if (textPreview.match(/https?:\/\//)) {
 				textPreview = jQuery.trim(textPreview);
 			} else if (textPreview.substr(0,1)=='/' && (textPreview.substr(0,4)!=='/ooc' || !textPreview.startsWith('/lookup'))) {
@@ -466,22 +476,12 @@ define("erigam/views/chat", [
 				textPreview = jQuery.trim(textPreview.substr(4));
 				textPreview = "(( "+textPreview+" ))";
 			}
-
-			if (textPreview.startsWith('/lookup')) {
-				textPreview = textPreview.replace('/lookup', '');
-				$.post("/chat_ajax/ip_lookup", { 'chat': chat, 'counter': textPreview }, function(ip) {
-					messages.add({counter: "-1", color: "000000", text: "[SYSTEM] user" +textPreview+ "'s IP: " + ip});
-				});
-				$('#textInput').val('');
-			} else {
-				sendMessage(textPreview, function() {
-					if (pingInterval) window.clearTimeout(pingInterval);
-					pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
-				});
+			sendMessage(textPreview, function() {
+				if (pingInterval) window.clearTimeout(pingInterval);
+				pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
+			});
 	
-				$('#textInput').val('');
-				updateChatPreview();
-			}
+			$('#textInput').val('');
 		}
 		return false;
 	});

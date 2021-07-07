@@ -19,3 +19,4 @@ Werkzeug==0.12.2
 wheel==0.29.0
 raven==6.1.0
 blinker
+requests

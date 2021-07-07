@@ -1,4 +1,6 @@
 import os
+import requests
+import sys
 from flask import g, request, abort, current_app
 from redis import ConnectionPool, Redis
 
@@ -17,6 +19,23 @@ redis_pool = ConnectionPool(
     decode_responses=True
 )
 
+# VPN checking
+
+def checkIP(ip):
+	#change this variable to your email address
+	contactEmail="hecksadecimal@outlook.com"
+	#if probability from getIPIntel is grater than this value, return 1
+	maxProbability=0.99
+	timeout=5.00
+	#if you wish to use flags or json format, edit the request below
+	result = requests.get("http://check.getipintel.net/check.php?ip="+ip+"&contact="+contactEmail, timeout=timeout)
+	if (result.status_code != 200) or (float(result.content) < 0):
+		sys.stderr.write("An error occured while querying GetIPIntel")
+	if (float(result.content) > maxProbability):
+		return 1;
+	else:
+		return 0;
+
 # Before request
 
 def connect_redis():
@@ -34,6 +53,16 @@ def create_session():
     # Do not bother allowing the user in if they are globalbanned.
     if g.redis.sismember("globalbans", request.headers.get('X-Forwarded-For', request.remote_addr)):
         abort(403)
+    
+    # VPN prevention
+    if g.redis.sismember("vpn-ips", request.headers.get('X-Forwarded-For', request.remote_addr)):
+        abort(403)
+    elif not g.redis.sismember("cleared-ips", request.headers.get('X-Forwarded-For', request.remote_addr)):
+        if checkIP(request.headers.get('X-Forwarded-For', request.remote_addr)):
+            g.redis.sadd("vpn-ips", request.headers.get('X-Forwarded-For', request.remote_addr))
+            abort(403)
+        else:
+            g.redis.sadd("cleared-ips", request.headers.get('X-Forwarded-For', request.remote_addr))
 
     # Create a user object, using session ID.
 

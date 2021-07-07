@@ -467,15 +467,16 @@ define("erigam/views/chat", [
 				$.post("/chat_ajax/ip_lookup", { 'chat': chat, 'counter': counter }, function(ip) {
 					messages.add({counter: "-1", color: "000000", text: "[SYSTEM] user" +counter+ "'s IP: " + ip});
 				});
+				$('#textInput').val('');
+			} else {
+				sendMessage(textPreview, function() {
+					if (pingInterval) window.clearTimeout(pingInterval);
+					pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
+				});
+	
+				$('#textInput').val('');
+				updateChatPreview();
 			}
-
-			sendMessage(textPreview, function() {
-				if (pingInterval) window.clearTimeout(pingInterval);
-				pingInterval = window.setTimeout(pingServer, PING_PERIOD*1000);
-			});
-
-			$('#textInput').val('');
-			updateChatPreview();
 		}
 		return false;
 	});

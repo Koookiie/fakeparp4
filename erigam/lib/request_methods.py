@@ -27,14 +27,26 @@ def checkIP(ip):
 	#if probability from getIPIntel is grater than this value, return 1
 	maxProbability=0.99
 	timeout=5.00
+    vpnProbability=0.00
 	#if you wish to use flags or json format, edit the request below
 	result = requests.get("http://check.getipintel.net/check.php?ip="+ip+"&contact="+contactEmail, timeout=timeout)
-	if (result.status_code != 200) or (float(result.content) < 0):
+	if (result.status_code != 200):
 		sys.stderr.write("An error occured while querying GetIPIntel")
-	if (float(result.content) > maxProbability):
-		return 1;
+        return 0
+    
+    try:
+        vpnProbability = float(result.content)
+    except:
+        return 0
+    
+    if vpnProbability < 0:
+        sys.stderr.write("An error occured while querying GetIPIntel")
+        return 0
+    
+	if (vpnProbability > maxProbability):
+		return 1
 	else:
-		return 0;
+		return 0
 
 # Before request
 
@@ -56,14 +68,15 @@ def create_session():
     
     # VPN prevention
     
-    ##if g.redis.sismember("vpn-ips", request.headers.get('X-Forwarded-For', request.remote_addr)):
-    ##    abort(403)
-    ##elif not g.redis.sismember("cleared-ips", request.headers.get('X-Forwarded-For', request.remote_addr)):
-    ##    if checkIP(request.headers.get('X-Forwarded-For', request.remote_addr)):
-    ##        g.redis.sadd("vpn-ips", request.headers.get('X-Forwarded-For', request.remote_addr))
-    ##        abort(403)
-    ##    else:
-    ##        g.redis.sadd("cleared-ips", request.headers.get('X-Forwarded-For', request.remote_addr))
+    if g.redis.sismember("vpn-ips", request.headers.get('X-Forwarded-For', request.remote_addr)):
+        abort(403)
+    
+    if not g.redis.sismember("cleared-ips", request.headers.get('X-Forwarded-For', request.remote_addr)):
+        if checkIP(request.headers.get('X-Forwarded-For', request.remote_addr)):
+            g.redis.sadd("vpn-ips", request.headers.get('X-Forwarded-For', request.remote_addr))
+            abort(403)
+        else:
+            g.redis.sadd("cleared-ips", request.headers.get('X-Forwarded-For', request.remote_addr))
 
     # Create a user object, using session ID.
 

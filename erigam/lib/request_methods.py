@@ -55,14 +55,15 @@ def create_session():
         abort(403)
     
     # VPN prevention
-    if g.redis.sismember("vpn-ips", request.headers.get('X-Forwarded-For', request.remote_addr)):
-        abort(403)
-    elif not g.redis.sismember("cleared-ips", request.headers.get('X-Forwarded-For', request.remote_addr)):
-        if checkIP(request.headers.get('X-Forwarded-For', request.remote_addr)):
-            g.redis.sadd("vpn-ips", request.headers.get('X-Forwarded-For', request.remote_addr))
-            abort(403)
-        else:
-            g.redis.sadd("cleared-ips", request.headers.get('X-Forwarded-For', request.remote_addr))
+    
+    ##if g.redis.sismember("vpn-ips", request.headers.get('X-Forwarded-For', request.remote_addr)):
+    ##    abort(403)
+    ##elif not g.redis.sismember("cleared-ips", request.headers.get('X-Forwarded-For', request.remote_addr)):
+    ##    if checkIP(request.headers.get('X-Forwarded-For', request.remote_addr)):
+    ##        g.redis.sadd("vpn-ips", request.headers.get('X-Forwarded-For', request.remote_addr))
+    ##        abort(403)
+    ##    else:
+    ##        g.redis.sadd("cleared-ips", request.headers.get('X-Forwarded-For', request.remote_addr))
 
     # Create a user object, using session ID.
 

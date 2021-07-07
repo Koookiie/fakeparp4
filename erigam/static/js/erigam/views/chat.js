@@ -357,8 +357,7 @@ define("erigam/views/chat", [
 	}
 
 	function ipLookupNumber(num) {
-		$.ajax(
-			{
+		$.ajax({
 				type: 'POST',
 				url: '/chat_ajax/ip_lookup',
 				data: { 'chat': chat, 'counter': num }
@@ -470,7 +469,7 @@ define("erigam/views/chat", [
 				ipLookupNumber(textPreview);
 				$('#textInput').val('');
 				updateChatPreview();
-				return
+				return false;
 			}
 
 			if (textPreview.match(/https?:\/\//)) {

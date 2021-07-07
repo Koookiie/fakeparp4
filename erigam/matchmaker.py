@@ -31,6 +31,7 @@ def check_compatibility(first, second):
             first_option is not None
             and second_option is not None
             and first_option != second_option
+            and first['panda'] != second['panda']
         ):
             return False, None
         if first_option is not None:
@@ -52,6 +53,7 @@ if __name__ == '__main__':
             sessions = [{
                 'id': session_id,
                 'options': redis.hgetall('session.'+session_id+'.picky-options'),
+                'panda': redis.hexists('punish-scene', redis.hget('session.'+session_id+'.meta', 'last_ip'))
             } for session_id in searchers]
 
             # https://docs.python.org/2/library/functions.html#zip

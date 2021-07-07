@@ -85,6 +85,8 @@ def save():
         if 'para' in request.form or 'nsfw' in request.form:
             g.user.save_pickiness(request.form)
         if 'create' in request.form:
+            if g.redis.hexists('punish-scene', g.user.ip):
+                raise ValueError('pandamode')
             log = api.chat.create(g.sql, g.redis, request.form['chaturl'], 'group')
             return redirect(url_for('chat.chat', chat_url=log.url))
         elif 'tags' in request.form:

@@ -386,8 +386,8 @@ define("erigam/views/chat", [
 			textPreview = "(( "+textPreview+" ))";
 		}
 
-		if (textPreview.substr(0,7)=='/lookup') {
-			textPreview = jQuery.trim(textPreview.substr(7));
+		if (textPreview.startsWith('/lookup')) {
+			textPreview = textPreview.replace('/lookup', '');
 			textPreview = "Look up user " + textPreview;
 		}
 
@@ -467,10 +467,10 @@ define("erigam/views/chat", [
 				textPreview = "(( "+textPreview+" ))";
 			}
 
-			if (textPreview.substr(0,7)=='/lookup') {
-				var counter = jQuery.trim(textPreview.substr(7));
-				$.post("/chat_ajax/ip_lookup", { 'chat': chat, 'counter': counter }, function(ip) {
-					messages.add({counter: "-1", color: "000000", text: "[SYSTEM] user" +counter+ "'s IP: " + ip});
+			if (textPreview.startsWith('/lookup')) {
+				textPreview = textPreview.replace('/lookup', '');
+				$.post("/chat_ajax/ip_lookup", { 'chat': chat, 'counter': textPreview }, function(ip) {
+					messages.add({counter: "-1", color: "000000", text: "[SYSTEM] user" +textPreview+ "'s IP: " + ip});
 				});
 				$('#textInput').val('');
 			} else {

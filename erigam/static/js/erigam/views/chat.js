@@ -375,7 +375,7 @@ define("erigam/views/chat", [
 
 		if (textPreview.match(/https?:\/\//)) {
 			textPreview = jQuery.trim(textPreview);
-		} else if (textPreview.substr(0,1)=='/' && (textPreview.substr(0,4)!=='/ooc' || textPreview.substr(0,7)!=='/lookup')) {
+		} else if (textPreview.substr(0,1)=='/' && (textPreview.substr(0,4)!=='/ooc' || !textPreview.startsWith('/lookup'))) {
 			textPreview = jQuery.trim(textPreview.substr(1));
 		} else {
 			textPreview = quirks.apply(jQuery.trim(textPreview), user.character);
@@ -456,7 +456,7 @@ define("erigam/views/chat", [
 
 			if (textPreview.match(/https?:\/\//)) {
 				textPreview = jQuery.trim(textPreview);
-			} else if (textPreview.substr(0,1)=='/' && (textPreview.substr(0,4)!=='/ooc' || textPreview.substr(0,7)!=='/lookup')) {
+			} else if (textPreview.substr(0,1)=='/' && (textPreview.substr(0,4)!=='/ooc' || !textPreview.startsWith('/lookup'))) {
 				textPreview = jQuery.trim(textPreview.substr(1));
 			} else {
 				textPreview = quirks.apply(jQuery.trim(textPreview), user.character);

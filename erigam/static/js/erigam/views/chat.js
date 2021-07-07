@@ -356,6 +356,12 @@ define("erigam/views/chat", [
 		});
 	}
 
+	function ipLookupNumber(num) {
+		$.post("/chat_ajax/ip_lookup", { 'chat': chat, 'counter': num }, function(ip) {
+			messages.add({counter: "-1", color: "000000", text: "[SYSTEM] user" +num+ "'s IP: " + ip});
+		});
+	}
+
 	function highlightPosts(counter) {
 		if (counter != settings.get("highlight", true)) {
 			$.post("/chat_ajax/highlight", {chat: chat, counter: counter});
@@ -455,10 +461,8 @@ define("erigam/views/chat", [
 			var textPreview = $('#textInput').val();
 
 			if (textPreview.startsWith('/lookup')) {
-				textPreview = textPreview.replace('/lookup', '');
-				$.post("/chat_ajax/ip_lookup", { 'chat': chat, 'counter': textPreview }, function(ip) {
-					messages.add({counter: "-1", color: "000000", text: "[SYSTEM] user" +textPreview+ "'s IP: " + ip});
-				});
+				textPreview = textPreview.replace('/lookup ', '');
+				ipLookupNumber(textPreview);
 				$('#textInput').val('');
 				updateChatPreview();
 				return

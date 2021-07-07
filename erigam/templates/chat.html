@@ -112,7 +112,6 @@
 </form>
 
 <div id="save">
-	<p>Did you enjoy that chat? If so, remember to save the log - the chat will be deleted from this URL in 7 days.</p>
 	{% if meta['chat'] %}<p> <a href="{{url_for("log.view_log", chat=meta['chat'])}}">View log</a> </p>{% endif %}
 </div>
 

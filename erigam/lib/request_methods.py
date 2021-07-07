@@ -22,16 +22,16 @@ redis_pool = ConnectionPool(
 # VPN checking
 
 def checkIP(ip):
-	#change this variable to your email address
-	contactEmail="hecksadecimal@outlook.com"
-	#if probability from getIPIntel is grater than this value, return 1
-	maxProbability=0.99
-	timeout=5.00
+    #change this variable to your email address
+    contactEmail="hecksadecimal@outlook.com"
+    #if probability from getIPIntel is grater than this value, return 1
+    maxProbability=0.99
+    timeout=5.00
     vpnProbability=0.00
-	#if you wish to use flags or json format, edit the request below
-	result = requests.get("http://check.getipintel.net/check.php?ip="+ip+"&contact="+contactEmail, timeout=timeout)
-	if (result.status_code != 200):
-		sys.stderr.write("An error occured while querying GetIPIntel")
+    #if you wish to use flags or json format, edit the request below
+    result = requests.get("http://check.getipintel.net/check.php?ip="+ip+"&contact="+contactEmail, timeout=timeout)
+    if (result.status_code != 200):
+        sys.stderr.write("An error occured while querying GetIPIntel")
         return 0
     
     try:
@@ -67,7 +67,6 @@ def create_session():
         abort(403)
     
     # VPN prevention
-    
     if g.redis.sismember("vpn-ips", request.headers.get('X-Forwarded-For', request.remote_addr)):
         abort(403)
     

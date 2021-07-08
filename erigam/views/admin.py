@@ -173,7 +173,9 @@ def panda():
 @use_db
 def vpn_bans():
     bans = g.redis.smembers('vpn-ips')
+    cleared = g.redis.smembers('cleared-ips')
 
     return render_template('admin/vpnbans.html',
-        bans=bans
+        bans=bans,
+        cleared=cleared
     )

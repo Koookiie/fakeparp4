@@ -167,3 +167,13 @@ def panda():
         result=result,
         extrapunishments=extrapunishments
     )
+
+@blueprint.route('/vpnbans', methods=['GET'])
+@require_admin
+@use_db
+def vpn_bans():
+    bans = g.redis.smembers('vpn-ips')
+
+    return render_template('admin/vpnbans.html',
+        bans=bans
+    )

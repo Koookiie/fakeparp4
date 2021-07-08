@@ -29,6 +29,7 @@
                         <li {% if page == 'broadcast' %}class="active"{% endif %}><a href="{{url_for('admin.broadcast')}}">Broadcast</a></li>
                         <li {% if page == 'allbans' %}class="active"{% endif %}><a href="{{url_for('admin.all_bans')}}">All Bans</a></li>
                         <li {% if page == 'panda' %}class="active"{% endif %}><a href="{{url_for('admin.panda')}}">Panda</a></li>
+                        <li {% if page == 'vpnbans' %}class="active"{% endif %}><a href="{{url_for('admin.vpn_bans')}}">VPN Bans</a></li>
                     </ul>
                 </li>
                 {% endif %}

@@ -8,10 +8,14 @@ define("erigam/bbcode", ['jquery', 'erigam/helpers'], function($, helpers) {
 			return this.raw_encode(helpers.html_encode(text), admin);
 		},
 		raw_encode: function(text, admin) {
-			var self = this;
-
-			text = text.replace(/(\[br\])+/g, "<br>");
-			return text.replace(/(https?:\/\/\S+)|\[([A-Za-z]+)(?:=([^\]]+))?\]([\s\S]*?)\[\/\2\]/g, function(str, url, tag, attribute, content) {
+			// convert BBCode inside [raw] to html escapes to prevent stacking problems and make it show with BBcode disabled
+			var re = /\[raw\]([\s\S]*?)\[([\s\S]*?)\]([\s\S]*?)\[\/raw\]/ig;
+			while (re.exec(text)) {
+				text = text.replace(re, "[raw]$1&#91;$2&#93;$3[/raw]");
+			}
+			text = text.replace(/(\[[bB][rR]\])+/g, "<br>");
+			// Just outright make this match case insensitive so we don't have to worry about tags matching in casing on the \2 callback
+			return text.replace(/(https?:\/\/\S+)|\[([A-Za-z]+)(?:=([^\]]+))?\]([\s\S]*?)\[\/\2\]/gi, function(str, url, tag, attribute, content) {
 				if (url) {
 					var suffix = "";
 					// Exclude a trailing closing bracket if there isn't an opening bracket.
@@ -19,21 +23,25 @@ define("erigam/bbcode", ['jquery', 'erigam/helpers'], function($, helpers) {
 						url = url.substr(0, url.length-1);
 						suffix = ")";
 					}
-					return $("<a>").attr({href: url, target: "_blank"}).text(url)[0].outerHTML + suffix;
+					url = url.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#x27;/g, "'"); // re-escape to work with links
+					return $("<a>").attr({href: ("/redirect?url=" + encodeURIComponent(url)), target: "_blank"}).text(url)[0].outerHTML + suffix;
 				}
 				tag = tag.toLowerCase();
 				if (attribute) {
 					switch (tag) {
 						case "bgcolor":
 						case "color":
+							return $("<span>").css(tag_properties[tag], attribute).html(raw_bbencode(content, admin))[0].outerHTML;
 						case "font":
-							return $("<span>").css(tag_properties[tag], attribute).html(self.raw_encode(content, admin))[0].outerHTML;
+							// Gotta quote the font name so fonts starting with numbers work.
+							return $("<span>").css(tag_properties[tag], "'" + attribute + "'").html(raw_bbencode(content, admin))[0].outerHTML;
 						case "bshadow":
 						case "tshadow":
-							return $("<span>").css(tag_properties[tag], attribute).html(self.raw_encode(content, admin))[0].outerHTML;
+							return admin ? $("<span>").css(tag_properties[tag], attribute).html(raw_bbencode(content, admin))[0].outerHTML : raw_bbencode(content, admin);
 						case "url":
 							if (attribute.substr(0, 7) == "http://" || attribute.substr(0, 8) == "https://") {
-								return $("<a>").attr({href: attribute, target: "_blank"}).html(self.raw_encode(content, admin))[0].outerHTML;
+								attribute = attribute.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#x27;/g, "'"); // re-escape to work with links
+								return $("<a>").attr({href: ("/redirect?url=" + encodeURIComponent(attribute)), target: "_blank"}).html(raw_bbencode(content, admin))[0].outerHTML;
 							}
 							break;
 					}
@@ -46,28 +54,25 @@ define("erigam/bbcode", ['jquery', 'erigam/helpers'], function($, helpers) {
 						case "sup":
 						case "u":
 						case "s":
-							return "<" + tag + ">" + self.raw_encode(content, admin) + "</" + tag + ">";
+							return "<" + tag + ">" + raw_bbencode(content, admin) + "</" + tag + ">";
+						case "c":
+							return "<span style=\"text-transform: uppercase\">" + raw_bbencode(content, admin) + "</span>";
+						case "w":
+							return "<span style=\"text-transform: lowercase\">" + raw_bbencode(content, admin) + "</span>";
+						case "alternian":
+							return "<span class=\"alternian\">" + raw_bbencode(content, admin) + "</span>";
 						case "spoiler":
-							return "<label class=\"spoiler\"><input type=\"checkbox\"><span>SPOILER</span> <span>" + self.raw_encode(content, admin) + "</span></label>";
+							return "<label class=\"spoiler\"><input type=\"checkbox\"><span>SPOILER</span><span>" + raw_bbencode(content, admin) + "</span></label>";
 						case "raw":
 							return content;
-						case "audio":
-							// _autoplay_ must be replaced because of how creating the string puts the element in the DOM.
-							return window.legacy_bbcode || admin ? $("<audio>").attr("src", content).attr("_autoplay_", "autoplay").attr("controls", "controls").attr("preload", "none")[0].outerHTML.replace("_autoplay_", "autoplay") : self.raw_encode(content, admin);
-						case "img":
-							return window.legacy_bbcode || admin ? $("<img>").attr("src", content).attr("width", 300).css("max-width", "100%")[0].outerHTML : self.raw_encode(content, admin);
 					}
 				}
-				return "[" + tag + (attribute ? "=" + attribute : "") + "]" + self.raw_encode(content, admin) + "[/" + tag + "]";
+				return "[" + tag + (attribute ? "=" + attribute : "") + "]" + raw_bbencode(content, admin) + "[/" + tag + "]";
 			});
 		},
 		remove: function(text) {
-			var self = this;
-
-			text = text.replace(/(\[br\])+/g, "");
-			return text.replace(/\[([A-Za-z]+)(?:=[^\]]+)?\]([\s\S]*?)\[\/\1\]/g, function(str, tag, content) {
-				return self.remove(content);
-			});
+			text = text.replace(/(\[[bB][rR]\])+/g, "");
+			return text.replace(/\[([A-Za-z]+)(?:=[^\]]+)?\]([\s\S]*?)\[\/\1\]/gi, function(str, tag, content) { return bbremove(content); });
 		}
 	};
 });

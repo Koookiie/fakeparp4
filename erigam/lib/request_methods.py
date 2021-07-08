@@ -43,10 +43,10 @@ def checkIP(ip):
         sys.stderr.write("An error occured while querying GetIPIntel")
         return 0
     
-	if (vpnProbability > maxProbability):
-		return 1
-	else:
-		return 0
+    if (vpnProbability > maxProbability):
+        return 1
+    else:
+        return 0
 
 # Before request
 

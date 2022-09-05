@@ -6,6 +6,7 @@ from erigam.lib import SEARCH_PERIOD, get_time, api, validate_chat_url
 from erigam.lib.characters import CHARACTER_GROUPS, CHARACTERS
 from erigam.lib.sessions import CASE_OPTIONS
 from erigam.lib.request_methods import use_db
+from erigam.lib.archive import get_or_create_log
 
 blueprint = Blueprint('main', __name__)
 
@@ -100,9 +101,9 @@ def save():
             if g.user.meta['group']!='globalmod':
                 g.user.set_group('mod')
             g.redis.hset('chat.'+chat+'.meta', 'type', 'group')
-            get_or_create_log(g.redis, g.mysql, chat)
-            g.mysql.commit()
-            return redirect(url_for('chat.chat', chat=chat))
+            log, c = get_or_create_log(g.sql, chat, "group")
+            g.sql.commit()
+            return redirect(url_for('chat.chat') + chat)
     except ValueError as e:
         return show_homepage(e.args[0])
 

@@ -77,8 +77,6 @@ def chat(chat_url=None):
         "log_id": log.id if log else None
     }
 
-    print(chat_url)
-
     return render_template(
         'chat.html',
         user=g.user,

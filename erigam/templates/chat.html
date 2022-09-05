@@ -114,12 +114,12 @@
 	<button type="button" id="disconnectButton">Abscond</button>
 	<button type="button" id="userListButton">User list</button>
 	<button type="button" id="settingsButton">Settings</button>
-	<a id="logLink" href="{{url_for("log.view_log", chat=chat_meta['chat'])}}" target="_blank">Log</a>
+	{% if chat_meta['chat'] %}<a id="logLink" href="{{url_for("log.view_log", chat=chat_meta['chat'], page=None)}}" target="_blank">Log</a>{% endif %}
 	<button type="submit">Send</button>
 </form>
 
 <div id="save">
-	{% if chat_meta['chat'] %}<p> <a href="{{url_for("log.view_log", chat=chat_meta['chat'])}}">View log</a> </p>{% endif %}
+	{% if chat_meta['chat'] %}<p> <a href="{{url_for("log.view_log", chat=chat_meta['chat'], page=None)}}">View log</a> </p>{% endif %}
 </div>
 
 {% raw %}

@@ -150,7 +150,6 @@ class Session(object):
         #        del saved_character[key]
         pipe = redis.pipeline()
         pipe.delete(self.prefix)
-        print(saved_character)
         if saved_character:
             pipe.hset(self.prefix, mapping=saved_character)
             pipe.execute()
@@ -213,7 +212,6 @@ class Session(object):
             )
         )
         self.character = fill_in_data(self.character)
-        print(self.character)
 
     def set_group(self, group):
         self.meta['group'] = group

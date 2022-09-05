@@ -114,7 +114,7 @@
 	<button type="button" id="disconnectButton">Abscond</button>
 	<button type="button" id="userListButton">User list</button>
 	<button type="button" id="settingsButton">Settings</button>
-	<a id="logLink" target="_blank">Log</a>
+	<a id="logLink" href="{{url_for("log.view_log", chat=chat_meta['chat'])}}" target="_blank">Log</a>
 	<button type="submit">Send</button>
 </form>
 

@@ -1,6 +1,7 @@
 import os
 import requests
 import sys
+import logging
 from flask import g, request, abort, current_app
 from redis import ConnectionPool, Redis
 
@@ -11,13 +12,18 @@ from erigam.lib.sessions import Session
 from functools import wraps
 
 # Connection pooling. This takes far too much effort.
-redis_pool = ConnectionPool(
-    host=os.environ.get('REDIS_PORT_6379_TCP_ADDR', os.environ.get('REDIS_HOST', '127.0.0.1')),
-    password=os.environ.get('REDIS_PASSWORD', ''),
-    port=int(os.environ.get('REDIS_PORT_6379_TCP_PORT', os.environ.get('REDIS_PORT', 6379))),
-    db=int(os.environ.get('REDIS_DB', 0)),
-    decode_responses=True
-)
+redis_pool = ConnectionPool.from_url(os.environ.get('REDIS_URL', ''), decode_responses=True)
+#redis_pool = ConnectionPool(
+#    host=os.environ.get('REDIS_PORT_6379_TCP_ADDR', os.environ.get('REDIS_HOST', '127.0.0.1')),
+#    password=os.environ.get('REDIS_PASSWORD', ''),
+#    port=int(os.environ.get('REDIS_PORT_6379_TCP_PORT', os.environ.get('REDIS_PORT', 6379))),
+#    db=int(os.environ.get('REDIS_DB', 0)),
+#    decode_responses=True
+#)
+
+logger = logging.getLogger()
+if 'DEBUG' in os.environ:
+    logger.setLevel("DEBUG")
 
 # VPN checking
 
@@ -80,6 +86,7 @@ def create_session():
     # Create a user object, using session ID.
 
     session_id = request.cookies.get('session', None)
+
     chat = request.form.get('chat', None)
 
     if chat and validate_chat_url(chat):

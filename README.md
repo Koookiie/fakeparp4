@@ -16,6 +16,6 @@ python setup.py develop
 export REDIS_HOST=127.0.0.1
 export REDIS_PORT=6379
 export REDIS_DB=0
-export SQL_URL=postgres://yourusername:yourpassword@yourhost/yourdatabase
+export DATABASE_URL=postgres://yourusername:yourpassword@yourhost/yourdatabase
 python erigam
 ```

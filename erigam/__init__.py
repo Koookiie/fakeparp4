@@ -78,7 +78,7 @@ def notfound_error(e):
 if not app.config['DEBUG']:
     @app.errorhandler(Exception)
     def production_error(e):
-        if request.is_xhr:
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             if 'debug' not in request.args and 'debug' not in request.form:
                 raise
 

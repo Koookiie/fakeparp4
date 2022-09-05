@@ -35,13 +35,15 @@ for msg in pubsub.listen():
                             "username": "Dreambubble Modsummon"
                         }
 
+                        domain = os.environ.get("BASE_DOMAIN", "dreambubble.xyz")
+
                         data["embeds"] = [{
                             "title": "Message Content",
                             "description": encoded_msg.decode('utf-8'),
                             "color": None,
                             "author": {
                                 "name": channel,
-                                "url": "https://dreambubble.xyz/chat/" + channel
+                                "url": "https://"+ domain +"/chat/" + channel
                             }}
                         ]
 

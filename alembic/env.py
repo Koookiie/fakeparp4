@@ -39,7 +39,9 @@ def run_migrations_offline():
     script output.
 
     """
-    url = os.environ["SQL_URL"]
+    url = os.environ["DATABASE_URL"]
+    if url:
+        url = url.replace("postgres://", "postgresql://")
     context.configure(
         url=url, target_metadata=target_metadata, literal_binds=True, compare_type=True)
 
@@ -54,10 +56,13 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
+    url = os.environ["DATABASE_URL"]
+    if url:
+        url = url.replace("postgres://", "postgresql://")
     connectable = engine_from_config(
         config.get_section(config.config_ini_section),
         prefix='sqlalchemy.',
-        url=os.environ["SQL_URL"],
+        url=url,
         poolclass=pool.NullPool)
 
     with connectable.connect() as connection:

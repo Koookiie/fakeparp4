@@ -586,7 +586,7 @@ define("erigam/views/chat", [
 		}
 	};
 
-	$(window).unload(function() {
+	$(window).on('beforeunload', function() {
 		if (chatState=='chat') {
 			$.ajax(QUIT_URL, {'type': 'POST', data: {'chat': chat}, 'async': false});
 		}

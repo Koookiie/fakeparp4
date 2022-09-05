@@ -36,7 +36,7 @@ define("erigam/search", ['jquery'], function($) {
 				}
 			});
 
-			$(window).unload(function() {
+			$(window).on('beforeunload', function() {
 				if (searching) $.ajax(SEARCH_QUIT_URL, { "type": "POST", "async": false });
 			});
 		}

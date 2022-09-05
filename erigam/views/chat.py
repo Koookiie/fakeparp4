@@ -51,6 +51,7 @@ def chat(chat_url=None):
             chat_meta = api.chat.load(g.sql, g.redis, chat_url)
             g.redis.delete("chat."+chat_url+".regen")
 
+        print(chat_meta)
         # Make sure it's in the archive queue.
         if g.redis.zscore('archive-queue', chat_url) is None:
             g.redis.zadd('archive-queue', {chat_url: get_time(ARCHIVE_PERIOD)})

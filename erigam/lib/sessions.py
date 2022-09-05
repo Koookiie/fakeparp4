@@ -7,7 +7,7 @@ from uuid import uuid4
 from erigam.lib import DELETE_SESSION_PERIOD, get_time
 from erigam.lib.characters import CHARACTER_DETAILS
 from erigam.lib.messages import send_message
-from erigam.lib.model import sm, Log
+from erigam.lib.model import sm, Log, Message
 
 CASE_OPTIONS = {
     'normal': 'Normal',
@@ -67,7 +67,7 @@ class Session(object):
                     self.original_prefix,
                     # Redis hashes can't be empty - if there are no keys they are auto-deleted.
                     # So we store the character ID in this dict so it always has at least one.
-                    lambda: dict([('character', 'anonymous/other')]+CHARACTER_DETAILS['anonymous/other'].items())
+                    lambda: CHARACTER_DEFAULTS
                 )
             )
         else:
@@ -77,7 +77,7 @@ class Session(object):
             character = get_or_create(
                 redis,
                 self.prefix,
-                lambda: dict([('character', 'anonymous/other')]+CHARACTER_DETAILS['anonymous/other'].items())
+                lambda: CHARACTER_DEFAULTS
             )
 
         # Fill in missing fields from the characters dict.
@@ -144,11 +144,13 @@ class Session(object):
         character['replacements'] = json.dumps(replacements)
 
         saved_character = dict(character)
-        for key, value in CHARACTER_DETAILS[character['character']].items():
-            if saved_character[key]==value:
-                del saved_character[key]
+        #for key, value in CHARACTER_DETAILS[character['character']].items():
+        #    print(key, value)
+        #    if saved_character[key]==value:
+        #        del saved_character[key]
         pipe = redis.pipeline()
         pipe.delete(self.prefix)
+        print(saved_character)
         if saved_character:
             pipe.hset(self.prefix, mapping=saved_character)
             pipe.execute()
@@ -211,6 +213,7 @@ class Session(object):
             )
         )
         self.character = fill_in_data(self.character)
+        print(self.character)
 
     def set_group(self, group):
         self.meta['group'] = group
@@ -218,7 +221,6 @@ class Session(object):
 
 def get_or_create(redis, key, default):
     data = redis.hgetall(key)
-    print(data)
     if data is None or len(data) == 0:
         data = default()
         redis.hset(key, mapping=data)

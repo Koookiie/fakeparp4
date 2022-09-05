@@ -28,7 +28,7 @@ if __name__ == '__main__':
             if online + idle == 0:
                 redis.zrem("longpoll-timeout", chat)
             else:
-                redis.zadd("longpoll-timeout", chat, get_time(LONGPOLL_TIMEOUT_PERIOD))
+                redis.zadd("longpoll-timeout", {chat: get_time(LONGPOLL_TIMEOUT_PERIOD)})
 
         for dead in redis.zrangebyscore('chats-alive', 0, get_time()):
             chat, session = dead.split('/', 1)

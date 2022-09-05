@@ -11,7 +11,8 @@ from erigam.lib.request_methods import (
     db_commit,
     disconnect_redis,
     disconnect_sql,
-    cache_breaker
+    cache_breaker,
+    populate_all_chars
 )
 
 from erigam.views import (
@@ -28,6 +29,7 @@ app = Flask(__name__)
 app.url_defaults(cache_breaker)
 
 # Pre and post request stuff
+app.before_first_request(populate_all_chars)
 app.before_request(connect_redis)
 app.before_request(create_session)
 app.after_request(set_cookie)

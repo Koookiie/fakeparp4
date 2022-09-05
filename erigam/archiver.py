@@ -41,7 +41,7 @@ if __name__ == '__main__':
                 if online + idle == 0:
                     redis.zrem('archive-queue', chat)
                 else:
-                    redis.zadd('archive-queue', chat, get_time(ARCHIVE_PERIOD))
+                    redis.zadd('archive-queue', {chat: get_time(ARCHIVE_PERIOD)})
 
             # Delete chat-sessions.
             for chat_session in redis.zrangebyscore('chat-sessions', 0, get_time()):

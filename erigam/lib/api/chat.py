@@ -58,7 +58,7 @@ def load(sql, redis, chat):
                 "quirk_suffix": sql_session.quirk_suffix,
             })
             redis.sadd('session.'+sql_session.session_id+'.chats', chat)
-            redis.zadd('chat-sessions', chat+'/'+sql_session.session_id, mktime(sql_session.expiry_time.timetuple()))
+            redis.zadd('chat-sessions', {chat+'/'+sql_session.session_id: mktime(sql_session.expiry_time.timetuple())})
     except NoResultFound:
         abort(404)
 

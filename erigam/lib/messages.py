@@ -14,7 +14,7 @@ def send_message(db, redis, message):
 
     # Cache before sending.
     cache_key = "chat:%s" % message.log_id
-    redis.zadd(cache_key, json.dumps(message_dict), message.id)
+    redis.zadd(cache_key, {json.dumps(message_dict): message.id})
     redis.zremrangebyrank(cache_key, 0, -51)
 
     # Prepare pubsub message
@@ -29,7 +29,7 @@ def send_message(db, redis, message):
         redis_message['meta'] = redis.hgetall('chat.'+message.log.url+'.meta')
 
     redis.publish("channel.%s" % message.log.url, json.dumps(redis_message))
-    redis.zadd('longpoll-timeout', message.log.url, get_time(LONGPOLL_TIMEOUT_PERIOD))
+    redis.zadd('longpoll-timeout', {message.log.url: get_time(LONGPOLL_TIMEOUT_PERIOD)})
 
 def send_userlist(redis, log):
     redis_message = {

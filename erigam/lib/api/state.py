@@ -10,7 +10,7 @@ def join(sql, redis, log, session):
 
     # Make sure it's in the archive queue.
     if redis.zscore('archive-queue', log.url) is None:
-        redis.zadd('archive-queue', log.url, get_time(ARCHIVE_PERIOD))
+        redis.zadd('archive-queue', {log.url: get_time(ARCHIVE_PERIOD)})
 
     # Set user state.
     redis.sadd('chat.'+log.url+'.online', session.session_id)
@@ -26,7 +26,7 @@ def join(sql, redis, log, session):
             text=join_message
         ))
     redis.sadd('sessions-chatting', session.session_id)
-    redis.zadd('chats-alive', log.url+'/'+session.session_id, get_time(PING_PERIOD*2))
+    redis.zadd('chats-alive', {log.url+'/'+session.session_id: get_time(PING_PERIOD*2)})
     return True
 
 def disconnect(sql, redis, log, session_id, disconnect_message=None):

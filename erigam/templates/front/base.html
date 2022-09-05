@@ -10,7 +10,7 @@
 <div id="container">
 <form method="post" action="{{url_for('main.save')}}" >
 <div class="logo">
-	<div class="image"><img src="/static/img/spacer.gif"></div>
+	<div class="image"><a href="/"><img src="/static/img/spacer.gif"></a></div>
 </div>
 <div id="charbar" >
 </div>
@@ -26,7 +26,7 @@
 		</a>
 	</li>
 	<li>
-		<a class="groups new" href=""{{url_for('main.get_chats')}}"" target="_blank">Groups
+		<a class="groups new{{' active' if page == 'groups'}}" href="{{url_for('main.get_chats')}}">Groups
 		</a>
 	</li>
 	{% if g.user and g.user.globalmod %}

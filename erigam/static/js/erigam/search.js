@@ -22,6 +22,7 @@ define("erigam/search", ['jquery'], function($) {
 					window.location.replace('/chat/' + data.chat);
 				}
 
+				console.log(data)
 				callback({
 					chat: data.chat,
 					log_id: data.log

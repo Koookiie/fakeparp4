@@ -23,7 +23,7 @@ def mark_alive(f):
             get_log()
             g.joining = api.state.join(g.sql, g.redis, g.log, g.user)
         else:
-            g.redis.zadd('chats-alive', g.user.chat+'/'+g.user.session_id, get_time(PING_PERIOD*2))
+            g.redis.zadd('chats-alive', {g.user.chat+'/'+g.user.session_id: get_time(PING_PERIOD*2)})
             g.joining = False
         return f(*args, **kwargs)
     return decorated_function

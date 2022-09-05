@@ -9,10 +9,11 @@ from erigam.lib import validate_chat_url, session_validator
 from erigam.lib.archive import get_or_create_log
 from erigam.lib.model import sm
 from erigam.lib.sessions import Session
+from erigam.lib.characters import CHARACTER_DETAILS
 from functools import wraps
 
 # Connection pooling. This takes far too much effort.
-redis_pool = ConnectionPool.from_url(os.environ.get('REDIS_URL', ''), decode_responses=True)
+redis_pool = ConnectionPool.from_url(os.environ.get('REDIS_URL', 'redis://localhost:6379'), decode_responses=True)
 #redis_pool = ConnectionPool(
 #    host=os.environ.get('REDIS_PORT_6379_TCP_ADDR', os.environ.get('REDIS_HOST', '127.0.0.1')),
 #    password=os.environ.get('REDIS_PASSWORD', ''),
@@ -53,6 +54,15 @@ def checkIP(ip):
         return 1
     else:
         return 0
+
+def populate_all_chars():
+    redis = Redis(connection_pool=redis_pool)
+    pipe = redis.pipeline()
+    pipe.delete('all-chars')
+    pipe.sadd('all-chars', *CHARACTER_DETAILS.keys())
+    pipe.execute()
+    del pipe
+    del redis
 
 # Before request
 

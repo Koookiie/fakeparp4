@@ -53,7 +53,7 @@ def chat(chat_url=None):
 
         # Make sure it's in the archive queue.
         if g.redis.zscore('archive-queue', chat_url) is None:
-            g.redis.zadd('archive-queue', chat_url, get_time(ARCHIVE_PERIOD))
+            g.redis.zadd('archive-queue', {chat_url: get_time(ARCHIVE_PERIOD)})
 
         # Load chat-based session data.
         g.user.set_chat(chat_url)
@@ -77,6 +77,8 @@ def chat(chat_url=None):
         "log_id": log.id if log else None
     }
 
+    print(chat_url)
+
     return render_template(
         'chat.html',
         user=g.user,
@@ -88,7 +90,7 @@ def chat(chat_url=None):
         chat=chat_url,
         chat_meta=meta,
         latest_num=latest_num,
-        legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat_url)
+        legacy_bbcode=False if not chat_url else g.redis.sismember('use-legacy-bbcode', chat_url)
     )
 
 @blueprint.route('/<chat>/unban', methods=['GET', 'POST'])

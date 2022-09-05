@@ -17,6 +17,7 @@ def show_homepage(error):
         error=error,
         replacements=json.loads(g.user.character['replacements']),
         tag_text=g.redis.get(g.user.prefix+'.tag-text') or "",
+        picky=g.redis.smembers(g.user.prefix+'.picky') or set(),
         picky_options=g.redis.hgetall(g.user.prefix+'.picky-options') or {},
         case_options=CASE_OPTIONS,
         groups=CHARACTER_GROUPS,
@@ -68,12 +69,12 @@ def get_chats():
 
 @blueprint.route('/search', methods=['POST'])
 def foundYet():
-    target = g.redis.hgetall('session.'+g.user.session_id+'.match')
+    target=g.redis.get('session.'+g.user.session_id+'.match')
     if target:
         g.redis.delete('session.'+g.user.session_id+'.match')
-        return jsonify(target)
+        return jsonify(json.loads(target))
     else:
-        g.redis.zadd('searchers', g.user.session_id, get_time(SEARCH_PERIOD*2))
+        g.redis.zadd('searchers', {g.user.session_id: get_time(SEARCH_PERIOD*2)})
         abort(404)
 
 @blueprint.route('/stop_search', methods=['POST'])
@@ -81,23 +82,28 @@ def quitSearching():
     g.redis.zrem('searchers', g.user.session_id)
     return 'ok'
 
-# Save
-
 @blueprint.route('/save', methods=['POST'])
 @use_db
 def save():
     try:
         if 'character' in request.form:
             g.user.save_character(request.form)
-        if 'para' in request.form or 'nsfw' in request.form:
+        if 'save_pickiness' in request.form:
             g.user.save_pickiness(request.form)
         if 'create' in request.form:
-            if g.redis.hexists('punish-scene', g.user.ip):
-                raise ValueError('pandamode')
-            log = api.chat.create(g.sql, g.redis, request.form['chaturl'], 'group')
-            return redirect(url_for('chat.chat', chat_url=log.url))
-        elif 'tags' in request.form:
-            g.user.save_pickiness(request.form)
+            chat = request.form['chaturl']
+            if g.redis.exists('chat.'+chat+'.meta'):
+                raise ValueError('chaturl_taken')
+            # USE VALIDATE_CHAT_URL
+            if not validate_chat_url(chat):
+                raise ValueError('chaturl_invalid')
+            g.user.set_chat(chat)
+            if g.user.meta['group']!='globalmod':
+                g.user.set_group('mod')
+            g.redis.hset('chat.'+chat+'.meta', 'type', 'group')
+            get_or_create_log(g.redis, g.mysql, chat)
+            g.mysql.commit()
+            return redirect(url_for('chat.chat', chat=chat))
     except ValueError as e:
         return show_homepage(e.args[0])
 

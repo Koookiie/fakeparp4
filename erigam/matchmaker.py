@@ -2,18 +2,14 @@
 from redis import Redis
 import uuid
 import time
-import logging
 import os
+import json
 
 from erigam.lib import api
 from erigam.lib.model import sm, Message
 from erigam.lib.messages import send_message
 from erigam.lib.request_methods import redis_pool
 
-logger = logging.getLogger()
-
-if 'DEBUG' in os.environ:
-    logger.setLevel("DEBUG")
 
 OPTION_LABELS = {
     'para0': 'script style',
@@ -30,65 +26,72 @@ def check_compatibility(first, second):
         if (
             first_option is not None
             and second_option is not None
-            and first_option != second_option
-            and first['panda'] != second['panda']
+            and first_option!=second_option
         ):
-            return False, None
+            return False, selected_options
         if first_option is not None:
             selected_options.append(option+first_option)
         elif second_option is not None:
             selected_options.append(option+second_option)
+    compatible = first['char'] in second['wanted_chars'] and second['char'] in first['wanted_chars']
+    if first['lastmatched'] == None or second['lastmatched'] == None:
+        pass
+    elif first['lastmatched'] == second['id'] and second['lastmatched'] == first['id']:
+        return False, selected_options
+    return compatible, selected_options
 
-    return True, selected_options
-
-if __name__ == '__main__':
+if __name__=='__main__': 
 
     db = sm()
     redis = Redis(connection_pool=redis_pool)
 
     while True:
         searchers = redis.zrange('searchers', 0, -1)
+        
+        if len(searchers)>=2: # if there aren't at least 2 people, there can't be matches
 
-        if len(searchers) >= 2:  # if there aren't at least 2 people, there can't be matches
+            all_chars = redis.smembers('all-chars')
             sessions = [{
                 'id': session_id,
+                'char': redis.hget('session.'+session_id, 'character'),
+                'wanted_chars': redis.smembers('session.'+session_id+'.picky') or all_chars,
                 'options': redis.hgetall('session.'+session_id+'.picky-options'),
-                'panda': redis.hexists('punish-scene', redis.hget('session.'+session_id+'.meta', 'last_ip'))
+                'lastmatched': redis.get('session.'+session_id+'.matched'),
             } for session_id in searchers]
 
-            # https://docs.python.org/2/library/functions.html#zip
-            for searcher1, searcher2 in zip(*[iter(sessions)]*2):
-                logging.debug("Matching %s and %s" % (searcher1['id'], searcher2['id']))
-                compatible, selected_options = check_compatibility(searcher1, searcher2)
-
-                if not compatible:
-                    logging.debug("%s not compatible with %s" % (searcher1['id'], searcher2['id']))
-                    continue
-
-                chat = str(uuid.uuid4()).replace('-', '')
-                logging.debug('Match found, sending to %s.' % chat)
-                logging.debug('%s: options %s' % (searcher1['id'], searcher1['options']))
-                logging.debug('%s: options %s' % (searcher2['id'], searcher2['options']))
-                log = api.chat.create(db, redis, chat, 'saved')
-
-                # Send options message if options are present.
-                if len(selected_options) > 0:
-                    option_text = ', '.join(OPTION_LABELS[_] for _ in selected_options)
-                    send_message(db, redis, Message(
-                        log_id=log.id,
-                        type="message",
-                        counter=-1,
-                        text="This is a {option} chat.".format(option=option_text)
-                    ))
-
-                matchdata = {
-                    "chat": chat,
-                    "log": log.id
-                }
-
-                redis.hmset('session.'+searcher1['id']+'.match', matchdata)
-                redis.hmset('session.'+searcher2['id']+'.match', matchdata)
-                redis.zrem('searchers', searcher1['id'])
-                redis.zrem('searchers', searcher2['id'])
+            already_matched = set()
+            for n in range(len(sessions)):
+                for m in range(n+1, len(sessions)):
+                    print(sessions[n]['id'], sessions[m]['id'])
+                    if (
+                        sessions[n]['id'] not in already_matched
+                        and sessions[m]['id'] not in already_matched
+                    ):
+                        compatible, selected_options = check_compatibility(sessions[n], sessions[m])
+                        print(compatible, selected_options)
+                        if not compatible:
+                            continue
+                        chat = str(uuid.uuid4()).replace('-','')
+                        redis.hset('chat.'+chat+'.meta', 'type', 'unsaved')
+                        if len(selected_options)>0:
+                            option_text = ', '.join(OPTION_LABELS[_] for _ in selected_options)
+                            redis.rpush(
+                                'chat.'+chat,
+                                str(int(time.time()))+',-1,message,000000,This is a '+option_text+' chat.'
+                            )
+                        log = api.chat.create(db, redis, chat, 'saved')
+                        matchdata = {
+                            "chat": chat,
+                            "log": log.id
+                        }
+                        redis.set('session.'+sessions[n]['id']+'.match', json.dumps(matchdata))
+                        redis.set('session.'+sessions[m]['id']+'.match', json.dumps(matchdata))
+                        redis.zrem('searchers', sessions[n]['id'])
+                        redis.zrem('searchers', sessions[m]['id'])
+                        already_matched.add(sessions[n]['id'])
+                        already_matched.add(sessions[m]['id'])
+                        redis.setex('session.'+sessions[n]['id']+'.matched', 60, sessions[m]['id'])
+                        redis.setex('session.'+sessions[m]['id']+'.matched', 60, sessions[n]['id'])
 
         time.sleep(1)
+

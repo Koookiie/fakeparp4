@@ -131,7 +131,7 @@ You completely need javascript for this site. Turn it on or upgrade to a real br
 <div class="checkbox_outer"><label><input type="checkbox" class="boxy showtext" name="astext" /><span class="checky"></span> Show as text</label></div><br>
 
 <div id="picky-icon">
-{% for group in groups %}
+	{% for group in groups %}
 		<div class="checkbox_outer"><label class="picky-header"><input type="checkbox" class="boxy" id="group-{{group|lower}}" name="group-{{group|lower}}"><span class="checky"></span> {{group}}</label></div>
 		<div class="picky-group">
 		{% for char in characters[group] %}
@@ -143,7 +143,7 @@ You completely need javascript for this site. Turn it on or upgrade to a real br
 </div>
 
 <div id="picky-text">
-{% for group in groups %}
+    {% for group in groups %}
 		<div class="checkbox_outer"><label class="picky-header"><input type="checkbox" id="group-{{group|lower}}" class="boxy" name="group-{{group|lower}}"><span class="checky"></span> {{group}}:</label></div>
 		<div class="picky-group">
 		{% for char in characters[group] %}

@@ -6,6 +6,7 @@ from uuid import uuid4
 
 from erigam.lib import DELETE_SESSION_PERIOD, get_time
 from erigam.lib.characters import CHARACTER_DETAILS
+from erigam.lib.messages import send_message
 
 CASE_OPTIONS = {
     'normal': 'Normal',

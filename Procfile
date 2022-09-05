@@ -4,3 +4,5 @@ archiver: python3.5 erigam/archiver.py
 matchmaker: python3.5 erigam/matchmaker.py
 reaper: python3.5 erigam/reaper.py
 live: python3.5 erigam/nado_istyping.py
+spamless: python3.5 erigam/extras/usertrack.py
+modsummon: python3.5 erigam/extras/modsummon.py

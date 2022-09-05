@@ -63,7 +63,7 @@ class Session(object):
                 self.prefix,
                 lambda: get_or_create(
                     redis,
-                    original_prefix,
+                    self.original_prefix,
                     # Redis hashes can't be empty - if there are no keys they are auto-deleted.
                     # So we store the character ID in this dict so it always has at least one.
                     lambda: dict([('character', 'anonymous/other')]+CHARACTER_DETAILS['anonymous/other'].items())

@@ -41,8 +41,8 @@ class Session(object):
     def __init__(self, redis, session_id=None, chat=None):
 
         self.redis = redis
-        self.chat = None
         self.session_id = session_id or str(uuid4())
+        self.chat = chat
         self.globalmod = redis.sismember('global-mods', self.session_id)
         self.ip = request.headers.get('X-Forwarded-For', request.remote_addr)
 
@@ -51,23 +51,36 @@ class Session(object):
 
         # Load metadata and character data.
         if chat is not None:
-            self.set_chat(chat)
+            self.prefix = self.original_prefix+'.chat.'+chat
+            self.meta_prefix = self.original_meta_prefix+'.'+chat
+            self.meta = get_or_create(
+                redis,
+                self.meta_prefix,
+                lambda: new_chat_metadata(redis, chat, session_id)
+            )
+            character = get_or_create(
+                redis,
+                self.prefix,
+                lambda: get_or_create(
+                    redis,
+                    original_prefix,
+                    # Redis hashes can't be empty - if there are no keys they are auto-deleted.
+                    # So we store the character ID in this dict so it always has at least one.
+                    lambda: dict([('character', 'anonymous/other')]+CHARACTER_DETAILS['anonymous/other'].items())
+                )
+            )
         else:
             self.prefix = self.original_prefix
             self.meta_prefix = self.original_meta_prefix
             self.meta = get_or_create(redis, self.original_meta_prefix, lambda: META_DEFAULTS)
-            self.character = get_or_create(
+            character = get_or_create(
                 redis,
                 self.prefix,
-                lambda: CHARACTER_DEFAULTS
+                lambda: dict([('character', 'anonymous/other')]+CHARACTER_DETAILS['anonymous/other'].items())
             )
 
-        # Old data transation hack
-        if 'character' not in self.character:
-            self.character['character'] = 'anonymous/other'
-
         # Fill in missing fields from the characters dict.
-        self.character = fill_in_data(self.character)
+        self.character = fill_in_data(character)
 
         redis.zadd('all-sessions', {self.session_id: get_time(DELETE_SESSION_PERIOD)})
         if chat is not None:

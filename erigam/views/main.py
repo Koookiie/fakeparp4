@@ -2,8 +2,7 @@ import json
 from collections import defaultdict
 from flask import Blueprint, g, request, render_template, make_response, redirect, url_for, jsonify, abort
 
-from erigam.lib import SEARCH_PERIOD, get_time
-from erigam.lib import api
+from erigam.lib import SEARCH_PERIOD, get_time, api, validate_chat_url
 from erigam.lib.characters import CHARACTER_GROUPS, CHARACTERS
 from erigam.lib.sessions import CASE_OPTIONS
 from erigam.lib.request_methods import use_db

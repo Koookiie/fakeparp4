@@ -162,14 +162,14 @@ class Session(object):
                     user_change_message = None
                 else:
                     user_change_message = '%s [%s] is now %s [%s]. ~~ %s ~~' % (old_name, old_acronym, character['name'], character['acronym'], self.meta['counter'])
-                send_message(sql, redis, Message(
+                send_message(self.sql, redis, Message(
                     log_id=log.id,
                     type="user_change",
                     counter=-1,
                     text=user_change_message
                 ))
             elif character['color']!=old_color:
-                send_message(sql, redis, Message(
+                send_message(self.sql, redis, Message(
                     log_id=log.id,
                     type="user_change",
                     counter=-1,

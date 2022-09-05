@@ -7,6 +7,7 @@ from uuid import uuid4
 from erigam.lib import DELETE_SESSION_PERIOD, get_time
 from erigam.lib.characters import CHARACTER_DETAILS
 from erigam.lib.messages import send_message
+from erigam.lib.model import sm, Log
 
 CASE_OPTIONS = {
     'normal': 'Normal',
@@ -39,7 +40,7 @@ META_DEFAULTS = {
 class Session(object):
 
     def __init__(self, redis, session_id=None, chat=None):
-
+        self.sql = sm()
         self.redis = redis
         self.session_id = session_id or str(uuid4())
         self.chat = chat
@@ -155,14 +156,26 @@ class Session(object):
         # Chat-related things.
         if self.chat is not None:
             redis.sadd('chat.'+self.chat+'.characters', character['character'])
+            log = self.sql.query(Log).filter(Log.url == self.chat).scalar()
             if character['name']!=old_name or character['acronym']!=old_acronym:
                 if self.meta['group']=='silent':
                     user_change_message = None
                 else:
                     user_change_message = '%s [%s] is now %s [%s]. ~~ %s ~~' % (old_name, old_acronym, character['name'], character['acronym'], self.meta['counter'])
-                send_message(redis, request.form['chat'], -1, 'user_change', user_change_message)
+                send_message(sql, redis, Message(
+                    log_id=log.id,
+                    type="user_change",
+                    counter=-1,
+                    text=user_change_message
+                ))
             elif character['color']!=old_color:
-                send_message(redis, request.form['chat'], -1, 'user_change', None)
+                send_message(sql, redis, Message(
+                    log_id=log.id,
+                    type="user_change",
+                    counter=-1,
+                    text=user_change_message
+                ))
+
 
     def save_pickiness(self, form):
         # Characters

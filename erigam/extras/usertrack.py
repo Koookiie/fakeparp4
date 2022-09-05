@@ -5,8 +5,10 @@ from redis import Redis
 
 from erigam.lib.messages import send_message
 from erigam.lib.request_methods import redis_pool
+from erigam.lib.model import sm
 
 db = Redis(connection_pool=redis_pool)
+sql = sm()
 
 chat_history = []
 
@@ -32,15 +34,13 @@ while True:
                 db.hset("chat.%s.meta" % chat, "autosilence", 1)
                 # Send a message out.
                 # XXX NEEDS TO BE META_CHANGE TOO.
-                send_message(
-                    db,
-                    chat,
-                    -1,
-                    'user_change',
-                    '----------------------------------------- SPAM DETECTED, SILENCING -----------------------------------------',
-                    '000000',
-                    '',
-                )
+                log = sql.query(Log).filter(Log.url == chat).scalar()
+                send_message(sql, redis, Message(
+                    log_id=log.id,
+                    type="user_change",
+                    counter=-1,
+                    text="----------------------------------------- SPAM DETECTED, SILENCING -----------------------------------------"
+                ))
                 print('Spam detected in', chat)
         print()
         del chat_history[0]

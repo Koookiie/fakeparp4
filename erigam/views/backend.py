@@ -282,7 +282,6 @@ def getMessages():
         after = 0
 
     # Look for stored messages first, and only subscribe if there aren't any.
-    print(request.form)
     messages = g.redis.zrangebyscore("chat:%s" % int(request.form["log_id"]), "(%s" % after, "+inf")
 
     if "joining" in request.form or (hasattr("g", "joining") and g.joining):

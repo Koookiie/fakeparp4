@@ -218,6 +218,7 @@ class Session(object):
 
 def get_or_create(redis, key, default):
     data = redis.hgetall(key)
+    print(data)
     if data is None or len(data) == 0:
         data = default()
         redis.hset(key, mapping=data)

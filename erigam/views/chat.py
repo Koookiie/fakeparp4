@@ -81,10 +81,13 @@ def chat(chat_url=None):
         'chat.html',
         user=g.user,
         case_options=CASE_OPTIONS,
+        character_dict=g.user.json_info(),
         groups=CHARACTER_GROUPS,
         characters=CHARACTERS,
         messages=messages,
-        meta=meta,
+        chat=chat_url,
+        chat_meta=meta,
+        latest_num=latest_num,
         legacy_bbcode=g.redis.sismember('use-legacy-bbcode', chat_url)
     )
 

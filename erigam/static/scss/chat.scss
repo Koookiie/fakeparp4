@@ -1,17 +1,10 @@
-@import 'fonts';
-
+@import 'characters';
 /* General */
 
 body {
 	margin: 5px;
 	background-color: #cccccc;
 	background-attachment: fixed;
-	word-wrap: break-word;
-	background-image: none;
-	/*main one: http://i.imgur.com/1gA5miD.jpg*/
-	background-size: 100% 100%;
-	background-repeat: no-repeat;
-	background-position: center;
 	word-wrap: break-word;
 }
 
@@ -21,22 +14,19 @@ body, button, input, select, optgroup, option {
 	font-weight: bold;
 }
 
-a {
-	text-decoration: none;
-
-	&:link, &:visited, &:active {
-		text-decoration: none;
-	}
-
-	&:hover {
-		text-decoration: underline;
-	}
-}
-
+a:hover {text-decoration: none;}
+A:link {text-decoration: none}
+A:visited {text-decoration: none}
+A:active {text-decoration: none}
+A:hover {text-decoration: underline}
 
 h1 {
-	font-size: 1.25rem;
+	font-size: 14pt;
 	word-wrap: break-word;
+}
+
+h1 {
+	margin: 5px;
 }
 
 p {
@@ -51,26 +41,20 @@ hr {
 	border-width: 1px 0 0 0;
 }
 
-button, input, select, #conversation, #settings, #userList, #preview, .aButton, #archiveConversation, .pager {
+button, input, select, #conversation, #settings, #userList, #preview, .pager, #archiveConversation, #logLink {
 	border: 1px solid #999999;
 	border-radius: 1px;
 }
 
-#conversation, #settings, #userList, #preview, #archiveConversation, .pager {
+#conversation, #settings, #userList, #preview, .pager, #archiveConversation {
 	background-color: #eeeeee;
 }
 
-button, .aButton {
-	background-color: rgba(83,83,83,0.8);
-	color: #eeeeee;
-}
-
-input, select {
+button, input, select, #logLink {
 	background-color: rgba(255,255,255,0.8);
 }
 
-input[type="submit"], button, .aButton {
-	margin: 1px;
+input[type="submit"], button, #logLink {
 	display: inline-block;
 	padding: 2px 4px;
 	cursor: pointer;
@@ -83,23 +67,25 @@ input {
 optgroup {
 	color: #666666;
 	font-style: normal;
-
-	option {
-		color: #000000;
-		padding: 0 10px;
-	}
 }
 
-input:focus, input:hover, select:focus, select:hover, button:hover, .aButton:hover {
+optgroup option {
+	color: #000000;
+	padding: 0 10px;
+}
+
+input:focus, input:hover, select:focus, select:hover, button:hover, #logLink:hover {
 	background-color: #ffffff;
 }
 
-button:hover, .aButton:hover {
-	background-color: #666666;
+.timestamp {
+	display: none;
 }
 
-.aButton:hover {
-	text-decoration: none;
+p:hover .timestamp {
+	display: block;
+	float: right;
+	color: #666;
 }
 
 /* Chat layout */
@@ -112,16 +98,16 @@ button:hover, .aButton:hover {
 	left: 5px;
 	overflow: auto;
 	padding: 2px 0;
+}
 
-	&.search {
-		background-image: url('/static/img/throbber-big.gif');
-		background-repeat: no-repeat;
-		background-position: center;
-	}
+#conversation.search {
+	background-image: url('/static/img/spinner-big.gif');
+	background-repeat: no-repeat;
+	background-position: center !important;
+}
 
-	body.withSidebar & {
-		right: 230px;
-	}
+body.withSidebar #conversation {
+	right: 230px;
 }
 
 .sidebar {
@@ -151,16 +137,25 @@ button:hover, .aButton:hover {
 	}
 }
 
+.sidebar .close {
+	display: none;
+}
+
 #topic {
 	padding: 0 5px 5px;
 	word-wrap: break-word;
-
-	&:empty {
-		display: none;
-	}
 }
 
-#online:empty:after, #idle:empty:after {
+#topic:empty {
+	display: none;
+}
+
+.sidebar ul {
+	margin: 0;
+	padding: 0 0 0 1.5em;
+}
+
+#online:empty:after {
 	content: "(no-one)";
 	display: block;
 	padding: 2px 0;
@@ -168,8 +163,20 @@ button:hover, .aButton:hover {
 	font-style: italic;
 }
 
-#online li, #idle li {
+.sidebar ul li {
+	padding: 2px 0;
+}
+
+#online li {
 	cursor: pointer;
+}
+
+.sidebar ul ul {
+	color: #000;
+}
+
+.sidebar #replacementList li input {
+	width:50px;
 }
 
 #controls {
@@ -179,7 +186,11 @@ button:hover, .aButton:hover {
 	left: 8px;
 }
 
-#controls input[type="submit"], #controls button, .aButton {
+body.withSidebar #controls {
+	right: 233px;
+}
+
+#controls input[type="submit"], #controls button, #logLink {
 	margin: 5px 0 0 0;
 }
 
@@ -211,12 +222,15 @@ body #userListButton {
 }
 
 .highlight {
-	background-color: rgba(255, 255, 255, 0.75);
+	background-color: #ffffff;
 }
 
 body > #save {
 	display: none;
 }
+
+ #disconnectButton, #settingsButton, #userListButton, #controls #logLink, button[type="submit"]
+ {font-weight:bold;line-height:14px;padding: 4px 10px;}
 
 /* Sidebars */
 
@@ -229,91 +243,6 @@ label {
 	margin: 5px 0;
 }
 
-/* User groups */
-
-.globalmod {
-	text-decoration: underline;
-}
-
-.mod, .mod2, .mod3 {
-	font-style: italic;
-}
-
-.silent {
-	text-decoration: line-through;
-}
-
-/* Moderation */
-
-#metaOptions, .modPowers #metaResults, #metaResults li {
-	display: none;
-}
-
-#metaOptions input {
-	vertical-align: middle;
-	margin: 0 0 0 2px;
-}
-
-/* BBCode */
-
-.padded {
-	padding: 5px;
-	border-radius: 5px;
-}
-
-.spoiler {
-	position: relative;
-	padding: 0 2px;
-	border: 1px dashed #ccc;
-	cursor: pointer;
-}
-
-.spoiler input {
-	display: none;
-}
-
-.spoiler input + span + span, .spoiler input:checked + span {
-	display: none;
-}
-
-.spoiler input:checked + span + span {
-	display: inline;
-}
-
-.userID {
-	display: block;
-	color: #000000;
-	font-size: 11px;
-}
-
-#backgroundAudio {
-	width: 100%;
-}
-
-/* Online / Idle Status  */
-
-.sidebar h1 {
-	margin: 5px;
-}
-
-#online li {
-	list-style: none;
-	background: url("/static/img/sburb_green.png") no-repeat 0 0;
-	padding-left: 16px;
-}
-
-#idle li {
-	list-style: none;
-	background: url("/static/img/sburb_red.png") no-repeat 0 0;
-	padding-left: 16px;
-}
-
-#actionList li {
-	list-style: disc;
-	background: none;
-	padding-left: 0;
-}
-
 /* Sidebar Menu */
 
 #chatName {
@@ -322,12 +251,6 @@ label {
 
 #menu, #unban {
 	display: none;
-}
-
-.modPowers #menu {
-	display: block;
-	text-align: center;
-	margin-bottom: 10px;
 }
 
 .pwbPowers #unban {
@@ -362,66 +285,185 @@ label {
 	border-bottom: 1px solid #999999;
 }
 
-/* Archive */
+/* User groups */
 
-#archiveConversation {
-	margin: 5px 0;
-	padding: 2px 0;
-
-	h1 {
-		margin: 5px;
-	}
+.globalmod {
+	text-decoration: underline;
 }
+
+.mod, .mod2, .mod3 {
+	font-style: italic;
+}
+
+.silent {
+	text-decoration: line-through;
+}
+
+.globalicon, .spiroicon {vertical-align:middle;margin-right:6px;display:inline-block;width:16px;height:16px;}
+
+.globalicon {background: url('/static/img/sburb.png') no-repeat;}
+
+.spiroicon {background: url('/static/img/spirograph.png') no-repeat;}
+
+/* Moderation */
+.modPowers #menu {
+	display: block;
+	text-align: center;
+	margin-bottom: 10px;
+}
+
+.pwbPowers #unban {
+	display: inline-block;
+}
+
+#metaOptions, .modPowers #metaResults, #metaResults li {
+	display: none;
+}
+
+#menu.showmenu #metaOptions {
+	display: block;
+}
+
+#menu:hover, .showmenu {
+	color: rgb(238, 238, 238);
+	background-color: rgb(153, 153, 153);
+}
+
+#metaOptions input {
+	vertical-align: middle;
+	margin: 0 0 0 2px;
+}
+
+#logLink {
+	color: black;
+}
+
+#logLink:hover {
+	text-decoration: none;
+}
+
+#menu.showmenu #metaOptions {
+	display: block;
+}
+
+/* Mobile */
+
+body.mobile .sidebar {
+	left: 5px;
+	width: auto;
+}
+
+body.mobile #disconnectButton, body.mobile #settingsButton, body.mobile #userListButton, body.mobile #controls #logLink, body.mobile button[type="submit"]
+ {font-weight:bold;line-height:1em;padding: 2px;}
+
+body.mobile .sidebar .close {
+	display: block;
+	margin: 5px;
+	float: right;
+}
+
+body.mobile #conversation {
+	right: 5px !important;
+}
+
+body.mobile #controls {
+	right: 8px !important;
+}
+
+body.mobile #userListButton {
+	display: inline;
+}
+
+body.mobile.withSidebar #conversation, body.mobile.withSidebar #controls {
+	display: none;
+}
+
+body.mobile #conversation, body.mobile #userList, body.mobile #settings {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Archive */
 
 .pager {
 	padding: 2px 5px;
 }
 
-.timestamp {
-	display: none;
-
-	p:hover > & {
-		display: block;
-		float: right;
-		color: #666;
-	}
+#archiveConversation {
+	margin: 5px 0;
+	padding: 2px 0;
 }
 
-/* Mobile */
+/* checkbox style */
 
-body.mobile {
-	.sidebar {
-		left: 5px;
-		width: auto;
-	}
+.checkbox_outer * {height:27px;vertical-align:middle}
+.checkbox_outer label{vertical-align:baseline;line-height:27px;margin:0px;padding:0}
 
-	.sidebar .close {
-		display: block;
-		margin: 5px;
-		float: right;
-	}
+.boxy {background:none; cursor:pointer;opacity:0;width:16px;height:16px;overflow:hidden;display:inline-block;margin:0 ;padding:0}
+.checkbox_outer {position:relative;top:0px;display:inline; margin:0 ;padding:0;margin-right: 5px}
+.boxy + .checky {position:absolute; margin:0;top:0; left:0; background-image: url('/static/img/controls.png'); background-repeat: no-repeat;width:16px;height:16px;overflow:hidden;display:inline;}
+.boxy, .checkbox_outer {height: 16px; width: 16px; position: relative; z-index: 10;}
 
-	#conversation {
-		right: 5px !important;
-	}
+.checkbutton_outer {display:inline}
 
-	#controls {
-		right: 8px !important;
-	}
 
-	#userListButton {
-		display: inline;
-	}
+/* Checkbox options */
 
-	.withSidebar #conversation, .withSidebar #controls {
-		display: none;
-	}
+.boxy:checked + .checky{ background-position: -16px 0; }
+.boxy:hover:checked + .checky,
+.boxy:focus:checked + .checky { background-position: -16px -16px; }
+.boxy:hover + .checky,
+.boxy:focus + .checky { background-position: 0 -16px; }
+.boxy:active + .checky { background-position: 0 -48px; }
+.boxy:disabled + .checky{ background-position: 0 -32px; }
+.boxy:disabled:checked + .checky { background-position: -16px -32px; }
+.boxy:hover:disabled + .checky,
+.boxy:focus:disabled + .checky { background-position: 0 -32px; }
+.boxy:hover:disabled:checked + .checky ,
+.boxy:focus:disabled:checked + .checky { background-position: -16px -32px; }
+.boxy:active:checked + .checky { background-position: -16px -48px; }
 
-	#conversation, #userList, #settings {
-		-webkit-overflow-scrolling: touch;
-	}
+/* BBCode */
+.padded {
+	padding: 5px;
+	border-radius: 5px;
+}
 
-	#userList, #settings {
-		background-color: rgba(238, 238, 238, 1);
-	}
+.spoil {
+    border: dashed;
+    border-width: 1px;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.spoiler{
+    opacity: 0;
+    cursor: pointer;
+}
+
+.userID {
+    display: block;
+    color: #000000;
+    font-size: 11px;
+}
+
+#userList #online {list-style:none;margin-left:0px;padding-left:8px}
+#userList .charbut {vertical-align:middle;margin:-3px;margin-left:-6px;margin-right:1px;display:inline-block;width:28px;height:28px; -ms-transform: scale(0.85);-webkit-transform: scale(0.85);transform: scale(0.85)}
+
+
+/* hdpi */
+
+@media 
+(-webkit-min-device-pixel-ratio: 1.2), (min-device-pixel-ratio: 1.1),  
+(min-resolution: 106dpi), (min-resolution: 100dpi) and (-moz-images-in-menus: 1), (min-resolution: 100dpi) and (-moz-images-in-menus: 0) { 
+
+body:not(.hdpi-disabled) .boxy + .checky {background-image: url('/static/img/controls.svg');}
+
+body:not(.hdpi-disabled) .globalicon {background: url('/static/img/sburb.svg') no-repeat;}
+
+body:not(.hdpi-disabled) .spiroicon {background: url('/static/img/spirograph.svg') no-repeat;}
+
+body:not(.hdpi-disabled) #conversation.search {
+	background-size: 75px 75px;
+}
+
 }

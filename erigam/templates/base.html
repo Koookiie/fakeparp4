@@ -1,49 +1,45 @@
 {% import 'include/macros.html' as macros %}
-
 <!DOCTYPE html>
-<html>
-    <head>
-        <link rel="icon" href="{{url_for('static', filename='favicon.png')}}">
-        <link rel="shortcut icon" href="{{url_for('static', filename='favicon.png')}}">
-        <link rel="apple-touch-icon" href="{{url_for('static', filename='favicon.png')}}">
+	<head>
+		<link rel="icon" href="{{url_for('static', filename='favicon.png')}}">
+		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.png')}}">
+		<link rel="apple-touch-icon" href="{{url_for('static', filename='favicon.png')}}">
+	
+		<title>{%block title %}{% endblock %}DREAMBUBBLE (BETA)</title>
+		<meta name="viewport" content="initial-scale=1" content="width=device-width" />
+		{% block css %}{% endblock %}
+	</head>
+	<!-- Analytics -->
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-NXJW18ZEHV"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
 
-        <title>{%block title %}{% endblock %}Dreambubble (Alpha)</title>
+		gtag('config', 'G-NXJW18ZEHV');
+	</script>
+	
+	<!-- Scripts -->
+	{% if legacy_bbcode %}
+	<script>window.legacy_bbcode = true;</script>
+	{% endif %}
+	{% if config.DEBUG %}
+	<!-- Debug mode is active. -->
+	<script src="/static/vendor/requirejs/require.js"></script>
+	<script src="/static/js/config.js"></script>
+	<script>
+			require.config({urlArgs: "debug=" + (new Date()).getTime()});
+			window.debug = true;
+	</script>
+	{% else %}
+	<script src="{{url_for('static', filename='js/app.min.js')}}"></script>
+	{% endif %}
+	{% block scripts %}{% endblock %}
+	<!-- This doesn't do anything: <script src="/static/js/msparp.js"></script>-->
+	{%block header %}{%endblock%}
 
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-        {% block header %}{% endblock %}
-
-    </head>
-
-    <body>
-        {% block prefix %}{% endblock %}
-        {% block content %}{% endblock %}
-
-        <!-- Analytics -->
-        <script>
-          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-          ga('create', 'UA-48753920-1', 'auto');
-          ga('send', 'pageview');
-        </script>
-
-        <!-- Scripts -->
-        {% if legacy_bbcode %}
-        <script>window.legacy_bbcode = true;</script>
-        {% endif %}
-        {% if config.DEBUG %}
-        <!-- Debug mode is active. -->
-        <script src="/static/vendor/requirejs/require.js"></script>
-        <script src="/static/js/config.js"></script>
-        <script>
-                require.config({urlArgs: "debug=" + (new Date()).getTime()});
-                window.debug = true;
-        </script>
-        {% else %}
-        <script src="{{url_for('static', filename='js/app.min.js')}}"></script>
-        {% endif %}
-        {% block scripts %}{% endblock %}
-    </body>
+	<body>
+		{%block content%}{% endblock %}
+	</body>
 </html>

@@ -1,8 +1,8 @@
-{% extends 'mod/base.html' %}
+{% extends 'front/base.html' %}
 
 {% set page = 'unban' %}
 
-{% block content %}
+{% block front_content %}
     <div class="container">
     	{% if result %}<div class="alert alert-info">{{result}}</div>{% endif %}
         <h1> Bans for chat: <small>{{chat}}</small> </h1>

@@ -1,5 +1,12 @@
-define("erigam/characters", ['jquery'], function($) {
+define("erigam/characters", ['jquery', 'erigam/colorpicker'], function($, ColorPicker) {
 	"use strict";
+
+	$.fn.extend({
+		ColorPicker: ColorPicker.init,
+		ColorPickerHide: ColorPicker.hidePicker,
+		ColorPickerShow: ColorPicker.showPicker,
+		ColorPickerSetColor: ColorPicker.setColor
+	});
 
 	var characterKeys = ['acronym', 'name', 'color', 'quirk_suffix', 'quirk_prefix', 'case'];
 
@@ -825,7 +832,7 @@ define("erigam/characters", ['jquery'], function($) {
 	}
 
 	function addReplacement(e, from, to) {
-		var newItem = $('<li><input class="form-control quirks" type="text" name="quirk_from" size="4"> to <input class="form-control quirks" type="text" name="quirk_to" size="4"> <a href="#" class="btn btn-danger deleteReplacement">Remove</a></li>');
+		var newItem = $('<li><input type="text" name="quirk_from" size="4"> to <input type="text" name="quirk_to" size="4"> <a href="#" class="deleteReplacement">x</a></li>');
 		if (from && to) {
 			var inputs = $(newItem).find('input');
 			inputs[0].value = from;
@@ -852,14 +859,32 @@ define("erigam/characters", ['jquery'], function($) {
 				$('input[name="'+characterKeys[i]+'"], select[name="'+characterKeys[i]+'"]').val(newCharacter[characterKeys[i]]);
 			}
 			clearReplacements(null);
-			if (newCharacter.replacements.length>0) {
-				for (var i=0; i<newCharacter.replacements.length; i++) {
-					addReplacement(null, newCharacter.replacements[i][0], newCharacter.replacements[i][1]);
+			if (newCharacter['replacements'].length>0) {
+				for (var i=0; i<newCharacter['replacements'].length; i++) {
+					addReplacement(null, newCharacter['replacements'][i][0], newCharacter['replacements'][i][1]);
 				}
 			} else {
 				addReplacement();
 			}
 		}
+	});
+
+	var colorBox = $('input[name="color"]');
+	colorBox.ColorPicker({
+		onSubmit: function(hsb, hex, rgb, el) {
+			$(el).val(hex);
+			$(el).ColorPickerHide();
+		},
+		onBeforeShow: function () {
+			$(this).ColorPickerSetColor(this.value);
+		},
+		onChange: function (hsb, hex, rgb) {
+			colorBox.val(hex);
+			// This doesn't do anything in the chat window.
+			$('#color-preview').css('color', '#' + hex);
+		}
+	}).bind('keyup', function() {
+		$(this).ColorPickerSetColor(this.value);
 	});
 
 	return characters;

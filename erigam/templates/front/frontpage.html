@@ -1,189 +1,176 @@
 {% extends "front/base.html" %}
+{% block front_content %}
+<div class="blockwrapper">
+<!-- ### append error messages into this <p> -->
+<p class="error"></p>
+<noscript>
+You completely need javascript for this site. Turn it on or upgrade to a real browser.
+</noscript>
 
-{% set page = "home" %}
+<div class="number-of-users">
 
-{% block header %}
-<link rel="stylesheet" href="{{url_for('static', filename='css/home.min.css')}}">
-{% endblock %}
+	<p id="numberUsers"><span class="bigtext">PARP server is <span id="serverstatus"><span class="ok">running</span></span>.</span><br><br> <a class="isonlinetoggle" onclick="">{{users_searching+users_chatting}} clients connected</a><br>{{users_chatting}} connections established, {{users_searching}} pending</p>
+	<br><div class="checkbox_outer"><label><input type="checkbox" class="boxy wrapbutton" name="wrapbutton"/><span class="checky"></span> wrap chat buttons under quirks</label></div><br>	
+	<div class="checkbox_outer"><label><input type="checkbox" class="boxy enablecreppy" name="enablecreppy"/><span class="checky"></span> relive MSCREPPY</label></div>	<div class="checkbox_outer"><label><input type="checkbox" class="boxy showheaderchar" name="headerchar"/><span class="checky"></span> show character usage in header</label></div><br>
+	<div class="checkbox_outer hidecreppy"><label><input type="checkbox" class="boxy toggledown" name="toggledownfall"/><span class="checky"></span> /toggledownfall</label></div><br>	
+</div><div class="noticeblock">
+<div class="online-notice">
+	<h1>Announcements</h1>
+	<span>{{message|safe}}</span>
+</div>
+</div></div><br>
+<div class="blockwrapper">
+<div id="isonlineblock" style="display:none"></div>
+<div class="leftblock">
+<div class="options">
+	<!-- <p class="welcometext">{{welcome_text|safe}}</p> -->
+	<h1> Roleplay as: </h1>
 
-{% block content %}
-<form id="frontform" method="post" action="{{url_for('main.save')}}" role="form">
+	<div class="options-contents">
+		<select class="character-select" name="character">
+			{% for group in groups %}
+			<optgroup label="{{group}}">
+				{% for char in characters[group] %}
+				<option value="{{char|lower}}" {% if char|lower==g.user.character['character'] %}selected="selected"{%endif%}>{{char}}</option>
+				{% endfor %}
+			</optgroup>
+			{% endfor %}
+		</select>{% if error=="character" %}<br />
+		<span class="error">Congratulations. You've somehow picked a character who doesn't exist. I'm not sure how you got here, but I guess you'll just have to try again.</span>{% endif %}
+	</div>
+</div>
+<div class="options tableForm">
+	<h1> With settings:</h1>
+	<div class="options-contents" id="character-config">
+		<div class="inputContainer">
+			<label for="l_acronym">Acronym:</label>
+			<input type="text" size="15" id="l_acronym" name="acronym" value="{{g.user.character['acronym']}}" maxlength="15"/>
+		</div>
+		<div class="inputContainer">
+			<label for="l_name">Name:</label>
+			<input type="text" size="50" id="l_name" name="name" value="{{g.user.character['name']}}" maxlength="50"/>{% if error=="name" %}
+			<span class="error">You can't chat with a blank name!</span>{% endif %}
+		</div>
+		<div class="inputContainer"> 
+			<label for="l_color">Color:</label>
+			<input type="text" size="7" id="l_color" name="color" value="{{g.user.character['color']}}"/>
+		</div>
+		<span class="pester-line" id="color-preview"><span id="acronym">??: </span><span id="quote">oh god how did this get here I am not good with computer</span></span>{% if error=="color" %}
+                <span class="error">You entered an invalid hex code. Try using the color picker.</span>{% endif %}
+	</div>
+	<a id="quirkexpbutton" onclick="$('#quirkexplain').toggle()">How to disable quirks per line & more</a><br>
+	<span id="quirkexplain" style="display:none">
+	· "Lower" no longer prevents you from YELLING and EMPHASIS<br>
+	· Begin a line with / to prevent quirks from applying<br>
+	· Use [caps][/caps] or [c][/c] to force caps<br>
+	· Use [whisper][/whisper] or [w][/w] for GC/CG/AT whispering<br>
+	</span>
+</div>
 
-	<div class="jumbotron mainjumbo">
-		<div class="container">
-			<h1>Dreambubble</h1>
-			<strong style="font-size: 18px"> {% if message %} {{message|safe}} {% endif %} </strong>
-			<p style="font-size: 15px">{{users_searching+users_chatting}} users online ({{users_searching}} searching, {{users_chatting}} chatting)</p>
+<div class="options">
+<h1> Typing quirks</h1><button data-target="typing-quirks" class="show-button"> SET &#x22EE; </button>
+<div class="options-contents defaults-off" id="typing-quirks">
+
+	<div class="tableForm">
+		<div class="inputContainer">
+			<label>Prefix:</label>
+			<input type="text" name="quirk_prefix" value="{{g.user.character['quirk_prefix']}}"/>
+			<label>Suffix:</label>
+			<input type="text" name="quirk_suffix" value="{{g.user.character['quirk_suffix']}}"/>
+		</div>
+		<div class="inputContainer"> 
+			<label for="l_case">Case:</label>
+			<select name="case" id="l_case">
+				{% for case in case_options.items()|sort %}
+				<option value="{{case[0]}}"{% if case[0]==g.user.character['case'] %} selected="selected"{%endif%}>{{case[1]}}</option>
+				{% endfor %}
+			</select>{% if error=="case" %}
+		<span class="error">Congratulations. You've somehow picked a case option which doesn't exist. I'm not sure how you got here, but I guess you'll just have to try again.</span>{% endif %}
 		</div>
 	</div>
 
-	<div class="container">
-		{% if error=="name" %} <div class="alert alert-danger"><strong>You can't chat with a blank name!</strong></div>{% endif %}
-		{% if error=="case" %} <div class="alert alert-danger"><strong>Congratulations. You've somehow picked a case option which doesn't exist. I'm not sure how you got here, but I guess you'll just have to try again.</strong></div>{% endif %}
-		{% if error=="color" %} <div class="alert alert-danger"><strong>You entered an invalid hex code. Try using the color picker.</strong></div>{% endif %}
-		{% if error=="chaturl_taken" %}
-		<div class="alert alert-danger"><strong>The chat URL <a href="{{url_for("chat.chat", chat_url=request.form['chaturl'])}}">{{request.form.chaturl}}</a> has already been taken.</strong></div>
-		{% elif error=="chaturl_invalid" %}
-		<div class="alert alert-danger"><strong>The chat URL you specified is invalid. Chat URLs can only contain letters, numbers, hyphens and underscores.</strong></div>
-		{% elif error=="pandamode" %}
-		<div class="alert alert-danger"><strong>Ecks Dee pandas can't make chats, silly.</strong></div>
-		{% endif %}
-		<div class="row">
-			<div class="opting main sopting">
-				<div class="options-contents" id="character-config">
-					<div class="col-md-6">
-						<!-- Characters -->
-						<div class="form-group">
-							<label>Character: </label>
-							<select class="form-control character-select" name="character">
-								{% for group in groups %}
-								<optgroup label="{{group}}">
-									{% for char in characters[group] %}
-									<option value="{{char|lower}}" {% if char|lower==g.user.character['character'] %}selected="selected"{%endif%}>{{char}}</option>
-									{% endfor %}
-								</optgroup>
-								{% endfor %}
-							</select>
-						</div>
+<p>Letter replacements:</p>
+<ul id="replacementList">
+			{% if replacements|length!=0 %}
+			{% for replacement in replacements %}
+			<li><input type="text" name="quirk_from" size="4" value="{{replacement[0]}}"> to <input type="text" name="quirk_to" size="4" value="{{replacement[1]}}"> <a href="#" class="deleteReplacement">x</a></li>
+			{% endfor %}
+			{% else %}
+			<li><input type="text" name="quirk_from" size="4"> to <input type="text" name="quirk_to" size="4"> <a href="#" class="deleteReplacement">x</a></li>
+			{% endif %}
+		</ul>
+<a href="#" class="linkButton" id="addReplacement">Add</a> <a href="#" class="linkButton" id="clearReplacements">Clear</a>
+</div>
+</div>
+</div>
 
-						<!-- Name -->
-						<div class="form-group">
-							<label>Username: </label>
-							<input class="form-control" id="usingname" type="text" size="50" name="name" value="{{g.user.character['name']}}" maxlength="50"/>
-						</div>
-
-						<!-- Acronym -->
-						<div class="form-group">
-							<label>Alias: </label>
-							<input class="form-control" id="ailin" type="text" size="15" name="acronym" value="{{g.user.character['acronym']}}" maxlength="15"/>
-						</div>
-
-						<!-- Color -->
-						<div class="form-group">
-							<label>Color: </label>
-							<input type="color" id="color_input" size="7" maxlength="6" value="#{{g.user.character['color']}}"/>
-							<input type="text" id="color_input_hex" class="form-control" size="7" maxlength="6" name="color" value="{{g.user.character['color']}}"/>
-						</div>
-
-						<!-- Quirks -->
-						<div class="options-contents defaults-off" id="typing-quirks">
-
-							<div class="form-group">
-								<label>Letter replacements:</label>
-								<ul id="replacementList">
-									{% if replacements|length!=0 %}
-									{% for replacement in replacements %}
-									<li><input class="form-control quirks" type="text" name="quirk_from" size="4" value="{{replacement[0]}}"> to <input class="form-control quirks" type="text" name="quirk_to" size="4" value="{{replacement[1]}}"> <a href="#" class="btn btn-danger deleteReplacement">Remove</a></li>
-									{% endfor %}
-									{% else %}
-									<li><input class="form-control quirks" type="text" name="quirk_from" size="4"> to <input class="form-control quirks" type="text" name="quirk_to" size="4"> <a href="#" class="btn btn-danger deleteReplacement">Remove</a></li>
-									{% endif %}
-								</ul>
-								<a href="#" class="btn btn-primary" id="addReplacement">Add</a>
-								<a href="#" class="btn btn-primary" id="clearReplacements">Clear</a>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<!-- Case -->
-						<div class="form-group">
-							<label>Case:</label>
-							<select class="form-control" id="casing" name="case">
-								{% for case in case_options.items()|sort %}
-								<option value="{{case[0]}}"{% if case[0]==g.user.character['case'] %} selected="selected"{%endif%}>{{case[1]}}</option>
-								{% endfor %}
-							</select>
-						</div>
-
-						<!-- RP Type -->
-						<div class="form-group">
-							<label>Script or paragraph?</label>
-							<select class="form-control" id="para" name="para">
-								<option value="">No preference</option>
-								<option value="0"{% if picky_options.get('para')=='0' %} selected="selected"{% endif %}>Script</option>
-								<option value="1"{% if picky_options.get('para')=='1' %} selected="selected"{% endif %}>Paragraph</option>
-							</select>
-						</div>
-
-						<!-- NSFW -->
-						<div class="form-group">
-							<label>Work-safe or not?</label>
-							<select class="form-control" id="nsfwsfw" name="nsfw">
-								<option id="nopref" value="">No preference</option>
-								<option id="sfwsel" value="0"{% if picky_options.get('nsfw')=='0' %} selected="selected"{% endif %}>Safe for work</option>
-								<option id="nsfwsel" value="1"{% if picky_options.get('nsfw')=='1' %} selected="selected"{% endif %}>Not safe for work</option>
-							</select>
-						</div>
-
-						<!-- Prefix & Suffix -->
-						<div class="form-group">
-							<label>Prefix: </label>
-							<input class="form-control" id="prei" type="text" name="quirk_prefix" value="{{g.user.character['quirk_prefix']}}"/>
-						</div>
-
-						<div class="form-group">
-							<label>Suffix: </label>
-							<input class="form-control" id="sufi" type="text" name="quirk_suffix" value="{{g.user.character['quirk_suffix']}}"/>
-						</div>
-
-						<!-- Replacements -->
-
-						<div class="form-group">
-							<button id="typetog" type="button" class="btn btn-primary">Replacements</button>
-						</div>
-
-						<div class="form-group">
-							<input class="btn btn-primary chatbuttons" id="save" type="submit" name="save" value="Save">
-							<input class="btn btn-primary chatbuttons" type="submit" name="search" value="Start Chatting">
-						</div>
-
-					</div> <!-- End 6 grid -->
-					<div class="col-md-12">
-						<!-- Quote -->
-						<blockquote>
-							<span class="pester-line" id="color-preview" style="color:#{{g.user.character['color']}};"><span id="acronym">??: </span><span id="quote">oh god how did this get here I am not good with computer</span></span>
-						</blockquote>
-					</div>
-				</div>
-			</div>
-
-			<div class="opting group_chat">
-				<center>
-					<div class="form-group">
-						<input class="form-control groups" type="text" name="chaturl" id="groupsub" placeholder="Chat URL" maxlength="100">
-					</div>
-					<div class="form-group">
-						<input class="form-control groups btn btn-primary" id="groupbut" type="submit" name="create" value="Create Chat Room">
-					</div>
-					<div class="group_container">
-						<h1>Public Groups</h1>
-						<div class="active_container">
-							{% for chat in active_pub if chat['total_online'] != 0 %}
-							<div id="chat_{{chat['url']}}">
-								<h3 class="url"><a href="/chat/{{chat['url']}}">{{chat['url']}}</a></h3>
-								<p class="topic">{% if 'topic' in chat %} {{chat['topic']}} {% endif %}</p>
-								<p class="online">
-									<span class="num_active">Active: {{chat['active']}}</span>
-									<span class="num_idle">Idle: {{chat['idle']}}</span>
-									<p class="total">
-										<span class="num_total">Total: {{chat['active'] + chat['idle']}}</span>
-									</p>
-								</p>
-								{% if chat['nsfw'] == True %}
-								<p class="nsfw"> This chat is NSFW </p>
-								{% endif %}
-							</div>
-							{% endfor %}
-						</div>
-					</div>
-				</center>
-			</div>
-		</div>
+<div class="rightblock">
+<div class="options">
+<h1> Search for...</h1>
+<div class="tableForm">
+	<div class="inputContainer"> 
+		<label for="l_para">Script or paragraph?</label> 
+		<select name="para" id="l_para">
+		<option value="">No preference</option>
+		<option value="0"{% if picky_options.get('para')=='0' %} selected="selected"{% endif %}>Script</option>
+		<option value="1"{% if picky_options.get('para')=='1' %} selected="selected"{% endif %}>Paragraph</option>
+	</select>
 	</div>
+	<div class="inputContainer">
+		<label for="l_nsfw">Work-safe or not?</label> 
+		<select name="nsfw" id="l_nsfw">
+		<option value="">No preference</option>
+		<option value="0"{% if picky_options.get('nsfw')=='0' %} selected="selected"{% endif %}>Work-safe</option>
+		<option value="1"{% if picky_options.get('nsfw')=='1' %} selected="selected"{% endif %}>Not work-safe</option>
+	</select>
+	</div>
+ </div>
+<input type="hidden" name="save_pickiness" value="true">
+<div class="checkbox_outer"><label><input type="checkbox" class="boxy" name="picky" {% if picky|length!=0 %}checked="checked" {%endif%}	/><span class="checky"></span> Look for or exclude specific characters</label></div>
+<div id="picky-matches">
+<div class="checkbox_outer"><label><input type="checkbox" class="boxy showtext" name="astext" /><span class="checky"></span> Show as text</label></div><br>
+
+<div id="picky-icon">
+{% for group in groups %}
+		<div class="checkbox_outer"><label class="picky-header"><input type="checkbox" class="boxy" id="group-{{group|lower}}" name="group-{{group|lower}}"><span class="checky"></span> {{group}}</label></div>
+		<div class="picky-group">
+		{% for char in characters[group] %}
+		<div class="checkbutton_outer"><label><input type="checkbox" class="butty" name="picky-{{char|lower}}" {% if char|lower in picky %}
+				checked="checked" {% endif %} title="{{char}}"><span class="charbut char{{char.replace(" ", "").replace("(", "").replace(")", "").replace("/", "")|lower}}" title="{{char}}"></span><span class="chartip">{{char}}</span></label></div>
+		{% endfor %} 
+		</div>
+	{% endfor %}
+</div>
+
+<div id="picky-text">
+{% for group in groups %}
+		<div class="checkbox_outer"><label class="picky-header"><input type="checkbox" id="group-{{group|lower}}" class="boxy" name="group-{{group|lower}}"><span class="checky"></span> {{group}}:</label></div>
+		<div class="picky-group">
+		{% for char in characters[group] %}
+		<div class="checkbox_outer"><label><input type="checkbox" class="boxy" name="picky-{{char|lower}}" {% if char|lower in picky %}
+				checked="checked" {% endif %} ><span class="checky"></span> {{char}}</label></div>
+		{% endfor %} 
+		</div>
+	{% endfor %}
+</div>
+
+</div>
+</div>
+</div>
+
+<div class="optionswrap">
+<ul id="saveOptions">
+<li><input type="submit" name="search" class="redbutton" value="==> Enter"></li>
+<li><input type="submit" name="save" value="Save info"><br><input type="submit" name="create" value="Create group chat"> <input type="text" class="gname" name="chaturl" placeholder="Chat URL" maxlength="100"></li>
+</ul>{% if error=="chaturl_taken" %}
+<span class="error">The chat URL you specified has already been taken.</span>{% elif error=="chaturl_invalid" %}
+<span class="error">The chat URL you specified is invalid. Chat URLs can only contain letters, numbers, hyphens and underscores.</span>{% endif %}
+</div>
+</div>
+
 </form>
+</div>
 {% endblock %}
-
 {% block scripts %}
 <script>
 	{% if error=="chaturl_taken" or error=="chaturl_invalid" or error=="pandamode" %}

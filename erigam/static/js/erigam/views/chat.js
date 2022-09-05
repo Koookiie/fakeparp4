@@ -357,6 +357,8 @@ define("erigam/views/chat", [
 	}
 
 	function ipLookupNumber(num) {
+		console.log(num);
+		console.log(chat);
 		$.ajax({
 				type: 'POST',
 				url: '/chat_ajax/ip_lookup',
@@ -586,7 +588,7 @@ define("erigam/views/chat", [
 		}
 	};
 
-	$(window).on('beforeunload', function() {
+	$(window).on('unload', function() {
 		if (chatState=='chat') {
 			$.ajax(QUIT_URL, {'type': 'POST', data: {'chat': chat}, 'async': false});
 		}

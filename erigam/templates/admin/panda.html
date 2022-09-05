@@ -2,7 +2,7 @@
 
 {% set page = "panda" %}
 
-{% block content %}
+{% block front_content %}
 
 <style>
     body {
@@ -21,9 +21,11 @@
 </style>
 
 <div class="container">
+    {% if result != None %}
     <div class="row">
-        <div class="alert alert-info">{{result if result != None else "space rulez (aka this is better than seeing just None \o/)"}}</div>
+        <div class="alert alert-info">{{result}}</div>
     </div>
+    {% endif %}
     <div class="row">
         <div class="col-md-3">
             <h1> Scenify </h1>

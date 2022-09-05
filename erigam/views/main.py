@@ -1,5 +1,6 @@
 import json
-from flask import Blueprint, g, request, render_template, redirect, url_for, jsonify, abort
+from collections import defaultdict
+from flask import Blueprint, g, request, render_template, make_response, redirect, url_for, jsonify, abort
 
 from erigam.lib import SEARCH_PERIOD, get_time
 from erigam.lib import api
@@ -12,6 +13,26 @@ blueprint = Blueprint('main', __name__)
 # Helper functions
 
 def show_homepage(error):
+    return render_template('front/frontpage.html',
+        error=error,
+        replacements=json.loads(g.user.character['replacements']),
+        tag_text=g.redis.get(g.user.prefix+'.tag-text') or "",
+        picky_options=g.redis.hgetall(g.user.prefix+'.picky-options') or {},
+        case_options=CASE_OPTIONS,
+        groups=CHARACTER_GROUPS,
+        characters=CHARACTERS,
+        users_searching=g.redis.zcard('searchers'),
+        users_chatting=g.redis.scard('sessions-chatting'),
+        message=g.redis.get('front_message') or "Blame Nepeat",
+    )
+
+@blueprint.route("/")
+def home():
+    return show_homepage(None)
+
+# Groupchats
+@blueprint.route("/chats")
+def get_chats():
     public_chats = []
 
     for chat in g.redis.smembers("public-chats"):
@@ -39,23 +60,9 @@ def show_homepage(error):
     public_chats = sorted(public_chats, key=lambda k: k['total_online'])
     public_chats = public_chats[::-1]
 
-    return render_template('front/frontpage.html',
-        error=error,
-        replacements=json.loads(g.user.character['replacements']),
-        tag_text=g.redis.get(g.user.prefix+'.tag-text') or "",
-        picky_options=g.redis.hgetall(g.user.prefix+'.picky-options') or {},
-        case_options=CASE_OPTIONS,
-        groups=CHARACTER_GROUPS,
-        characters=CHARACTERS,
-        users_searching=g.redis.zcard('searchers'),
-        users_chatting=g.redis.scard('sessions-chatting'),
-        active_pub=public_chats,
-        message=g.redis.get('front_message') or "Blame Nepeat",
+    return render_template('front/groups.html',
+        active_pub=public_chats
     )
-
-@blueprint.route("/")
-def home():
-    return show_homepage(None)
 
 # Searching
 
@@ -98,3 +105,27 @@ def save():
         return redirect(url_for('chat.chat'))
     else:
         return redirect(url_for('main.home'))
+
+# Character bar
+
+@blueprint.route("/charinfo.json")
+def getusers():
+    if g.redis.exists("cache.usercounts"):
+        resp = make_response(g.redis.get("cache.usercounts"))
+        resp.headers['Content-type'] = 'application/json'
+        return resp
+
+    chars = defaultdict(lambda: 0)
+
+    sessions = g.redis.zrange("chats-alive", 0, -1)
+
+    for x in sessions:
+        chat, cookie = x.split("/", 1)
+        char = g.redis.hget("session.%s.chat.%s" % (cookie, chat), "character")
+        if char is not None:
+            chars[char] += 1
+
+    g.redis.set("cache.usercounts", json.dumps(chars))
+    g.redis.expire("cache.usercounts", 30)
+
+    return jsonify(chars)

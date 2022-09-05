@@ -1,25 +1,33 @@
 {% extends "base.html" %}
-
 {% block title%}{% endblock %}
-
 {% block header %}
-	<link rel="stylesheet" href="{{url_for('static', filename='css/chat.min.css')}}">
-{% endblock %}
 
+{% block css %}
+<link rel="stylesheet" href="/static/css/chat.min.css">
+{% endblock %}
+<link rel="stylesheet" media="screen" type="text/css" href="/static/colorpicker/css/colorpicker.css" />
+<script type="text/javascript">
+	var user = {{character_dict|tojson|safe}};
+	var chat = {{(chat)|tojson|safe}};
+	var chat_meta = {{chat_meta|tojson|safe}};
+	var latestNum = {{latest_num}};
+</script>
+{% endblock %}
 {% block content %}
+
 <div id="conversation">
-{% if meta['chat'] %}
-	<p><a href="{{url_for("log.view_log", chat=meta['chat'])}}" target="_blank">View earlier messages</a></p>
+{% if chat_meta['type']!='unsaved' and lines|length>=50 %}
+	<p><a href="/chat/{{chat}}/log" target="_blank">View earlier messages</a></p>
 {% endif %}
-{% for message in messages %}
-	{{macros.render_message(message)}}
+{% for line in lines %}
+	<p style="color: #{{line.color}}" class="{% if line.counter==-1 %}system{% else %}user{{line.counter}}{% endif %}">{{line.line}}</p>
 {% endfor %}
 </div>
 
 <div id="userList" class="sidebar">
 	<a href="#" class="close">[close]</a>
-{% if meta['chat_meta']['type'] == 'group' %}
-	<h1 id="chatName">{{meta['chat'].replace('_', ' ')}}</h1>
+{% if chat_meta['chat_meta']['type'] == 'group' %}
+	<h1 id="chatName">{{chat_meta['chat'].replace('_', ' ')}}</h1>
 	<div id="menu">
 		<hr>
 		<h1 id="modSettings">Mod Settings &#x22EE;</h1>
@@ -28,13 +36,13 @@
 			<button type="button" class="button" id="bgButton">Change Background</button>
 			<button type="button" class="button" id="audioButton">Change BG Audio</button>
 			<button type="button" class="button metatog" id="autosilence"> Auto-silence new users </button>
-			<button type="button" class="button metatog {% if meta['chat_meta']['public']=='1' %}active{% endif %}" id="public"> Public Chat </button>
+			<button type="button" class="button metatog {% if chat_meta['chat_meta']['public']=='1' %}active{% endif %}" id="public"> Public Chat </button>
 			<button type="button" class="button metatog" id="nsfw"> NSFW </button>
-			<form action="{{url_for("chat.unban", chat=meta['chat'])}}" target="_blank"><button type="submit" class="button metapwb" id="unban" value="Unban">Unban</button></form>
+			<form action="{{url_for("chat.unban", chat=chat_meta['chat'])}}" target="_blank"><button type="submit" class="button metapwb" id="unban" value="Unban">Unban</button></form>
 		</div>
 		<hr>
 	</div>
-	<p id="topic">{{meta['chat_meta'].get('topic', '')}}</p>
+	<p id="topic">{{chat_meta['chat_meta'].get('topic', '')}}</p>
 	<ul id="metaResults">
 		<li id="autosilenceResult">New users are auto-silenced.</li>
 		<li id="publicResult">This chat is public.</li>
@@ -76,8 +84,8 @@
 	</select></label></p>
 	<p>Replacements:</p>
 		<ul id="replacementList">
-			{% if meta['user']['character']['replacements']|length!=0 %}
-			{% for replacement in meta['user']['character']['replacements'] %}
+			{% if chat_meta['user']['character']['replacements']|length!=0 %}
+			{% for replacement in chat_meta['user']['character']['replacements'] %}
 			<li><input type="text" name="quirk_from" size="4" value="{{replacement[0]}}"> to <input type="text" name="quirk_to" size="4" value="{{replacement[1]}}"> <a href="#" class="deleteReplacement">x</a></li>
 			{% endfor %}
 			{% else %}
@@ -99,20 +107,19 @@
 	<p><audio id="backgroundAudio" src="" autoplay loop controls></audio></p>
 </form>
 
-<form id="controls" class="controls">
+<form id="controls">
 	<a href="#" id="hidePreview">[hide]</a>
 	<div id="preview"></div>
 	<input type="text" id="textInput" name="textInput" autocomplete="off" maxlength="1500">
 	<button type="button" id="disconnectButton">Abscond</button>
-	<button type="button" id="idleButton">Idle</button>
-	<button type="button" id="userListButton">Users</button>
+	<button type="button" id="userListButton">User list</button>
 	<button type="button" id="settingsButton">Settings</button>
-	{% if meta['chat'] %}<a id="logLink" class="aButton" target="_blank" href="{{url_for("log.view_log", chat=meta['chat'])}}">Log</a>{% endif %}
+	<a id="logLink" target="_blank">Log</a>
 	<button type="submit">Send</button>
 </form>
 
 <div id="save">
-	{% if meta['chat'] %}<p> <a href="{{url_for("log.view_log", chat=meta['chat'])}}">View log</a> </p>{% endif %}
+	{% if chat_meta['chat'] %}<p> <a href="{{url_for("log.view_log", chat=chat_meta['chat'])}}">View log</a> </p>{% endif %}
 </div>
 
 {% raw %}
@@ -125,13 +132,11 @@
 {{/each}}
 </script>
 {% endraw %}
-
 {% endblock %}
-
 {% block scripts %}
 <script>
 	require(['erigam'], function(erigam) {
-		erigam.chat({{meta|tojson|safe}});
+		erigam.chat({{chat_meta|tojson|safe}});
 	});
 </script>
 {% endblock %}

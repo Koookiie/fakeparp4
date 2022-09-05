@@ -10,7 +10,7 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'bootstrap'], functi
 	var text_preview_container = $('#color-preview');
 
 	// You need cookies to use this site.
-	if (document.cookie === "") {
+	if (!window.navigator.cookieEnabled) {
 		$('<p class="error">').text("It seems you have cookies disabled. Unfortunately cookies are essential for MSPARP to work, so you'll need to either enable them or add an exception in order to use MSPARP.").appendTo(document.body);
 	}
 

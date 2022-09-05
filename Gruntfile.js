@@ -1,3 +1,5 @@
+const sass = require('node-sass');
+
 module.exports = function(grunt) {
 
 	var rjsconfig = {
@@ -33,11 +35,15 @@ module.exports = function(grunt) {
 			}
 		},
 		sass: {
+			options: {
+				implementation: sass,
+				sourceMap: false
+			},
 			dist: {
-				files: {
-					'build/home.css': 'erigam/static/scss/home.scss',
-					'build/chat.css': 'erigam/static/scss/chat.scss'
-				}
+				files: [
+					{"build/home.css": "erigam/static/scss/home.scss"},
+					{"build/chat.css": "erigam/static/scss/chat.scss"}
+				]
 			}
 		},
 		cssmin: {

@@ -1,16 +1,16 @@
 {
   "name": "erigam",
   "version": "1.0.0",
-  "dependencies": {},
   "devDependencies": {
-    "bower": "^1.4.1",
-    "grunt": "^0.4.5",
-    "grunt-contrib-cssmin": "^0.14.0",
-    "grunt-contrib-requirejs": "^0.4.4",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-sass": "^1.0.0"
+    "bower": "^1.8.14",
+    "grunt": "^1.5.3",
+    "grunt-contrib-cssmin": "^4.0.0",
+    "grunt-contrib-requirejs": "^1.0.0",
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-sass": "^3.1.0",
+    "node-sass": "^7.0.1"
   },
   "scripts": {
-    "postinstall": "bash node_modules/.bin/bower cache clean && bash node_modules/.bin/bower update"
+    "postinstall": "bower cache clean && bower update"
   }
 }

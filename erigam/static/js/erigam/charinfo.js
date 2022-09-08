@@ -50,6 +50,7 @@ define("erigam/charinfo", ['jquery', 'erigam/characters'], function($, character
             };
             window.setTimeout(slide_in, 100);
         });
+		$('#isonlineblock .isonlinechar').show();
         $('#isonlineblock span[data-count="0"]').hide();
         if(!($('input[name="picky"]')).is(':checked')) {
             $('#isonlineblock .iofiltered').hide();

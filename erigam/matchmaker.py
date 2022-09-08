@@ -68,18 +68,19 @@ if __name__=='__main__':
                         and sessions[m]['id'] not in already_matched
                     ):
                         compatible, selected_options = check_compatibility(sessions[n], sessions[m])
-                        print(compatible, selected_options)
                         if not compatible:
                             continue
                         chat = str(uuid.uuid4()).replace('-','')
                         redis.hset('chat.'+chat+'.meta', 'type', 'unsaved')
-                        if len(selected_options)>0:
-                            option_text = ', '.join(OPTION_LABELS[_] for _ in selected_options)
-                            redis.rpush(
-                                'chat.'+chat,
-                                str(int(time.time()))+',-1,message,000000,This is a '+option_text+' chat.'
-                            )
                         log = api.chat.create(db, redis, chat, 'saved')
+                        if len(selected_options)>0:
+                            option_text = ', '.join([OPTION_LABELS[o] for o in selected_options])
+                            send_message(db, redis, Message(
+                                log_id=log.id,
+                                type="message",
+                                counter=-1,
+                                text='This is a '+option_text+' chat.'
+                            ))
                         matchdata = {
                             "chat": chat,
                             "log": log.id

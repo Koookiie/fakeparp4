@@ -54,13 +54,16 @@ define("erigam/charinfo", ['jquery', 'erigam/characters'], function($, character
         $('#isonlineblock span[data-count="0"]').hide();
         if(!($('input[name="picky"]')).is(':checked')) {
             $('#isonlineblock .iofiltered').hide();
+		    $('#isonlineblock .isonlinechar').show();
+            $('#isonlineblock span[data-count="0"]').hide();
         } else {
-            $('#isonlineblock .iofiltered').show();
+            $('#isonlineblock .isonlinechar').hide();
             var pickySync = $('#picky-icon input[class="butty"]')
 			var i=0;
 			for (i=0; i<pickySync.length; i++) {
 				if($(pickySync[i]).is(':checked')) {
 					var client = $('#isonlineblock span[data-char="' + $(pickySync[i]).attr('name') + '"]');
+                    console.log(client.data("count"));
 					if(client.data("count") == 0){
 						client.hide();
 					} else {

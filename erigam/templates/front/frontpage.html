@@ -130,10 +130,10 @@ You completely need javascript for this site. Turn it on or upgrade to a real br
 
 <div id="picky-icon">
 	{% for group in groups %}
-		<div class="checkbox_outer"><label class="picky-header"><input type="checkbox" class="boxy" id="group-{{group|lower}}" name="group-{{group|lower}}"><span class="checky"></span> {{group}}</label></div>
+		<div class="checkbox_outer"><label class="picky-header"><input type="checkbox" class="boxy" id="group-{{group|lower}}" name="group-{{group|lower}}" {% if "group-"+group|lower in picky %} checked="checked" {% endif %}><span class="checky"></span> {{group}}</label></div>
 		<div class="picky-group">
 		{% for char in characters[group] %}
-		<div class="checkbutton_outer"><label><input type="checkbox" class="butty" name="picky-{{char|lower}}" {% if char|lower in picky %}
+		<div class="checkbutton_outer"><label><input type="checkbox" class="butty" data-group="group-{{group|lower}}" name="picky-{{char|lower}}" {% if char|lower in picky %}
 				checked="checked" {% endif %} title="{{char}}"><span class="charbut char{{char.replace(" ", "").replace("(", "").replace(")", "").replace("/", "")|lower}}" title="{{char}}"></span><span class="chartip">{{char}}</span></label></div>
 		{% endfor %} 
 		</div>
@@ -142,10 +142,10 @@ You completely need javascript for this site. Turn it on or upgrade to a real br
 
 <div id="picky-text">
     {% for group in groups %}
-		<div class="checkbox_outer"><label class="picky-header"><input type="checkbox" id="group-{{group|lower}}" class="boxy" name="group-{{group|lower}}"><span class="checky"></span> {{group}}:</label></div>
+		<div class="checkbox_outer"><label class="picky-header"><input type="checkbox" id="group-{{group|lower}}" class="boxy" name="group-{{group|lower}}" {% if "group-"+group|lower in picky %} checked="checked" {% endif %}><span class="checky"></span> {{group}}:</label></div>
 		<div class="picky-group">
 		{% for char in characters[group] %}
-		<div class="checkbox_outer"><label><input type="checkbox" class="boxy" name="picky-{{char|lower}}" {% if char|lower in picky %}
+		<div class="checkbox_outer"><label><input type="checkbox" class="boxy" data-group="group-{{group|lower}}" name="picky-{{char|lower}}" {% if char|lower in picky %}
 				checked="checked" {% endif %} ><span class="checky"></span> {{char}}</label></div>
 		{% endfor %} 
 		</div>

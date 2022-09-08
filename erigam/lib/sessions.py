@@ -183,8 +183,12 @@ class Session(object):
         picky_key = self.prefix+'.picky'
         self.redis.delete(picky_key)
         chars = self.picky = set(k[6:] for k in form.keys() if k.startswith('picky-'))
+        groups = self.picky = set(k for k in form.keys() if k.startswith('group-'))
         if len(CHARACTER_DETAILS)>len(chars)>0:
             self.redis.sadd(picky_key, *chars)
+            if len(groups) > 0:
+                self.redis.sadd(picky_key, *groups)
+
         # Other options
         option_key = self.prefix+'.picky-options'
         for option in ['para', 'nsfw']:

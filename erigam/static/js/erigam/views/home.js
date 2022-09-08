@@ -27,7 +27,6 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 	}
 
 	$('select[name="character"]').change(function() {
-		console.log("test");
 		if(characters[this.value]) {
 			var newCharacter = characters[this.value];
 			config.find('#color-preview #quote').text(newCharacter['quote']);
@@ -64,36 +63,38 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 				enablePicky('#picky-icon');
 				$('#picky-icon').hide();
 				$('#picky-text').show();
-				} else {
+			} else {
 				disablePicky('#picky-icon');
 				enablePicky('#picky-text');
 				$('#picky-icon').show();
 				$('#picky-text').hide();
 			}
 		if (localStorage.isonline == 'display'){
-				$('#isonlineblock').show()}
-				else{
-				$('#isonlineblock').hide()
-			}
+			$('#isonlineblock').show()
+		}else{
+			$('#isonlineblock').hide()
+		}
 	}
 	
 	$('input[name="astext"]').change(function() {
-			if($(this).is(':checked')) {
-				disablePicky('#picky-icon');
-				enablePicky('#picky-text');
-				$('#picky-icon').hide();
-				$('#picky-text').show();
-				if (storage){
-				localStorage.setItem('pstyle', 'text');}
-			} else {
-				disablePicky('#picky-text');
-				enablePicky('#picky-icon');
-				$('#picky-icon').show();
-				$('#picky-text').hide();
-				if (storage){
-				localStorage.setItem('pstyle', 'icon');}
+		if($(this).is(':checked')) {
+			disablePicky('#picky-icon');
+			enablePicky('#picky-text');
+			$('#picky-icon').hide();
+			$('#picky-text').show();
+			if (storage){
+				localStorage.setItem('pstyle', 'text');
 			}
-		}).change();
+		} else {
+			disablePicky('#picky-text');
+			enablePicky('#picky-icon');
+			$('#picky-icon').show();
+			$('#picky-text').hide();
+			if (storage){
+				localStorage.setItem('pstyle', 'icon');
+			}
+		}
+	}).change();
 		
 	if(storage){	
 		if (localStorage.creppy == 'creppy'){
@@ -105,83 +106,90 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 			$('.hidecreppy').hide();
 		}
 	}
-		
-		$('input[name="enablecreppy"]').change(function() {
-			if($(this).is(':checked')) {
-				$('head').append('<link rel="stylesheet" id="creppyid" href="/static/css/mscreppy.css?41101" type="text/css" />');
-				$('.hidecreppy').show();
-				if (storage){
-				localStorage.setItem('creppy', 'creppy');}
-				} else {
+	
+	$('input[name="enablecreppy"]').change(function() {
+		if($(this).is(':checked')) {
+			$('head').append('<link rel="stylesheet" id="creppyid" href="/static/css/mscreppy.css?41101" type="text/css" />');
+			$('.hidecreppy').show();
+			if (storage){
+				localStorage.setItem('creppy', 'creppy');
+			}
+			} else {
 				$("#creppyid").prop('disabled', true);
 				$("#creppyid").remove();
 				$('.hidecreppy').hide();
-				if (storage){
-				localStorage.setItem('creppy', '');}
+			if (storage){
+				localStorage.setItem('creppy', '');
 			}
-		}).change();
+		}
+	}).change();
 
 
 	if(storage){	
 		if (localStorage.charbar == 'enabled'){
 		    $('input[name="headerchar"]').prop('checked',true);
 			$('#charbar').addClass("show");
-			}
-		else {}
+		}
 	}
 		
-		$('input[name="headerchar"]').change(function() {
-			if($(this).is(':checked')) {
-				$('#charbar').addClass("show");
-				if (storage){
-				localStorage.setItem('charbar', 'enabled');}
-				} else {
-				$('#charbar').removeClass("show");;
-				if (storage){
-				localStorage.setItem('charbar', '');}
+	$('input[name="headerchar"]').change(function() {
+		if($(this).is(':checked')) {
+			$('#charbar').addClass("show");
+			if (storage){
+				localStorage.setItem('charbar', 'enabled');
 			}
-		}).change();
+		} else {
+			$('#charbar').removeClass("show");
+			if (storage){
+				localStorage.setItem('charbar', '');
+			}
+		}
+	}).change();
 
 		
 	if (storage){	
 		if (localStorage.dfall == 'downfall'){
 			$('input[name="toggledownfall"]').prop('checked',true);
-			}
+		}
 
-	$('body').addClass(localStorage.dfall);
+		$('body').addClass(localStorage.dfall);
 	}
 		
 	$('input[name="toggledownfall"]').change(function() {
-			if($(this).is(':checked')) {
-				$('body').addClass('downfall');
-				if (storage){
-				localStorage.setItem('dfall', 'downfall');}
-				} else {
-				$('body').removeClass('downfall');
-				if (storage){
-				localStorage.setItem('dfall', '');}
+		if($(this).is(':checked')) {
+			$('body').addClass('downfall');
+			if (storage){
+				localStorage.setItem('dfall', 'downfall');
 			}
-		}).change();
+			} else {
+			$('body').removeClass('downfall');
+			if (storage){
+				localStorage.setItem('dfall', '');
+			}
+		}
+	}).change();
 		
 	if (storage){
 		if (localStorage.wopt == 'wrapopt'){
 			$('input[name="wrapbutton"]').prop('checked',true);
-			}
+		}
 	
 		$('.optionswrap').addClass(localStorage.wopt);
 	}
 	
 	$('input[name="wrapbutton"]').change(function() {
-			if($(this).is(':checked')) {
-				$('.optionswrap').addClass('wrapopt');
-				if (storage){
-				localStorage.setItem('wopt', 'wrapopt');}
-				} else {
-				$('.optionswrap').removeClass('wrapopt');
-				if (storage){
-				localStorage.setItem('wopt', '');}
-				}
-		}).change();
+		if($(this).is(':checked')) {
+			$('.optionswrap').addClass('wrapopt');
+			if (storage){
+				localStorage.setItem('wopt', 'wrapopt');
+			}
+		} else {
+			$('.optionswrap').removeClass('wrapopt');
+			if (storage){
+				localStorage.setItem('wopt', '');
+			}
+		}
+	}).change();
 		
 		
 		
@@ -207,10 +215,8 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 				else{
 				localStorage.setItem('isonline', 'display');
 				$('#isonlineblock').show()}
-		}
-		else
-		{
-		$('#isonlineblock').toggle()
+		} else {
+			$('#isonlineblock').toggle()
 		}
 	});
 
@@ -225,16 +231,64 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 	}
 	
 	$('#picky-matches input').change(function() {
-		var pickySync = $('input[name="'+ $(this).attr('name') +'"]')
-		if($(this).is(':checked')) {
-			for (i=0; i<pickySync.length; i++) {
-				$(pickySync[i]).prop('checked', true);}
-				$('#isonlineblock span[data-char="' + $(this).attr('name') + '"]').show();
+		if(settingUp) {
+			return;
+		}
+		var pickyGroup = $('input[id="' + $(this).attr('data-group') + '"]')
+		var pickyChars = null;
+		if(pickyGroup.length == 0) {
+			pickyChars = $('input[data-group="' + $(this).attr('id') +'"]');
 		} else {
-			for (var i=0; i<pickySync.length; i++) {
-				$(pickySync[i]).prop('checked', false);}
+			pickyChars = $('input[data-group="' + $(this).attr('data-group') + '"]');
+		}
+
+		if(pickyChars.length == 0) {
+			pickyChars = $('input[data-group="'+ $(this).attr('id') +'"]');
+		}
+		if(pickyChars.length == 0) {
+			return;
+		}
+
+		var charSync = $('input[name="'+ $(this).attr('name') +'"]');
+		var groupSync = $('input[id="'+ $(this).attr('id') + '"]');
+		var isChecked = $(this).prop('checked');
+
+		console.log(charSync);
+		console.log(groupSync);
+
+		charSync.each(function() {
+			$(this).prop('checked', isChecked);
+		});
+
+		groupSync.each(function() {
+			$(this).prop('checked', isChecked);
+		});
+
+		if(pickyGroup.length == 0) {
+			if($(this).prop('checked')){
+				pickyChars.prop('checked', true);
+			} else {
+				pickyChars.prop('checked', false);
+			}
+		} else {
+			if($(this).is(':checked')) {
+				$('#isonlineblock span[data-char="' + $(this).attr('name') + '"]').show();
+			} else {
 				$('#isonlineblock span[data-char="' + $(this).attr('name') + '"]').hide();
+			}
+			var allChecked = true;
+			pickyChars.each(function() {
+				if($(this).is(':checked') == false) {
+					allChecked = false;
+					return;
 				}
+			});
+			if(allChecked) {
+				pickyGroup.prop('checked', true);
+			} else {
+				pickyGroup.prop('checked', false);
+			}
+		}
 	}).change();
 	
 	$('input[name="picky"]').change(function() {
@@ -244,7 +298,7 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 			$('#picky-matches').show();
 			if (storage){
 				if (localStorage.pstyle == 'text'){
-					$('input[name="astext"]').prop('checked',true);
+						$('input[name="astext"]').prop('checked',true);
 					}
 				}
 		} else {
@@ -262,21 +316,21 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 	});
 
 	$('.menubutton').click(function() {
-	$('#nav').toggleClass('is-open');
+		$('#nav').toggleClass('is-open');
 	});
 	
 	$('label.picky-header input').click(function() {
 		var checks = $(this.parentNode.parentNode).next('div.picky-group').find('input');
 		if (this.checked) {
-			for (i=0; i<checks.length; i++) {
+			for (var i=0; i<checks.length; i++) {
 			var pickySync = $('input[name="'+ $(checks[i]).attr('name') +'"]')
-			pickySync.attr('checked','checked');
+				pickySync.attr('checked','checked');
 			}
 		}
 		 else {
-			for (i=0; i<checks.length; i++) {
+			for (var i=0; i<checks.length; i++) {
 			var pickySync = $('input[name="'+ $(checks[i]).attr('name') +'"]')
-			pickySync.val([]);
+				pickySync.val([]);
 			}
 		}
 		updateIsonline();
@@ -298,28 +352,6 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 		if (storage){
 		localStorage.setItem('hdpi', '');
 		}
-	});
-	
-	function setGroupInput(groupDiv) {
-		var label = $(groupDiv).prev('label.picky-header').find('input')[0];
-		var group = $(groupDiv).find('input');
-		var groupChecked = $(groupDiv).find('input:checked');
-		if (groupChecked.length==0) {
-			$(label).removeAttr('checked').removeAttr('indeterminate');
-		} else if (groupChecked.length==group.length) {
-			$(label).removeAttr('indeterminate').attr('checked','checked');
-		} else {
-			$(label).removeAttr('checked').attr('indeterminate','indeterminate');
-		}
-	}
-
-	var pickyGroups = $('div.picky-group');
-	for (var i=0; i<pickyGroups.length; i++) {
-		setGroupInput(pickyGroups[i]);
-	}
-
-	$('div.picky-group input').click(function() {
-		setGroupInput(this.parentNode.parentNode);
 	});
 
 	$('div.defaults-off').hide();

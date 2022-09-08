@@ -13,6 +13,7 @@ blueprint = Blueprint('main', __name__)
 # Helper functions
 
 def show_homepage(error):
+    print(g.redis.smembers(g.user.prefix+'.picky'))
     return render_template('front/frontpage.html',
         error=error,
         replacements=json.loads(g.user.character['replacements']),
@@ -24,7 +25,7 @@ def show_homepage(error):
         characters=CHARACTERS,
         users_searching=g.redis.zcard('searchers'),
         users_chatting=g.redis.scard('sessions-chatting'),
-        message=g.redis.get('front_message') or "Blame Nepeat",
+        message=g.redis.get('front_message') or "Blame Hex",
     )
 
 @blueprint.route("/")

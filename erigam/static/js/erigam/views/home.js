@@ -196,14 +196,14 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 	function disablePicky(pickyid) {
 		var pickyInputs = $(pickyid + ' input');
 		for (var i=0; i<pickyInputs.length; i++) {
-				$(pickyInputs[i]).prop('disabled', true);
+			$(pickyInputs[i]).prop('disabled', true);
 		}
 	}
 	
 	function enablePicky(pickyid) {
 		var pickyInputs = $(pickyid + ' input');
 		for (var i=0; i<pickyInputs.length; i++) {
-				$(pickyInputs[i]).prop('disabled', false);
+			$(pickyInputs[i]).prop('disabled', false);
 		}
 	}
 	
@@ -211,10 +211,11 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 		if (storage){
 			if (localStorage.isonline == 'display'){
 				localStorage.setItem('isonline', '');
-				$('#isonlineblock').hide()}
-				else{
+				$('#isonlineblock').hide()
+			} else {
 				localStorage.setItem('isonline', 'display');
-				$('#isonlineblock').show()}
+				$('#isonlineblock').show()
+			}
 		} else {
 			$('#isonlineblock').toggle()
 		}
@@ -222,11 +223,22 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 
 	function updateIsonline() {
 		$('#isonlineblock .isonlinechar').hide();
-		var pickySync = $('#picky-icon input[class="butty"]')
-		for (i=0; i<pickySync.length; i++) {
-			if($(pickySync[i]).is(':checked')) {
-				$('#isonlineblock span[data-char="' + $(pickySync[i]).attr('name') + '"]').show();
-			}	
+		if(!($('input[name="picky"]')).is(':checked')) {
+			$('#isonlineblock .isonlinechar').show();
+			$('#isonlineblock span[data-count="0"]').hide();
+        } else {
+			var pickySync = $('#picky-icon input[class="butty"]')
+			var i=0;
+			for (i=0; i<pickySync.length; i++) {
+				if($(pickySync[i]).is(':checked')) {
+					var client = $('#isonlineblock span[data-char="' + $(pickySync[i]).attr('name') + '"]');
+					if(client.data("count") == 0){
+						client.hide();
+					} else {
+						client.show();
+					}
+				}	
+			}
 		}
 	}
 	
@@ -253,9 +265,6 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 		var groupSync = $('input[id="'+ $(this).attr('id') + '"]');
 		var isChecked = $(this).prop('checked');
 
-		console.log(charSync);
-		console.log(groupSync);
-
 		charSync.each(function() {
 			$(this).prop('checked', isChecked);
 		});
@@ -271,11 +280,6 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 				pickyChars.prop('checked', false);
 			}
 		} else {
-			if($(this).is(':checked')) {
-				$('#isonlineblock span[data-char="' + $(this).attr('name') + '"]').show();
-			} else {
-				$('#isonlineblock span[data-char="' + $(this).attr('name') + '"]').hide();
-			}
 			var allChecked = true;
 			pickyChars.each(function() {
 				if($(this).is(':checked') == false) {
@@ -289,6 +293,7 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 				pickyGroup.prop('checked', false);
 			}
 		}
+		updateIsonline();
 	}).change();
 	
 	$('input[name="picky"]').change(function() {
@@ -307,6 +312,7 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 			$('#picky-matches').hide();
 			$('#picky-matches input').removeAttr('checked').removeAttr('indeterminate');
 		}
+		updateIsonline();
 	}).change();
 
 	$('button.show-button').click(function() {

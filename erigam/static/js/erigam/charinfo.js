@@ -33,8 +33,9 @@ define("erigam/charinfo", ['jquery', 'erigam/characters'], function($, character
                     return a.replace(x, x.toUpperCase());
                 });
                 var escapedname = name.replace(/[()/\s]/g, '');
+                var visibility = 'style="display: none;"'
                 colorspans = colorspans + '<span class="slidein" id="character' + escapedname + '" style="width:' + percent + '%;background-color:#' + characters[name].color + '" title="' + uppername + '"></span>';
-                isonlinespans = isonlinespans + '<span class="isonlinechar" data-char="picky-' + name + '"><span class="charbut char' + escapedname + '" title="' + uppername + '"></span> x ' + current + '</span>'
+                isonlinespans = isonlinespans + '<span '+ visibility +' class="isonlinechar" data-char="picky-' + name + '" data-count="'+ current +'"><span class="charbut char' + escapedname + '" title="' + uppername + '"></span> x ' + current + '</span>'
                 $('.charbut.char' + escapedname).attr('title', uppername + ' (' + current + ' online)');
                 $('.charbut.char' + escapedname + ' + .chartip').html(uppername + ' (' + current + ' online)');
             } catch (e) {
@@ -49,14 +50,23 @@ define("erigam/charinfo", ['jquery', 'erigam/characters'], function($, character
             };
             window.setTimeout(slide_in, 100);
         });
-
-		$('#charbar').html(colorspans);
-		$('#isonlineblock').html(isonlinespans);
-		$(function(){
-		   function slide_in(){
-			  $('#charbar span').removeClass("slidein");
-		   };
-			window.setTimeout( slide_in, 100 ); 
-		});
+        $('#isonlineblock span[data-count="0"]').hide();
+        if(!($('input[name="picky"]')).is(':checked')) {
+            $('#isonlineblock .iofiltered').hide();
+        } else {
+            $('#isonlineblock .iofiltered').show();
+            var pickySync = $('#picky-icon input[class="butty"]')
+			var i=0;
+			for (i=0; i<pickySync.length; i++) {
+				if($(pickySync[i]).is(':checked')) {
+					var client = $('#isonlineblock span[data-char="' + $(pickySync[i]).attr('name') + '"]');
+					if(client.data("count") == 0){
+						client.hide();
+					} else {
+						client.show();
+					}
+				}	
+			}
+        }
 	});
 });

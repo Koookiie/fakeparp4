@@ -20,6 +20,7 @@ def show_homepage(error):
         tag_text=g.redis.get(g.user.prefix+'.tag-text') or "",
         picky=g.redis.smembers(g.user.prefix+'.picky') or set(),
         picky_options=g.redis.hgetall(g.user.prefix+'.picky-options') or {},
+        blacklist=g.redis.smembers(g.user.prefix+'.picky-blacklist') or set(),
         case_options=CASE_OPTIONS,
         groups=CHARACTER_GROUPS,
         characters=CHARACTERS,

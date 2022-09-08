@@ -183,7 +183,7 @@ class Session(object):
         picky_key = self.prefix+'.picky'
         self.redis.delete(picky_key)
         chars = self.picky = set(k[6:] for k in form.keys() if k.startswith('picky-'))
-        groups = self.picky = set(k for k in form.keys() if k.startswith('group-'))
+        groups = self.picky | set(k for k in form.keys() if k.startswith('group-'))
         if len(CHARACTER_DETAILS)>len(chars)>0:
             self.redis.sadd(picky_key, *chars)
             if len(groups) > 0:
@@ -196,6 +196,16 @@ class Session(object):
                 self.redis.hset(option_key, option, int(form[option]))
             else:
                 self.redis.hdel(option_key, option)
+
+        # Blacklist stuff
+        blacklist_key = self.prefix+'.picky-blacklist'
+        if "blacklist" in form:
+            blacklist = set([_ for _ in form.getlist("blacklist") if _!=''])
+            print(blacklist)
+            if len(blacklist) > 0:
+                self.redis.sadd(blacklist_key, *blacklist)
+            else:
+                self.redis.delete(blacklist_key)
 
     def set_chat(self, chat):
         self.chat = chat

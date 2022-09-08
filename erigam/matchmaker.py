@@ -33,7 +33,39 @@ def check_compatibility(first, second):
             selected_options.append(option+first_option)
         elif second_option is not None:
             selected_options.append(option+second_option)
-    compatible = first['char'] in second['wanted_chars'] and second['char'] in first['wanted_chars']
+    blacklist_compatible = True
+
+    for item in first['blacklist']:
+        if item.lower() in second['meta']['acronym'].lower():
+            blacklist_compatible = False
+            break
+        if item.lower() in second['meta']['name'].lower():
+            blacklist_compatible = False
+            break
+        if item.lower() in second['meta']['quirk_prefix'].lower():
+            blacklist_compatible = False
+            break
+        if item.lower() in second['meta']['quirk_suffix'].lower():
+            blacklist_compatible = False
+            break
+    
+    for item in second['blacklist']:
+        if not blacklist_compatible:
+            break
+        if item.lower() in first['meta']['acronym'].lower():
+            blacklist_compatible = False
+            break
+        if item.lower() in first['meta']['name'].lower():
+            blacklist_compatible = False
+            break
+        if item.lower() in first['meta']['quirk_prefix'].lower():
+            blacklist_compatible = False
+            break
+        if item.lower() in first['meta']['quirk_suffix'].lower():
+            blacklist_compatible = False
+            break
+    
+    compatible = first['char'] in second['wanted_chars'] and second['char'] in first['wanted_chars'] and blacklist_compatible
     if first['lastmatched'] == None or second['lastmatched'] == None:
         pass
     elif first['lastmatched'] == second['id'] and second['lastmatched'] == first['id']:
@@ -54,15 +86,16 @@ if __name__=='__main__':
             sessions = [{
                 'id': session_id,
                 'char': redis.hget('session.'+session_id, 'character'),
+                'meta': redis.hgetall('session.'+session_id),
                 'wanted_chars': redis.smembers('session.'+session_id+'.picky') or all_chars,
                 'options': redis.hgetall('session.'+session_id+'.picky-options'),
+                'blacklist': redis.smembers('session.'+session_id+'.picky-blacklist') or set(),
                 'lastmatched': redis.get('session.'+session_id+'.matched'),
             } for session_id in searchers]
 
             already_matched = set()
             for n in range(len(sessions)):
                 for m in range(n+1, len(sessions)):
-                    print(sessions[n]['id'], sessions[m]['id'])
                     if (
                         sessions[n]['id'] not in already_matched
                         and sessions[m]['id'] not in already_matched
@@ -70,6 +103,8 @@ if __name__=='__main__':
                         compatible, selected_options = check_compatibility(sessions[n], sessions[m])
                         if not compatible:
                             continue
+                        else:
+                            print("Match found between %s and %s" % (sessions[n]['id'], sessions[m]['id']))
                         chat = str(uuid.uuid4()).replace('-','')
                         redis.hset('chat.'+chat+'.meta', 'type', 'unsaved')
                         log = api.chat.create(db, redis, chat, 'saved')

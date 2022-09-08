@@ -124,6 +124,23 @@ You completely need javascript for this site. Turn it on or upgrade to a real br
 	</div>
  </div>
 <input type="hidden" name="save_pickiness" value="true">
+<label for="blacklist-show">Blacklist</label>
+<button name="blacklist-show" data-target="blacklist" class="show-button"> SET ⋮ </button><br />
+<div id="blacklist" class="blackist-contents defaults-off">
+	<div class="tableForm">
+		<ul id="blacklistValues">
+			{% if blacklist|length!=0 %}
+				{% for item in blacklist %}
+					<li><input type="text" name="blacklist" size="31" value="{{item}}"><a href="#" class="deleteBlacklistItem">x</a></li>
+				{% endfor %}
+			{% else %}
+				<li><input type="text" name="blacklist" size="31"><a href="#" class="deleteBlacklistItem">x</a></li>
+			{% endif %}
+		</ul>
+		<a href="#" class="linkButton" id="addBlacklistItem">Add</a> <a href="#" class="linkButton" id="clearBlacklist">Clear</a>
+	</div>
+</div>
+
 <div class="checkbox_outer"><label><input type="checkbox" class="boxy" name="picky" {% if picky|length!=0 %}checked="checked" {%endif%}	/><span class="checky"></span> Look for or exclude specific characters</label></div>
 <div id="picky-matches">
 <div class="checkbox_outer"><label><input type="checkbox" class="boxy showtext" name="astext" /><span class="checky"></span> Show as text</label></div><br>
@@ -151,11 +168,9 @@ You completely need javascript for this site. Turn it on or upgrade to a real br
 		</div>
 	{% endfor %}
 </div>
-
 </div>
 </div>
 </div>
-
 <div class="optionswrap">
 <ul id="saveOptions">
 <li><input type="submit" name="search" class="redbutton" value="==> Enter"></li>

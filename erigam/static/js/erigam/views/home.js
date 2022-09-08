@@ -355,6 +355,37 @@ define("erigam/views/home", ['jquery', 'erigam/characters', 'erigam/charinfo'], 
 	});
 
 	$('div.defaults-off').hide();
+
+	function deleteBlacklistItem(e) {
+		$(this.parentNode).remove();
+		var container = $("#blacklistValues");
+		if(container.children().length == 0) {
+			addBlacklistItem();
+		}
+		return false;
+	}
+
+	function addBlacklistItem(e, item) {
+		var newItem = $('<li><input type="text" name="blacklist" size="31"><a href="#" class="deleteBlacklistItem">x</a></li>');
+		if (item) {
+			var input = $(newItem).find('input');
+			input.value = item;
+		}
+		$(newItem).find('.deleteBlacklistItem').click(deleteBlacklistItem);
+		$(newItem).appendTo('#blacklistValues');
+		return false;
+	}
+
+	function clearBlacklist() {
+		$('#blacklistValues').empty();
+		addBlacklistItem();
+		return false;
+	}
+
+	$('.deleteBlacklistItem').click(deleteBlacklistItem);
+	$('#addBlacklistItem').click(addBlacklistItem);
+	$('#clearBlacklist').click(clearBlacklist);
+
 	settingUp=false;
 
 	return {

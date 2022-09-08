@@ -1,14 +1,13 @@
 {% extends "front/base.html" %}
 {% block front_content %}
+<form method="post" action="{{url_for('main.save')}}" >
 <div class="blockwrapper">
 <!-- ### append error messages into this <p> -->
 <p class="error"></p>
 <noscript>
 You completely need javascript for this site. Turn it on or upgrade to a real browser.
 </noscript>
-
 <div class="number-of-users">
-	<form method="post" action="{{url_for('main.save')}}" >
 	<p id="numberUsers"><span class="bigtext">PARP server is <span id="serverstatus"><span class="ok">running</span></span>.</span><br><br> <a class="isonlinetoggle" onclick="">{{users_searching+users_chatting}} clients connected</a><br>{{users_chatting}} connections established, {{users_searching}} pending</p>
 	<br><div class="checkbox_outer"><label><input type="checkbox" class="boxy wrapbutton" name="wrapbutton"/><span class="checky"></span> wrap chat buttons under quirks</label></div><br>	
 	<div class="checkbox_outer"><label><input type="checkbox" class="boxy showheaderchar" name="headerchar"/><span class="checky"></span> show character usage in header</label></div><br>	
@@ -160,15 +159,15 @@ You completely need javascript for this site. Turn it on or upgrade to a real br
 <div class="optionswrap">
 <ul id="saveOptions">
 <li><input type="submit" name="search" class="redbutton" value="==> Enter"></li>
-<li><input type="submit" name="save" value="Save info"><br><input type="submit" name="create" value="Create group chat"> <input type="text" class="gname" name="chaturl" placeholder="Chat URL" maxlength="100"></li>
+<li><input type="submit" id="save" name="save" value="Save info"><br><input type="submit" name="create" value="Create group chat"> <input type="text" class="gname" name="chaturl" placeholder="Chat URL" maxlength="100"></li>
 </ul>{% if error=="chaturl_taken" %}
 <span class="error">The chat URL you specified has already been taken.</span>{% elif error=="chaturl_invalid" %}
 <span class="error">The chat URL you specified is invalid. Chat URLs can only contain letters, numbers, hyphens and underscores.</span>{% endif %}
 </div>
 </div>
 
-</form>
 </div>
+</form>
 {% endblock %}
 {% block scripts %}
 <script>

@@ -25,7 +25,7 @@ define("erigam/messages", ['jquery', 'erigam/settings', 'erigam/bbcode'], functi
 
 			if (msg.acronym) msg.text = msg.acronym + ": " + msg.text;
 			
-			message = bbcode.encode(msg.text, msg.admin);
+			message = bbcode.encode(bbcode.raw_encode(msg.text), msg.admin);
 
 			var mp = $('<p>').addClass(msgClass).addClass("message").attr('title', msgClass).css('color', '#'+msg.color);
 			mp.append($("<span>").addClass("text").html(message));

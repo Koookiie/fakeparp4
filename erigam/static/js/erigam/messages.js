@@ -24,15 +24,12 @@ define("erigam/messages", ['jquery', 'erigam/settings', 'erigam/bbcode'], functi
 			}
 
 			if (msg.acronym) msg.text = msg.acronym + ": " + msg.text;
-
-			if (settings.get("bbcodeon") == 1) {
-				message = bbcode.encode(msg.text, msg.admin);
-			} else {
-				message = bbcode.remove(msg.text);
-			}
+			
+			message = bbcode.encode(msg.text, msg.admin);
 
 			var mp = $('<p>').addClass(msgClass).addClass("message").attr('title', msgClass).css('color', '#'+msg.color);
 			mp.append($("<span>").addClass("text").html(message));
+			
 
 			// Timestamp
 			var date = new Date(msg.timestamp * 1000);
@@ -48,6 +45,14 @@ define("erigam/messages", ['jquery', 'erigam/settings', 'erigam/bbcode'], functi
 			if (settings.get("sysnot") && msgClass == 'system') $('.system').hide();
 
 			if (at_bottom) this.scroll_bottom();
+
+			$('.spoiler').on('click', function() {
+				if ($(this).css('opacity') == '0') {
+					$(this).css('opacity','1');
+				} else {
+					$(this).css('opacity','0');
+				}
+			});
 
 			return mp;
 		}

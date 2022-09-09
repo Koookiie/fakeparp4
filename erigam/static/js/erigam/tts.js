@@ -57,7 +57,9 @@ define("erigam/tts", ['jquery', 'erigam/helpers', 'erigam/settings'], function($
 			return;
 		}
 
-		var text = $(event.target).find('.text').text();
+		var element_clone = $(event.target).find('.text').clone();
+		$(element_clone).find('.spoiler').remove();
+		var text = element_clone.text();
 		text = text.substring(text.indexOf(":") + 1);
 		if (text.includes("◖(◕ω◕)◗ < ")) {
 			text = text.replace("◖(◕ω◕)◗ < ", "");

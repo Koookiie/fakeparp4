@@ -164,7 +164,14 @@ define("erigam/views/chat", [
 
 			// Topic
 			if (typeof data.meta.topic!=='undefined') {
-				$('#topic').html(bbcode.encode(data.meta.topic));
+				$('#topic').html(bbcode.encode(data.meta.topic, false));
+				$('.spoiler').on('click', function() {
+					if ($(this).css('opacity') == '0') {
+						$(this).css('opacity','1');
+					} else {
+						$(this).css('opacity','0');
+					}
+				});
 			} else {
 				$('#topic').text('');
 			}
@@ -404,8 +411,15 @@ define("erigam/views/chat", [
 		}
 
 		if (textPreview.length>0) {
-			$('#preview').html(bbcode.encode(textPreview));
+			$('#preview').html(bbcode.encode(textPreview, user.meta.group=="globalmod"));
 			// $('#preview').text(textPreview);
+			$('.spoiler').on('click', function() {
+				if ($(this).css('opacity') == '0') {
+					$(this).css('opacity','1');
+				} else {
+					$(this).css('opacity','0');
+				}
+			});
 		} else {
 			$('#preview').html('&nbsp;');
 		}
@@ -603,6 +617,14 @@ define("erigam/views/chat", [
 			}
 		}
 	});
+
+	$('.spoiler').on('click', function() {
+        if ($(this).css('opacity') == '0') {
+            $(this).css('opacity','1');
+        } else {
+            $(this).css('opacity','0');
+        }
+    });
 
 	// ;)
 	/*

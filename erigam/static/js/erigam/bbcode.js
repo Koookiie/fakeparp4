@@ -1,73 +1,96 @@
 define("erigam/bbcode", ['jquery', 'erigam/helpers'], function($, helpers) {
 	"use strict";
-
-	var tag_properties = {bgcolor: "background-color", color: "color", font: "font-family", bshadow: "box-shadow", tshadow: "text-shadow"};
-
 	return {
-		encode: function(text, admin) {
-			return this.raw_encode(helpers.html_encode(text), admin);
-		},
-		raw_encode: function(text, admin) {
-			var self = this;
+		encode: function (S, isglobal) {
 
-			text = text.replace(/(\[br\])+/g, "<br>");
-			return text.replace(/(https?:\/\/\S+)|\[([A-Za-z]+)(?:=([^\]]+))?\]([\s\S]*?)\[\/\2\]/g, function(str, url, tag, attribute, content) {
-				if (url) {
-					var suffix = "";
-					// Exclude a trailing closing bracket if there isn't an opening bracket.
-					if (url[url.length - 1] == ")" && url.indexOf("(") == -1) {
-						url = url.substr(0, url.length-1);
-						suffix = ")";
-					}
-					return $("<a>").attr({href: url, target: "_blank"}).text(url)[0].outerHTML + suffix;
-				}
-				tag = tag.toLowerCase();
-				if (attribute) {
-					switch (tag) {
-						case "bgcolor":
-						case "color":
-						case "font":
-							return $("<span>").css(tag_properties[tag], attribute).html(self.raw_encode(content, admin))[0].outerHTML;
-						case "bshadow":
-						case "tshadow":
-							return $("<span>").css(tag_properties[tag], attribute).html(self.raw_encode(content, admin))[0].outerHTML;
-						case "url":
-							if (attribute.substr(0, 7) == "http://" || attribute.substr(0, 8) == "https://") {
-								return $("<a>").attr({href: attribute, target: "_blank"}).html(self.raw_encode(content, admin))[0].outerHTML;
-							}
-							break;
-					}
+			if (S.indexOf('[') < 0 || S.indexOf(']') < 0) return S;
+		
+			if(typeof(isglobal)==='undefined') isglobal = false;
+			
+			S = S.replace(/\[(font|color|bgcolor|tshadow|bshadow)=([^\]]+)]/gi, function(one,two,three) {
+				if (isglobal == true){
+					three = three;
 				} else {
-					switch (tag) {
-						case "b":
-						case "del":
-						case "i":
-						case "sub":
-						case "sup":
-						case "u":
-						case "s":
-							return "<" + tag + ">" + self.raw_encode(content, admin) + "</" + tag + ">";
-						case "spoiler":
-							return "<label class=\"spoiler\"><input type=\"checkbox\"><span>SPOILER</span> <span>" + self.raw_encode(content, admin) + "</span></label>";
-						case "raw":
-							return content;
-						case "audio":
-							// _autoplay_ must be replaced because of how creating the string puts the element in the DOM.
-							return window.legacy_bbcode || admin ? $("<audio>").attr("src", content).attr("_autoplay_", "autoplay").attr("controls", "controls").attr("preload", "none")[0].outerHTML.replace("_autoplay_", "autoplay") : self.raw_encode(content, admin);
-						case "img":
-							return window.legacy_bbcode || admin ? $("<img>").attr("src", content).attr("width", 300).css("max-width", "100%")[0].outerHTML : self.raw_encode(content, admin);
-					}
+					three = three.replace(/["';{}]/gi, "");
 				}
-				return "[" + tag + (attribute ? "=" + attribute : "") + "]" + self.raw_encode(content, admin) + "[/" + tag + "]";
+				return "["+two+"="+three+"]";
 			});
+			
+		
+			var BR = true;
+			while (BR == true) {
+				BR = false;
+				S = S.replace(/\[br]\s?\[br]/gi, function(w) {
+					if (w) { BR = true; }
+					return '[br]';
+				});
+			}
+		
+			function X(p, f) {return new RegExp(p, f)}
+			function D(s) {return rD.exec(s)}
+			function R(s) {return s.replace(rB, P);}
+			function A(s, p) {for (var i in p) s = s.replace(X(i, 'g'), p[i]); return s;}
+		
+			function P($0, $1, $2, $3) {
+				if ($3 && $3.indexOf('[') > -1) $3 = R($3);
+				var linkint = ($2||$3).trim();
+				linkint = linkint.replace(/javascript/gi, "");
+				linkint = linkint.replace(/["';{}]/g, "");
+				$2 = linkint;
+				switch ($1) {
+					case 'url':case 'email': return '<a target="_blank" '+ L[$1] + $2 +'">'+ $3 +'</a>';
+					case 'pad': return '<span class="padded">'+ $3 +'</span>';
+					case 'spoiler': return '<span class="spoil"><span class="spoiler">'+ $3 +'</span></span>';
+					case 'b':case 'i':case 'u':case 's':case 'sup':case 'sub': return '<'+ $1 +'>'+ $3 +'</'+ $1 +'>';
+				}
+				return '['+ $1 + ']'+ $3 +'[/'+ $1 +']';
+			}
+		
+			var C = {code: [{'\\[': '&#91;', ']': '&#93;'}, '', '']};
+			var rB = X('\\[([a-z][a-z0-9]*)(?:=([^\\]]+))?]((?:.|[\r\n])*?)\\[/\\1]', 'g'), rD = X('^(\\d+)x(\\d+)$');
+			var L = {url: 'href="', email: 'href="mailto: '};
+			if (isglobal==true){
+				var F = {font: 'font-family:$1', color: 'color:$1', bgcolor: 'background-color:$1', tshadow: 'line-height:20px;text-shadow:$1', bshadow: 'line-height:20px;box-shadow:$1'};
+			} else {
+				var F = {font: 'font-family:$1', color: 'color:$1', bgcolor: 'background-color:$1', tshadow: '', bshadow: ''};
+			}
+			var I = {}, B = {};
+		
+			for (var i in C) I['\\[('+ i +')]((?:.|[\r\n])*?)\\[/\\1]'] = function($0, $1, $2) {return C[$1][1] + A($2, C[$1][0]) + C[$1][2]};
+			for (var i in F) {B['\\['+ i +'=([^\\]]+)]'] = '<span style="'+ F[i] +'">'; B['\\[/'+ i +']'] = '</span>';}
+			B['\\[(br)]'] = '<$1 />';
+		
+			var result = R(A(A(S, I), B));
+			return result;
 		},
-		remove: function(text) {
-			var self = this;
-
-			text = text.replace(/(\[br\])+/g, "");
-			return text.replace(/\[([A-Za-z]+)(?:=[^\]]+)?\]([\s\S]*?)\[\/\1\]/g, function(str, tag, content) {
-				return self.remove(content);
-			});
+		raw_encode: function (value){
+			//create a in-memory div, set it's inner text(which jQuery automatically encodes)
+			//then grab the encoded contents back out.  The div never exists on the page.
+			return $('<div/>').text(value).html();
+		},
+		remove: function (S) {
+			if (S.indexOf('[') < 0 || S.indexOf(']') < 0) return S;
+		
+			function X(p, f) {return new RegExp(p, f)}
+			function D(s) {return rD.exec(s)}
+			function R(s) {return s.replace(rB, P)}
+			function A(s, p) {for (var i in p) s = s.replace(X(i, 'g'), p[i]); return s;}
+		
+			function P($0, $1, $2, $3) {
+				if ($3 && $3.indexOf('[') > -1) $3 = R($3);
+				switch ($1) {
+					case 'pad': return '$3';
+				}
+				return '['+ $1 + ']'+ $3 +'[/'+ $1 +']';
+			}
+		
+			var rB = X('\\[([a-z][a-z0-9]*)(?:=([^\\]]+))?]((?:.|[\r\n])*?)\\[/\\1]', 'g'), rD = X('^(\\d+)x(\\d+)$');
+			var F = {font: 'font-family:$1', color: 'color:$1', bgcolor: 'background-color:$1', tshadow: 'text-shadow:$1', bshadow: 'box-shadow:$1'};
+			var I = {}, B = {};
+		
+			for (var i in F) {B['\\['+ i +'=([^\\]]+)]'] = ''; B['\\[/'+ i +']'] = '';}
+			var result = R(A(A(S, I), B));
+			return result;
 		}
-	};
+	}
 });

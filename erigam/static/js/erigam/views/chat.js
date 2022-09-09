@@ -413,7 +413,7 @@ define("erigam/views/chat", [
 		if (textPreview.length>0) {
 			$('#preview').html(bbcode.encode(bbcode.raw_encode(textPreview), user.meta.group=="globalmod"));
 			// $('#preview').text(textPreview);
-			$('.spoiler').on('click', function() {
+			$('#preview .spoiler').on('click', function() {
 				if ($(this).css('opacity') == '0') {
 					$(this).css('opacity','1');
 				} else {

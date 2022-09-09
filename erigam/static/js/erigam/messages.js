@@ -29,6 +29,13 @@ define("erigam/messages", ['jquery', 'erigam/settings', 'erigam/bbcode'], functi
 
 			var mp = $('<p>').addClass(msgClass).addClass("message").attr('title', msgClass).css('color', '#'+msg.color);
 			mp.append($("<span>").addClass("text").html(message));
+			mp.find(".spoiler").on('click', function() {
+				if ($(this).css('opacity') == '0') {
+					$(this).css('opacity','1');
+				} else {
+					$(this).css('opacity','0');
+				}
+			});
 			
 
 			// Timestamp
@@ -45,14 +52,6 @@ define("erigam/messages", ['jquery', 'erigam/settings', 'erigam/bbcode'], functi
 			if (settings.get("sysnot") && msgClass == 'system') $('.system').hide();
 
 			if (at_bottom) this.scroll_bottom();
-
-			$('.spoiler').on('click', function() {
-				if ($(this).css('opacity') == '0') {
-					$(this).css('opacity','1');
-				} else {
-					$(this).css('opacity','0');
-				}
-			});
 
 			return mp;
 		}

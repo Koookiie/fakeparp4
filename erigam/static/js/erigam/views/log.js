@@ -8,11 +8,19 @@ define("erigam/views/log", ['jquery', 'erigam/bbcode'], function($, bbcode) {
 			$('#archiveConversation p').each(function() {
 				var line;
 				if (bbcodeon == 1) {
-					line = bbcode.raw_encode($(this).html());
+					line = bbcode.encode($(this).html());
 					$(this).html(line);
 				} else {
 					line = bbcode.remove($(this).html());
 					$(this).text(line);
+				}
+			});
+
+			$('.spoiler').on('click', function() {
+				if ($(this).css('opacity') == '0') {
+					$(this).css('opacity','1');
+				} else {
+					$(this).css('opacity','0');
 				}
 			});
 		}

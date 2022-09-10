@@ -77,10 +77,6 @@ def connect_redis():
 def create_session():
     if request.endpoint == "static":
         return
-
-    # Do not bother allowing the user in if they are globalbanned.
-    if g.redis.sismember("globalbans", request.headers.get('X-Forwarded-For', request.remote_addr)):
-        abort(403)
     
     # VPN prevention
     if g.redis.sismember("vpn-ips", request.headers.get('X-Forwarded-For', request.remote_addr)):
@@ -113,6 +109,10 @@ def create_session():
 
     # Log their IP address.
     g.redis.hset('session.'+g.user.session_id+'.meta', 'last_ip', g.user.ip)
+
+    # Reject banned users
+    if g.user.global_banned and not g.user.globalmod:
+        abort(423)
 
 
 # After request

@@ -1,0 +1,12 @@
+{% extends 'errors/base.html' %}
+
+{% block title: %}Locked - {% endblock %}
+
+{% block error %}
+	<p>You have been banned from Dreambubble for the following reason:</p>
+	<blockquote>"{{g.user.global_ban_reason}}"</blockquote>
+	<p>If you believe this is in error or otherwise wish to appeal your ban, please email <a href="mailto:appeals@dreamubbble.xyz">appeals@dreamubbble.xyz</a></p>
+	<p>Or fill out this <a href="https://help.dreambubble.xyz/help/1667071270" target="_blank">appeal ticket form</a></p>
+	<p>Include your current IP: {{g.user.ip}}</p>
+	<p>Ensure you check the Junk folder for confirmation</p>
+{% endblock %}

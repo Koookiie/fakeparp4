@@ -13,7 +13,6 @@ blueprint = Blueprint('main', __name__)
 # Helper functions
 
 def show_homepage(error):
-    print(g.redis.smembers(g.user.prefix+'.picky'))
     return render_template('front/frontpage.html',
         error=error,
         replacements=json.loads(g.user.character['replacements']),
@@ -66,6 +65,11 @@ def get_chats():
     return render_template('front/groups.html',
         active_pub=public_chats
     )
+
+# Rules
+@blueprint.route("/rules")
+def get_rules():
+    return render_template("front/rules.html")
 
 # Searching
 

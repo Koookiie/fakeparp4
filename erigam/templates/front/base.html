@@ -21,11 +21,11 @@
  </li>
  <!-- ### Links need inserting here to populate the menu -->
 	<li>
-		<a class="rules" href="https://guides.mxrp.chat/rules.html" target="_blank">Rules
+		<a class="rules{{' active' if page == 'rules'}}" href="{{url_for('main.get_rules')}}" target="_blank">Rules
 		</a>
 	</li>
 	<li>
-		<a class="groups new{{' active' if page == 'groups'}}" href="{{url_for('main.get_chats')}}">Groups
+		<a class="groups{{' active' if page == 'groups'}}" href="{{url_for('main.get_chats')}}">Groups
 		</a>
 	</li>
 	{% if g.user and g.user.globalmod %}
@@ -36,6 +36,7 @@
 				<a {% if page == 'allchats' %}class="active"{% endif %} href="{{url_for('admin.all_chats')}}">All Chats</a>
                 <a {% if page == 'changemsg' %}class="active"{% endif %} href="{{url_for('admin.messages')}}">Front Message</a>
                 <a {% if page == 'broadcast' %}class="active"{% endif %} href="{{url_for('admin.broadcast')}}">Broadcast</a>
+				<a {% if page == 'globalbans' %}class="active"{% endif %} href="{{url_for('admin.global_bans')}}">Global Bans</a>
                 <a {% if page == 'allbans' %}class="active"{% endif %} href="{{url_for('admin.all_bans')}}">All Bans</a>
                 <a {% if page == 'panda' %}class="active"{% endif %} href="{{url_for('admin.panda')}}">Panda</a>
                 <a {% if page == 'vpnbans' %}class="active"{% endif %} href="{{url_for('admin.vpn_bans')}}">VPN Bans</a>

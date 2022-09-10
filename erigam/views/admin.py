@@ -72,6 +72,31 @@ def broadcast():
         result=result
     )
 
+@blueprint.route('/globalbans', methods=['GET', 'POST'])
+@require_admin
+@use_db
+def global_bans():
+    result = None
+
+    if "ip" in request.form:
+        ip = request.form['ip']
+        action = request.form.get("action", None)
+        reason = request.form.get("reason", "No reason.")
+
+        if action == "add":
+            g.redis.hset("punish-bans", ip, reason)
+            result = "Ban added on %s!" % (ip)
+        elif action == "remove":
+            g.redis.hdel("punish-bans", ip)
+            result = "Ban removed on %s!" % (ip)
+
+    bans = g.redis.hgetall('punish-bans')
+
+    return render_template('admin/globalbans.html',
+        lines=bans,
+        result=result
+    )
+
 @blueprint.route('/allbans', methods=['GET', 'POST'])
 @require_admin
 @use_db

@@ -41,7 +41,7 @@ hr {
 	border-width: 1px 0 0 0;
 }
 
-button, input, select, #conversation, #settings, #userList, #preview, .pager, #archiveConversation, #logLink {
+button, input, select, #conversation, #settings, #userList, #preview, .pager, #archiveConversation, #logLink, #reportLink {
 	border: 1px solid #999999;
 	border-radius: 1px;
 }
@@ -50,11 +50,11 @@ button, input, select, #conversation, #settings, #userList, #preview, .pager, #a
 	background-color: #eeeeee;
 }
 
-button, input, select, #logLink {
+button, input, select, #logLink, #reportLink {
 	background-color: rgba(255,255,255,0.8);
 }
 
-input[type="submit"], button, #logLink {
+input[type="submit"], button, #logLink, #reportLink {
 	display: inline-block;
 	padding: 2px 4px;
 	cursor: pointer;
@@ -74,7 +74,7 @@ optgroup option {
 	padding: 0 10px;
 }
 
-input:focus, input:hover, select:focus, select:hover, button:hover, #logLink:hover {
+input:focus, input:hover, select:focus, select:hover, button:hover, #logLink:hover, #reportLink:hover {
 	background-color: #ffffff;
 }
 
@@ -190,7 +190,7 @@ body.withSidebar #controls {
 	right: 233px;
 }
 
-#controls input[type="submit"], #controls button, #logLink {
+#controls input[type="submit"], #controls button, #logLink, #reportLink {
 	margin: 5px 0 0 0;
 }
 
@@ -229,7 +229,7 @@ body > #save {
 	display: none;
 }
 
- #disconnectButton, #settingsButton, #userListButton, #controls #logLink, button[type="submit"]
+ #disconnectButton, #settingsButton, #userListButton, #controls #logLink, #reportLink, button[type="submit"]
  {font-weight:bold;line-height:14px;padding: 4px 10px;}
 
 /* Sidebars */
@@ -334,11 +334,11 @@ label {
 	margin: 0 0 0 2px;
 }
 
-#logLink {
+#logLink, #reportLink {
 	color: black;
 }
 
-#logLink:hover {
+#logLink:hover, #reportLink:hover{
 	text-decoration: none;
 }
 
@@ -353,7 +353,7 @@ body.mobile .sidebar {
 	width: auto;
 }
 
-body.mobile #disconnectButton, body.mobile #settingsButton, body.mobile #userListButton, body.mobile #controls #logLink, body.mobile button[type="submit"]
+body.mobile #disconnectButton, body.mobile #settingsButton, body.mobile #userListButton, body.mobile #controls #logLink, body.mobile #controls #reportLink, body.mobile button[type="submit"]
  {font-weight:bold;line-height:1em;padding: 2px;}
 
 body.mobile .sidebar .close {

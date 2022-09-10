@@ -77,6 +77,10 @@ app.register_blueprint(log.blueprint)
 def notfound_error(e):
     return render_template("errors/404.html"), 404
 
+@app.errorhandler(423)
+def forbidden_error(e):
+    return render_template("errors/423.html"), 423
+
 if not app.config['DEBUG']:
     @app.errorhandler(Exception)
     def production_error(e):

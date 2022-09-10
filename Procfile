@@ -6,3 +6,4 @@ reaper: python3.10 erigam/reaper.py
 live: python3.10 erigam/nado_istyping.py
 spamless: python3.10 erigam/extras/usertrack.py
 modsummon: python3.10 erigam/extras/modsummon.py
+release: alembic upgrade head

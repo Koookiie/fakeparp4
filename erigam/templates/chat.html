@@ -115,6 +115,7 @@
 	<button type="button" id="userListButton">User list</button>
 	<button type="button" id="settingsButton">Settings</button>
 	{% if chat_meta['chat'] %}<a id="logLink" href="{{url_for("log.view_log", chat=chat_meta['chat'], page=None)}}" target="_blank">Log</a>{% endif %}
+	<a id="reportLink" href="https://help.dreambubble.xyz/help/4199820444?f[name]=Anonymous&f[message]=Chat%20URL%3A%20%0AUser%20Number%3A%20" target="_blank">Report</a>
 	<button type="submit">Send</button>
 </form>
 

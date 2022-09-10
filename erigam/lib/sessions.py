@@ -50,6 +50,9 @@ class Session(object):
         self.original_prefix = 'session.'+self.session_id
         self.original_meta_prefix = self.original_prefix+'.meta'
 
+        self.global_banned = redis.hexists('punish-bans', self.ip)
+        self.global_ban_reason = self.redis.hget('punish-bans', self.ip) or "No reason specified"
+
         # Load metadata and character data.
         if chat is not None:
             self.prefix = self.original_prefix+'.chat.'+chat

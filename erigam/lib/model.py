@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import backref, relation, scoped_session, sessionmaker
 from sqlalchemy.schema import Index
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, ForeignKey, Integer, String, Unicode, UnicodeText, DateTime, Enum, Boolean
+from sqlalchemy import Column, ForeignKey, Integer, String, Unicode, UnicodeText, DateTime, Enum, Boolean, Sequence
 
 import datetime
 import os
@@ -73,7 +73,8 @@ class ChatSession(Base):
 
 class Ban(Base):
     __tablename__ = 'bans'
-    id = Column(Integer, primary_key=True)
+    id_seq = Sequence('bans_id_seq')
+    id = Column(Integer, id_seq, server_default=id_seq.next_value())
     url = Column(String(100), ForeignKey('logs.url'), primary_key=True)
     ip = Column(Unicode, nullable=False)
     name = Column(Unicode(100))
